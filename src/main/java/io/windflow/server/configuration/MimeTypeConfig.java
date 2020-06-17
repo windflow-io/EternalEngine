@@ -6,7 +6,7 @@ import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerF
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class WebServerConfig implements WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> {
+public class MimeTypeConfig implements WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> {
 
     @Override
     public void customize(ConfigurableServletWebServerFactory factory) {

@@ -1,4 +1,4 @@
-import Vue from '../vendor/vue/vue.esm.browser.js';
+import Vue from '/vendor/vue/vue.esm.browser.js';
 
 new Vue({
     el: '#app',
