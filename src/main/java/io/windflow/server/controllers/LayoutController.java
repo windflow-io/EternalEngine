@@ -7,12 +7,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class ComponentController {
+public class LayoutController {
 
-    @RequestMapping(value = "/api/components/{filename:^.+\\.mjs$}", produces = "text/javascript")
+    @RequestMapping(value = "/api/layouts/{filename:^.+\\.html$}", produces = "text/html")
     @ResponseBody
     public String mjs(@PathVariable("filename") String filename) {
-        String reader = StubReader.loadStub("/stubs/components/" + filename);
+        String reader = StubReader.loadStub("/stubs/layouts/" + filename);
         return reader;
     }
 
