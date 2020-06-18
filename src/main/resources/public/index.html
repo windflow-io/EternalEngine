@@ -1,13 +1,14 @@
-<html>
+<!doctype html>
+<html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>TailwindCSS</title>
+        <title>Windflow.io</title>
         <link rel="stylesheet" href="/vendor/tailwindcss/tailwind.min.css">
+        <link rel="icon" type="image/png" href="/img/favicon-32x32.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="/img/favicon-16x16.png" sizes="16x16" />
     </head>
     <body>
-        <div id="app" class="container mx-auto">
-            {{message}}
-        </div>
+        <component :is="component"></component>
         <script type="module" src="/app/windflow.mjs"></script>
     </body>
 </html>

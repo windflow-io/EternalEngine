@@ -19,7 +19,4 @@ public class WebController {
         return "forward:/";
     }
 
-
-
-
 }
