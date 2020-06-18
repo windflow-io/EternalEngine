@@ -1,0 +1,13 @@
+{
+    "components": [
+        {
+            "area": "menuArea",
+            "component": "side-menu"
+        },
+        {
+            "area": "contentArea",
+            "component": "main-content"
+
+        }
+    ]
+}
