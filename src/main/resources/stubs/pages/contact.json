@@ -1,7 +1,7 @@
 {
     "metaData": {
-        "title": "Home",
-        "description": "This is the home page",
+        "title": "Contact",
+        "description": "This is the contact page",
         "httpStatus": "200"
     },
     "components": [
@@ -11,7 +11,7 @@
         },
         {
             "area": "contentArea",
-            "components": ["header-home", "lipsum-content"]
+            "components": ["header-contact"]
         }
     ]
 }
