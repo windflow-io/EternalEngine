@@ -6,7 +6,7 @@
         },
         {
             "area": "contentArea",
-            "component": "main-content"
+            "component": "hello-world"
 
         }
     ]
