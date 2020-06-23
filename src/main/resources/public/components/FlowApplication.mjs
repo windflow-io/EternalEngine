@@ -4,9 +4,7 @@ export default {
     name: 'FlowApplication',
     template: `
         <div>
-            {{domain}} - {{path}}
             <component :is="layoutComponent"/>
-            Which is: {{layoutComponent}}
         </div>
      `,
     data() {
@@ -30,3 +28,5 @@ export default {
     }
 }
 // https://vueschool.io/articles/vuejs-tutorials/enhance-router-to-work-with-spas/
+// https://github.com/vitejs/vite
+// https://github.com/vuejs/vitepress/blob/master/src/client/app/router.ts
