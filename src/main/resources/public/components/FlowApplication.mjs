@@ -1,15 +1,24 @@
+import Vue from '/vendor/vue/vue.esm.browser.js';
 
-import {loadComponent} from '/modules/windflowUtils.mjs';
 export default {
     name: 'FlowApplication',
     template: `
         <div>
             {{domain}} - {{path}}
-            <flow-layout/>
+            <component :is="layoutComponent"/>
+            Which is: {{layoutComponent}}
         </div>
      `,
+    data() {
+        return {
+            layoutComponent: null
+        }
+    },
     beforeMount() {
-        loadComponent('FlowLayout', '/components/FlowLayout.mjs', '/api/layouts/sidebar-layout.html')
+        import('/api/components/left-menu-layout.mjs').then((module)=>{
+            Vue.component('LeftMenuLayout', module.default);
+            this.layoutComponent = module.default.name;
+        });
     },
     computed: {
         'domain' : function () {
