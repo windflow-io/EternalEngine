@@ -6,12 +6,12 @@
     },
     "components": [
         {
-            "area": "menuArea",
-            "component": "side-menu"
+            "area": "left",
+            "components": ["side-menu"]
         },
         {
-            "area": "contentArea",
-            "components": ["header-contact"]
+            "area": "right",
+            "components": ["header-contact", "main-contact"]
         }
     ]
 }

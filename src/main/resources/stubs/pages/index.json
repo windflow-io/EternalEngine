@@ -6,11 +6,11 @@
     },
     "components": [
         {
-            "area": "menuArea",
-            "component": "side-menu"
+            "area": "left",
+            "components": ["side-menu"]
         },
         {
-            "area": "contentArea",
+            "area": "right",
             "components": ["header-home", "lipsum-content"]
         }
     ]
