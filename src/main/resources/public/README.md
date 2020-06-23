@@ -14,9 +14,8 @@ These are general notes for Mark van Wyk. Required tests to make sure the new sy
  - Use Tomcat / Jetty compression through Spring (https://docs.spring.io/spring-boot/docs/2.0.0.RELEASE/reference/htmlsingle/#how-to-enable-http-response-compression)
 
 ## Tasks
-1. Routing
-2. Component Arrays
-3. (Component Loader)
+1. VueX Action (don't repeat yourself)
+2. Routing
 
    
 ## Predeploy

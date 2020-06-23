@@ -20,6 +20,11 @@ const store = new VueX.Store({
         setPageComponents(state, value) {
             state.pageComponents = value;
         }
+    },
+    actions: {
+        fetchPageData(context, commit) {
+            return new Promise((resolve, reject) => {fetch('/api/pages/' + document.location.href).then((response) => response.json()).then(data => resolve(data))})
+        }
     }
 })
 

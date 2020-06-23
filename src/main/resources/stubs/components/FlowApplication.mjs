@@ -6,7 +6,7 @@ export default {
         <div>
             <component :is="layoutComponent"/>
         </div>
-     `,
+    `,
     data() {
         return {
             layoutComponent: null
