@@ -13,8 +13,8 @@ export default {
         }
     },
     beforeMount() {
-        import('/api/components/left-menu-layout.mjs').then((module)=>{
-            Vue.component('LeftMenuLayout', module.default);
+        import('/api/components/LeftMenuLayout.mjs').then((module)=>{
+            Vue.component(module.default.name, module.default);
             this.layoutComponent = module.default.name;
         });
     },

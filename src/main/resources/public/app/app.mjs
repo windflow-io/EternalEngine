@@ -1,6 +1,6 @@
 import Vue from '/vendor/vue/vue.esm.browser.js';
 import VueX from '/vendor/vue/vuex.esm.browser.js'
-import FlowApplication from '/components/FlowApplication.mjs'
+import FlowApplication from '/api/components/FlowApplication.mjs'
 
 Vue.use(VueX);
 

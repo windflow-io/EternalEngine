@@ -7,11 +7,16 @@
     "components": [
         {
             "area": "left",
-            "components": ["side-menu"]
+            "components": [{"name":"SideMenu", "id":"6"}]
         },
         {
             "area": "right",
-            "components": ["header-about", "lipsum-content", "lipsum-content"]
+            "components":[
+                {"name":"HeaderAbout", "id":"7"},
+                {"name":"LipsumContent", "id":"8"},
+                {"name":"LipsumContent", "id":"9"}
+            ]
+
         }
     ]
 }

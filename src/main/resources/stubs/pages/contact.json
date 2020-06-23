@@ -7,11 +7,11 @@
     "components": [
         {
             "area": "left",
-            "components": ["side-menu"]
+            "components": [{"name":"SideMenu", "id":"4"}]
         },
         {
             "area": "right",
-            "components": ["header-contact", "main-contact"]
+            "components": [{"name":"HeaderContact", "id":"7"}, {"name":"MainContact", "id":"8"}]
         }
     ]
 }

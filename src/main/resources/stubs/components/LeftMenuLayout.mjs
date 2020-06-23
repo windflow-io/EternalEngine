@@ -1,5 +1,5 @@
 import Vue from '/vendor/vue/vue.esm.browser.js';
-import FlowArea from '/components/FlowArea.mjs'
+import FlowArea from '/api/components/FlowArea.mjs'
 
 export default {
     name: 'LeftMenuLayout',
