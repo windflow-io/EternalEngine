@@ -13,7 +13,6 @@ export default {
     template: '<div>{{name}}<br/><component :key="component.id" v-for="component in areaComponents" :is="component.name"/></div>',
     beforeMount() {
         this.$store.dispatch('fetchPageData', {host:this.host, path:this.path}).then(page => {
-            
             let components = page.components.find(e => e.area === this.name).components
             components.forEach(component => {
                 this.areaComponents.push(component)
