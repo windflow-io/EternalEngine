@@ -1,32 +1,41 @@
 import Vue from '/vendor/vue/vue.esm.browser.js';
+import {addUrlListener} from '/modules/history.mjs'
 
 export default {
     name: 'FlowApplication',
     template: `
         <div>
-            <component :is="layoutComponent"/>
+            <component :is="layoutComponent" :key="currentPath"/>          
         </div>
     `,
     data() {
         return {
-            layoutComponent: null
+            layoutComponent: null,
+            host: window.location.host,
+            path: window.location.pathname,
+            currentPath: window.location.pathname
         }
     },
-    beforeMount() {
-        import('/api/components/LeftMenuLayout.mjs').then((module)=>{
-            Vue.component(module.default.name, module.default);
-            this.layoutComponent = module.default.name;
-        });
+    created() {
+        addUrlListener(this.urlChanged);
     },
-    computed: {
-        'domain' : function () {
-            return location.host
+    beforeMount() {
+        this.pageLoad(this.host, this.path);
+    },
+    methods: {
+        urlChanged(current, previous) {
+            console.log (current, previous)
+            this.currentPath = current;
+            this.pageLoad(this.host, current);
         },
-        'path' : function() {
-            return location.pathname
+        pageLoad(host, path) {
+            this.$store.dispatch('fetchPageData', {host:host, path:path}).then(page => {
+                const layoutUrl = '/api/layouts/' + page.layout + '.mjs'
+                import(layoutUrl).then((module)=>{
+                    Vue.component(module.default.name, module.default);
+                    this.layoutComponent = module.default.name;
+                });
+            });
         }
     }
 }
-// https://vueschool.io/articles/vuejs-tutorials/enhance-router-to-work-with-spas/
-// https://github.com/vitejs/vite
-// https://github.com/vuejs/vitepress/blob/master/src/client/app/router.ts

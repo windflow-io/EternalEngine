@@ -4,6 +4,7 @@
         "description": "This is the home page",
         "httpStatus": "200"
     },
+    "layout": "LeftMenuLayout",
     "components": [
         {
             "area": "left",
@@ -13,5 +14,6 @@
             "area": "right",
             "components": [{"name":"HeaderHome", "id": "2"}, {"name":"LipsumContent", "id": "3"}]
         }
-    ]
+    ],
+    "data": {}
 }

@@ -4,6 +4,7 @@
         "description": "This is the contact page",
         "httpStatus": "200"
     },
+    "layout": "LeftMenuLayout",
     "components": [
         {
             "area": "left",
@@ -13,5 +14,6 @@
             "area": "right",
             "components": [{"name":"HeaderContact", "id":"7"}, {"name":"MainContact", "id":"8"}]
         }
-    ]
+    ],
+    "data": {}
 }

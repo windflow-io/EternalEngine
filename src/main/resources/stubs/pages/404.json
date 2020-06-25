@@ -3,5 +3,14 @@
         "title": "Not Found",
         "code": "404",
         "httpStatus": "200"
-    }
+    },
+    "layout": "StackedLayout",
+    "components": [
+        {
+            "area": "main",
+            "components":[
+                {"name":"Error404", "id":"9"}
+            ]
+        }],
+    "data": {}
 }

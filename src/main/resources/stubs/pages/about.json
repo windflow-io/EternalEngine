@@ -4,6 +4,7 @@
         "description": "This is the about page",
         "httpStatus": "200"
     },
+    "layout": "LeftMenuLayout",
     "components": [
         {
             "area": "left",
@@ -16,7 +17,7 @@
                 {"name":"LipsumContent", "id":"8"},
                 {"name":"LipsumContent", "id":"9"}
             ]
-
         }
-    ]
+    ],
+    "data": {}
 }

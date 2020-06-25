@@ -14,13 +14,18 @@ These are general notes for Mark van Wyk. Required tests to make sure the new sy
  - Use Tomcat / Jetty compression through Spring (https://docs.spring.io/spring-boot/docs/2.0.0.RELEASE/reference/htmlsingle/#how-to-enable-http-response-compression)
 
 ## Tasks
-1. VueX Action (don't repeat yourself)
-2. Routing
+1. VueX Action  (don't repeat yourself)
+2. Add the layout component name to the page data.
+3. Do the routing
+4. Where do we store the layouts
+5. How do we split between domains
+6. 404
+7. Title and Meta
 
-   
-## Predeploy
+   ## Predeploy
    1. Tomcat Compression!
    2. Module not found!
    3. Errors
    4. Preload MJS Components (server look through components one file export)
-``````
+   
+
