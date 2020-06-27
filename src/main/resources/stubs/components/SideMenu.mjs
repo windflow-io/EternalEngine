@@ -10,7 +10,6 @@ export default {
             <flow-link class="text-blue-500" to="/about">About</flow-link>
             <flow-link class="text-blue-500" to="/contact">Contact</flow-link>
             <flow-link class="text-blue-500" to="/poo">404</flow-link>
-            </section>
         </nav>
     `
 }

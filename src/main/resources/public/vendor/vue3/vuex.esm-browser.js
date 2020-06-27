@@ -3,7 +3,7 @@
  * (c) 2020 Evan You
  * @license MIT
  */
-import { inject, watch, reactive, computed } from 'vue';
+import { inject, watch, reactive, computed } from './vue.esm-browser.js';
 
 var storeKey = 'store';
 
@@ -286,10 +286,10 @@ var Store = function Store (options) {
   var this$1 = this;
   if ( options === void 0 ) options = {};
 
-  if (process.env.NODE_ENV !== 'production') {
-    assert(typeof Promise !== 'undefined', "vuex requires a Promise polyfill in this browser.");
-    assert(this instanceof Store, "store must be called with the new operator.");
-  }
+  // if (process.env.NODE_ENV !== 'production') {
+  //   assert(typeof Promise !== 'undefined', "vuex requires a Promise polyfill in this browser.");
+  //   assert(this instanceof Store, "store must be called with the new operator.");
+  // }
 
   var plugins = options.plugins; if ( plugins === void 0 ) plugins = [];
   var strict = options.strict; if ( strict === void 0 ) strict = false;
