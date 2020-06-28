@@ -1,6 +1,6 @@
 import FlowArea from '/api/components/FlowArea.mjs'
 export default {
-    name: 'LeftMenuLayout',
+    name: 'StackedLayout',
     components: {FlowArea},
     template:
         `<section class="flex flex-row h-screen bg-gray-900">

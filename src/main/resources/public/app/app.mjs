@@ -1,10 +1,21 @@
-import Vue from '/vendor/vue/vue.esm.browser.js';
-import VueX from '/vendor/vue/vuex.esm.browser.js'
+import { createApp } from '/vendor/vue3/vue.esm-browser.js';
+import VueX from '/vendor/vue3/vuex.esm-browser.js'
 import FlowApplication from '/api/components/FlowApplication.mjs'
 
-Vue.use(VueX);
+const registeredComponents = {};
 
-const store = new VueX.Store({
+async function loadComponent(url) {
+    const module = await import(url);
+
+    if (!registeredComponents[module.default.name]) {
+        app.component(module.default.name, module.default);
+        registeredComponents[module.default.name] = module.default;
+    }
+
+    return module.default.name;
+}
+
+const store = new VueX.createStore({
     state: {
         pageMeta: {
             title: null,
@@ -31,25 +42,28 @@ const store = new VueX.Store({
 
     },
     actions: {
-        fetchPageData({context, commit, state}, payload) {
-            return new Promise((resolve, reject) => {
-                fetch('/api/pages/' + payload.host + payload.path)
-                    .then((response) => response.json())
-                    .then(data => {
-                        commit('setPageMeta', data.metaData);
-                        commit('setPageLayout', data.layout);
-                        commit('setPageComponents', data.components);
-                        commit('setPageData', data.data);
-                        resolve(data);
-                    });
-            });
+        async fetchPageData({context, commit, state}, payload) {
+            const page = await fetch('/api/pages/' + payload.host + payload.path)
+                .then((response) => response.json());
+
+            commit('setPageMeta', page.metaData);
+            commit('setPageData', page.data);
+
+            const allComponents = [];
+            page.components.forEach(section => section.components.forEach(component => allComponents.push(component)));
+
+            const [layout, ...components] = await Promise.all([
+                loadComponent('/api/layouts/' + page.layout + '.mjs'),
+                ...allComponents.map(component => loadComponent('/api/components/' + component.name + '.mjs')),
+            ]);
+
+            commit('setPageLayout', page.layout);
+            commit('setPageComponents', page.components);
         }
     }
 })
 
-new Vue({
-    el: '#app',
-    store,
-    components: {FlowApplication},
-    template:'<flow-application/>',
-});
+const app = createApp(FlowApplication);
+app.use(store);
+
+app.mount(`#app`);

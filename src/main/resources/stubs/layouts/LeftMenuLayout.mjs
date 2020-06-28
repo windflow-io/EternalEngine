@@ -1,4 +1,5 @@
 import FlowArea from '/api/components/FlowArea.mjs'
+
 export default {
     name: 'LeftMenuLayout',
     components: {FlowArea},
