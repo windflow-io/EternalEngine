@@ -27,7 +27,6 @@ export default {
     },
     methods: {
         urlChanged(current, previous) {
-            console.log (current, previous)
             this.currentPath = current;
             this.pageLoad(this.host, current);
         },
