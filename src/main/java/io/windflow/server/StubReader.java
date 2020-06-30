@@ -18,6 +18,5 @@ public class StubReader {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-
     }
 }

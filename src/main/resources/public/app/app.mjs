@@ -2,6 +2,7 @@ import { createApp } from '/vendor/vue3/vue.esm-browser.js';
 import VueX from '/vendor/vue3/vuex.esm-browser.js'
 import FlowApplication from '/api/components/FlowApplication.mjs'
 
+
 const registeredComponents = {};
 
 async function loadComponent(url) {
