@@ -1,9 +1,11 @@
 import { createApp } from '/vendor/vue3/vue.esm-browser.js';
 import VueX from '/vendor/vue3/vuex.esm-browser.js'
-import FlowApplication from '/api/components/FlowApplication.mjs'
+import FlowApplication from '/api/components/windflowx/FlowApplication.mjs'
 
 
 const registeredComponents = {};
+
+/**@TODO: Move this to it's own place **/
 
 async function loadComponent(url) {
     const module = await import(url);
@@ -14,6 +16,14 @@ async function loadComponent(url) {
     }
 
     return module.default.name;
+}
+
+function removeNamespace(name) {
+    return name.substring(name.lastIndexOf(".") + 1)
+}
+
+function namespaceOnly(name) {
+    return name.substring(0, name.lastIndexOf("."));
 }
 
 const store = new VueX.createStore({
@@ -54,8 +64,8 @@ const store = new VueX.createStore({
             page.components.forEach(section => section.components.forEach(component => allComponents.push(component)));
 
             const [layout, ...components] = await Promise.all([
-                loadComponent('/api/layouts/' + page.layout + '.mjs'),
-                ...allComponents.map(component => loadComponent('/api/components/' + component.name + '.mjs')),
+                loadComponent('/api/layouts/' + namespaceOnly(page.layout) + '/' + removeNamespace(page.layout) + '.mjs'),
+                ...allComponents.map(component => loadComponent('/api/components/' + namespaceOnly(component.name)  + "/" + removeNamespace(component.name) + '.mjs')),
             ]);
 
             commit('setPageLayout', page.layout);

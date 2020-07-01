@@ -4,15 +4,15 @@
         "description": "This is the contact page",
         "httpStatus": "200"
     },
-    "layout": "LeftMenuLayout",
+    "layout": "windflowx.LeftMenuLayout",
     "components": [
         {
             "area": "left",
-            "components": [{"name":"SideMenu", "id":"4"}]
+            "components": [{"name":"localhost.SideMenu", "id":"4"}]
         },
         {
             "area": "right",
-            "components": [{"name":"HeaderContact", "id":"7"}, {"name":"MainContact", "id":"8"}]
+            "components": [{"name":"localhost.HeaderContact", "id":"7"}, {"name":"localhost.MainContact", "id":"8"}]
         }
     ],
     "data": {}

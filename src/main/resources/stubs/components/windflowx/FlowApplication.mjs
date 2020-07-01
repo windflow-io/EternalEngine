@@ -4,7 +4,7 @@ export default {
     name: 'FlowApplication',
     template: `
         <div>
-            <component :is="layoutComponent" :key="currentPath"/>          
+            <component :is="removeNamespace(layoutComponent)" :key="currentPath"/>          
         </div>
     `,
     data() {
@@ -32,6 +32,9 @@ export default {
         },
         pageLoad(host, path) {
             this.$store.dispatch('fetchPageData', {host:host, path:path});
+        },
+        removeNamespace(name) {
+            return name ? name.substring(name.lastIndexOf(".") + 1) : null;
         }
     }
 }

@@ -4,15 +4,15 @@
         "description": "This is the home page",
         "httpStatus": "200"
     },
-    "layout": "LeftMenuLayout",
+    "layout": "windflowx.LeftMenuLayout",
     "components": [
         {
             "area": "left",
-            "components": [{"name":"SideMenu", "id":"1"}]
+            "components": [{"name":"localhost.SideMenu", "id":"1"}]
         },
         {
             "area": "right",
-            "components": [{"name":"HeaderHome", "id": "2"}, {"name":"LipsumContent", "id": "3"}]
+            "components": [{"name":"localhost.HeaderHome", "id": "2"}, {"name":"localhost.LipsumContent", "id": "3"}]
         }
     ],
     "data": {}

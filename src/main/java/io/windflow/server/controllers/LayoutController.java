@@ -9,11 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class LayoutController {
 
-    @RequestMapping(value = "/api/layouts/{filename:^.+\\.mjs$}", produces = "application/javascript")
+    @RequestMapping(value = "/api/layouts/{namespace}/{filename:^.+\\.mjs$}", produces = "application/javascript")
     @ResponseBody
-    public String mjs(@PathVariable("filename") String filename) {
-        String reader = StubReader.loadStub("/stubs/layouts/" + filename);
-        return reader;
+    public String mjs(@PathVariable("namespace") String namespace, @PathVariable("filename") String filename) {
+        return StubReader.loadStub("/stubs/layouts/" + namespace + "/" + filename);
     }
-
 }

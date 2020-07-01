@@ -1,4 +1,4 @@
-import FlowArea from '/api/components/FlowArea.mjs'
+import FlowArea from '/api/components/windflowx/FlowArea.mjs'
 export default {
     name: 'StackedLayout',
     components: {FlowArea},

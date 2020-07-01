@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class ComponentController {
 
-    @RequestMapping(value = "/api/components/{filename:^.+\\.mjs$}", produces = "text/javascript")
+    @RequestMapping(value = "/api/components/{namespace}/{filename:^.+\\.mjs$}", produces = "text/javascript")
     @ResponseBody
-    public String mjs(@PathVariable("filename") String filename) {
-        String reader = StubReader.loadStub("/stubs/components/" + filename);
+    public String mjs(@PathVariable("namespace") String namespace, @PathVariable("filename") String filename) {
+
+        String reader = StubReader.loadStub("/stubs/components/" + namespace + "/" + filename);
         return reader;
     }
 

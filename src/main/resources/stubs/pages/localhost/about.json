@@ -4,18 +4,18 @@
         "description": "This is the about page",
         "httpStatus": "200"
     },
-    "layout": "LeftMenuLayout",
+    "layout": "windflowx.LeftMenuLayout",
     "components": [
         {
             "area": "left",
-            "components": [{"name":"SideMenu", "id":"6"}]
+            "components": [{"name":"localhost.SideMenu", "id":"6"}]
         },
         {
             "area": "right",
             "components":[
-                {"name":"HeaderAbout", "id":"7"},
-                {"name":"LipsumContent", "id":"8"},
-                {"name":"LipsumContent", "id":"9"}
+                {"name":"localhost.HeaderAbout", "id":"7"},
+                {"name":"localhost.LipsumContent", "id":"8"},
+                {"name":"localhost.LipsumContent", "id":"9"}
             ]
         }
     ],
