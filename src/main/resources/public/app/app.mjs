@@ -1,6 +1,6 @@
 import { createApp } from '/vendor/vue3/vue.esm-browser.js';
 import VueX from '/vendor/vue3/vuex.esm-browser.js'
-import FlowApplication from '/api/components/windflowx/FlowApplication.mjs'
+import {FlowApplication} from '/modules/coreComponents.mjs'
 import {removeNamespace, namespaceOnly, loadComponent} from '/modules/windflowUtils.mjs'
 
 const store = new VueX.createStore({

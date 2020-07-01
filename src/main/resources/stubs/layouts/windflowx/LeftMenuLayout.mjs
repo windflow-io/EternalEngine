@@ -1,4 +1,4 @@
-import FlowArea from '/api/components/windflowx/FlowArea.mjs'
+import {FlowArea} from '/modules/coreComponents.mjs'
 
 export default {
     name: 'LeftMenuLayout',
