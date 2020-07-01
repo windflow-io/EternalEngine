@@ -1,4 +1,4 @@
-import {pushUrl} from "/modules/history.mjs";
+import {pushUrl} from "/modules/windflowUtils.mjs";
 
 export default {
     name: 'FlowLink',

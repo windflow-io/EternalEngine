@@ -1,30 +1,7 @@
 import { createApp } from '/vendor/vue3/vue.esm-browser.js';
 import VueX from '/vendor/vue3/vuex.esm-browser.js'
 import FlowApplication from '/api/components/windflowx/FlowApplication.mjs'
-
-
-const registeredComponents = {};
-
-/**@TODO: Move this to it's own place **/
-
-async function loadComponent(url) {
-    const module = await import(url);
-
-    if (!registeredComponents[module.default.name]) {
-        app.component(module.default.name, module.default);
-        registeredComponents[module.default.name] = module.default;
-    }
-
-    return module.default.name;
-}
-
-function removeNamespace(name) {
-    return name.substring(name.lastIndexOf(".") + 1)
-}
-
-function namespaceOnly(name) {
-    return name.substring(0, name.lastIndexOf("."));
-}
+import {removeNamespace, namespaceOnly, loadComponent} from '/modules/windflowUtils.mjs'
 
 const store = new VueX.createStore({
     state: {
@@ -64,8 +41,8 @@ const store = new VueX.createStore({
             page.components.forEach(section => section.components.forEach(component => allComponents.push(component)));
 
             const [layout, ...components] = await Promise.all([
-                loadComponent('/api/layouts/' + namespaceOnly(page.layout) + '/' + removeNamespace(page.layout) + '.mjs'),
-                ...allComponents.map(component => loadComponent('/api/components/' + namespaceOnly(component.name)  + "/" + removeNamespace(component.name) + '.mjs')),
+                loadComponent(app, '/api/layouts/' + namespaceOnly(page.layout) + '/' + removeNamespace(page.layout) + '.mjs'),
+                ...allComponents.map(component => loadComponent(app, '/api/components/' + namespaceOnly(component.name)  + "/" + removeNamespace(component.name) + '.mjs')),
             ]);
 
             commit('setPageLayout', page.layout);

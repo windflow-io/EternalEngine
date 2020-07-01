@@ -1,3 +1,5 @@
+import {removeNamespace} from '/modules/windflowUtils.mjs'
+
 export default {
     name: 'FlowArea',
     data() {
@@ -15,9 +17,7 @@ export default {
     },
     methods: {
         /**@TODO: shove this in it's own place **/
-        removeNamespace(name) {
-            return name.substring(name.lastIndexOf(".") + 1)
-        }
+        removeNamespace: removeNamespace
     },
     template: '<div>{{name}}<br/><component :key="component.id" v-for="component in areaComponents" :is="removeNamespace(component.name)"/></div>',
 }

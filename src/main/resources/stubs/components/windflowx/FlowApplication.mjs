@@ -1,4 +1,6 @@
-import {addUrlListener} from '/modules/history.mjs'
+import {addUrlListener} from '/modules/windflowUtils.mjs'
+import {removeNamespace} from '/modules/windflowUtils.mjs'
+
 
 export default {
     name: 'FlowApplication',
@@ -33,8 +35,6 @@ export default {
         pageLoad(host, path) {
             this.$store.dispatch('fetchPageData', {host:host, path:path});
         },
-        removeNamespace(name) {
-            return name ? name.substring(name.lastIndexOf(".") + 1) : null;
-        }
+        removeNamespace: removeNamespace
     }
 }
