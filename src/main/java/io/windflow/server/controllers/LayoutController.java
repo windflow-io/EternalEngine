@@ -12,6 +12,6 @@ public class LayoutController {
     @RequestMapping(value = "/api/layouts/{namespace}/{filename:^.+\\.mjs$}", produces = "application/javascript")
     @ResponseBody
     public String mjs(@PathVariable("namespace") String namespace, @PathVariable("filename") String filename) {
-        return StubReader.loadStub("/stubs/layouts/" + namespace + "/" + filename);
+        return StubReader.loadStub("/stubs/layouts/" + namespace.toLowerCase() + "/" + filename);
     }
 }

@@ -13,7 +13,7 @@ public class ComponentController {
     @ResponseBody
     public String mjs(@PathVariable("namespace") String namespace, @PathVariable("filename") String filename) {
 
-        String reader = StubReader.loadStub("/stubs/components/" + namespace + "/" + filename);
+        String reader = StubReader.loadStub("/stubs/components/" + namespace.toLowerCase() + "/" + filename);
         return reader;
     }
 
