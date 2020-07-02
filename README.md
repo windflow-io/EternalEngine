@@ -25,13 +25,10 @@ The server-side application is Spring Boot, packaged in Gradle. Executing `./gra
     3. page data (lists of components for each area in the page) are stored in subfolder ./pages
     
 ### next steps
-1. Get the routing working (some kind of an pop state event listener needs to listen for route changes)
-2. The page (components and data) and layout need to update and re-render on route update
-3. Some kind of data needs to "populate" (components must be hydrated with content) from the page.  
+
+1. Some kind of data needs to "populate" (components must be hydrated with content) from the page.  
 
 ### production considerations
-* Tomcat compression needs to be switched on (debugged)
-* Vue and VueX need to be switched from development to production (I think it's the .min.js rather)
-* Upgrade to Vue.js 3 and only import the Vue modules actuall used (eg: `import { nextTick, observable } from 'vue'`)
-* Pre-render everything (on save) and at the same time uglify and minify, treeshake, csspurge, etc.
-* And (obviously) on request, see if you can rather serve a prerendered version.  
+* Pre-Render with Puppeteer-Prerender
+* Remove CSS with uncss
+* Maybe Treeshake Vue and VueX but this can probably be done once.

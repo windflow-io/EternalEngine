@@ -1,4 +1,4 @@
-import {addUrlListener, removeNamespace} from '/modules/windflowUtils.mjs'
+import {addUrlListener, removeNamespace, mapQueryString} from '/modules/windflowUtils.mjs'
 
 export const FlowApplication = {
     name: 'FlowApplication',
@@ -9,9 +9,9 @@ export const FlowApplication = {
     `,
     data() {
         return {
-            host: window.location.host,
-            path: window.location.pathname,
-            currentPath: window.location.pathname
+            host:  mapQueryString(window.location.href).host || location.host,
+            path: location.pathname,
+            currentPath: location.pathname
         }
     },
     computed: {

@@ -1,3 +1,18 @@
+/** Query String **/
+
+export const mapQueryString = (url) => {
+    let object = {}
+    let query = url.substring(url.indexOf("?") + 1);
+    let keyValues = query.split ("&");
+    for (let item in keyValues) {
+        let keyValueArray = keyValues[item].split("=");
+        let key = keyValueArray[0]
+        let value = keyValueArray[1]
+        object[key] = value;
+    }
+    return object;
+}
+
 /** Component Loading **/
 
 const registeredComponents = {};
