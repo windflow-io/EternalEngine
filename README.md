@@ -32,3 +32,4 @@ The server-side application is Spring Boot, packaged in Gradle. Executing `./gra
 * Pre-Render with Puppeteer-Prerender
 * Remove CSS with uncss
 * Maybe Treeshake Vue and VueX but this can probably be done once.
+* Allow the addition of meta data including charset and viewport

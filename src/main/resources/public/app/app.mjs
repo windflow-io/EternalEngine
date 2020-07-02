@@ -37,6 +37,9 @@ const store = new VueX.createStore({
             commit('setPageMeta', page.metaData);
             commit('setPageData', page.data);
 
+            document.title = page.metaData.title;
+            /**@TODO: Allow the adding of meta data (including charset and viewport) **/
+
             const allComponents = [];
             page.components.forEach(section => section.components.forEach(component => allComponents.push(component)));
 
