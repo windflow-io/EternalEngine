@@ -56,5 +56,5 @@ export const FlowArea = {
         /**@TODO: shove this in it's own place **/
         removeNamespace: removeNamespace
     },
-    template: '<div>{{name}}<br/><component :key="component.id" v-for="component in areaComponents" :is="removeNamespace(component.name)"/></div>',
+    template: '<component :key="component.id" v-for="component in areaComponents" :is="removeNamespace(component.name)"/></div>',
 }

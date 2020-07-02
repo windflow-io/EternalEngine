@@ -1,16 +1,13 @@
 /** Query String **/
 
 export const mapQueryString = (url) => {
-    let object = {}
-    let query = url.substring(url.indexOf("?") + 1);
-    let keyValues = query.split ("&");
-    for (let item in keyValues) {
-        let keyValueArray = keyValues[item].split("=");
-        let key = keyValueArray[0]
-        let value = keyValueArray[1]
-        object[key] = value;
+    let o = {}
+    let kvs = url.substring(url.indexOf("?") + 1).split("&");
+    for (let i in kvs) {
+        let kv = kvs[i].split("=");
+        o[kv[0]] = kv[1];
     }
-    return object;
+    return o;
 }
 
 /** Component Loading **/

@@ -1,0 +1,15 @@
+{
+    "metaData": {
+        "title": "Home",
+        "description": "This is the home page",
+        "httpStatus": "200"
+    },
+    "layout": "windflowx.StackedLayout",
+    "components": [
+        {
+            "area": "main",
+            "components": [{"name":"io.windflow.Hero", "id": "2"}]
+        }
+    ],
+    "data": {}
+}
