@@ -2,6 +2,7 @@ import {FlowArea} from '/modules/coreComponents.mjs'
 export default {
     name: 'StackedLayout',
     components: {FlowArea},
+    /**@TODO: Pull the themes from a Mixin from the Vue store **/
     template:
         `<section class="flex flex-row h-screen" :class="[backgroundColor, foregroundColor]" >
             <div class="flex-grow bg-blue-500 bg-opacity-25 p-1"><flow-area name="main"></flow-area></div>
