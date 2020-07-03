@@ -18,9 +18,6 @@ export const FlowApplication = {
         layoutComponent() {
             return this.$store.state.pageLayout;
         },
-        pageTitle() {
-            return this.$store.state.pageMeta.title;
-        }
     },
     created() {
         addUrlListener(this.urlChanged);
