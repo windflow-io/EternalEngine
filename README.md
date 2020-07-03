@@ -12,9 +12,12 @@ The process is as follows:
 4. Components are hydrated with data from vuex (that came with the list of components).
 
 ### running the application
-The server-side application is Spring Boot, packaged in Gradle. Executing `./gradlew/bootRun` from the root directory will start Gradle, download the necessary dependencies, start the Tomcat web server and serve the application on port 8080. (Note that there is a gradlew.bat for windows users too.)
+The server-side application is Spring Boot, packaged in Gradle. Executing `./gradlew/bootRun` from the root directory
+will start Gradle, download the necessary dependencies, start the Tomcat web server and serve the application on port 
+8080
 
-* The layout and components are currently
+* Note: that there is a gradlew.bat for windows users too.
+* Note: the application checks `window.location.host` to decide which site to serve. This doesn't help much when running locally as http://localhost so we added a feature that allows you to fudge hosts. To fudge a host, just add a querystring parameter `?host=www.windflow.io` for example to any url.  
 
 ### state of the application
 1. Although the data is intended to be stored as jsonb in a Postges database, the database has not yet been implemented.
