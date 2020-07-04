@@ -29,7 +29,11 @@ will start Gradle, download the necessary dependencies, start the Tomcat web ser
     
 ### next steps
 
-1. Some kind of data needs to "populate" (components must be hydrated with content) from the page.  
+1. Some kind of data needs to "populate" (components must be hydrated with content) from the page.
+2. Make a hand drawn layout for Mimo
+3. Mock it up
+4. Add Google Analytics
+5. Make our page nice
 
 ### production considerations
 * Pre-Render with Puppeteer-Prerender
