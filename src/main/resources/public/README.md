@@ -27,9 +27,9 @@ These are general notes for Mark van Wyk. Required tests to make sure the new sy
 7. Title and Meta
 
    ## Predeploy
-   1. Tomcat Compression!
-   2. Module not found!
-   3. Errors
-   4. Preload MJS Components (server look through components one file export)
+   1. Module not found!
+   2. Errors
+   3. Preload MJS Components (server look through components one file export)
+   4. Check IntelliJ JavaScript tools for treeshaking
    
 

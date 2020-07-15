@@ -44,8 +44,8 @@ const store = new VueX.createStore({
             page.components.forEach(section => section.components.forEach(component => allComponents.push(component)));
 
             const [layout, ...components] = await Promise.all([
-                loadComponent(app, '/api/layouts/' + namespaceOnly(page.layout) + '/' + removeNamespace(page.layout) + '.mjs'),
-                ...allComponents.map(component => loadComponent(app, '/api/components/' + namespaceOnly(component.name)  + "/" + removeNamespace(component.name) + '.mjs')),
+                loadComponent('/api/layouts/' + namespaceOnly(page.layout) + '/' + removeNamespace(page.layout) + '.mjs'),
+                ...allComponents.map(component => loadComponent('/api/components/' + namespaceOnly(component.name)  + "/" + removeNamespace(component.name) + '.mjs')),
             ]);
 
             commit('setPageLayout', page.layout);
@@ -54,7 +54,6 @@ const store = new VueX.createStore({
     }
 })
 
-const app = createApp(FlowApplication);
+export const app = createApp(FlowApplication);
 app.use(store);
-
 app.mount(`#app`);
