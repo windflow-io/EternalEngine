@@ -12,7 +12,7 @@ The process is as follows:
 4. Components are hydrated with data from vuex (that came with the list of components).
 
 ### running the application
-The server-side application is Spring Boot, packaged in Gradle. Executing `./gradlew/bootRun` from the root directory
+The server-side application is Spring Boot, packaged in Gradle. Executing `./gradlew bootRun` from the root directory
 will start Gradle, download the necessary dependencies, start the Tomcat web server and serve the application on port 
 8080
 
