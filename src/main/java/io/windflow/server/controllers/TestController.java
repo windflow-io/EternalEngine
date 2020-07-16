@@ -14,7 +14,7 @@ public class TestController {
     @ResponseBody
     public String doTest(@Autowired JavaScript javaScript, @RequestParam("number") String number) {
         Integer result = javaScript.testJavaScript(Integer.parseInt(number));
-        return number + " + 1 = " + result + " says JavaScript";
+        return number + " + 1 = " + result + " says Javascript";
     }
 
 }
