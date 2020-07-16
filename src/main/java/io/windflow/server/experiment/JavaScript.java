@@ -9,7 +9,6 @@ import javax.annotation.PostConstruct;
 @Component
 public class JavaScript {
 
-    @PostConstruct
     public Integer testJavaScript(Integer number) {
         try (Context context = Context.create()) {
             Value function = context.eval("js", "x => x+1");
