@@ -8,11 +8,4 @@ export default {
             <img src="https://i.imgur.com/yAxDnpu.png" class="relative z-10 max-w-4xl opacity-100">
         </div>                 
          `,
-
-    data() {
-        return {
-            backgroundColor: Math.round(Math.random()) === 1 ? 'bg-gray-900' : 'bg-red-900',
-            foregroundColor: Math.round(Math.random()) === 1 ? 'text-yellow-500' : 'text-green-500'
-        }
-    }
 }

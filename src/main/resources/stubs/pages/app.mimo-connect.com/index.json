@@ -1,0 +1,19 @@
+{
+    "metaData": {
+        "title": "Dashboard - MimoConnect 4",
+        "description": "",
+        "httpStatus": "200"
+    },
+    "layout": "com.mimo-connect.app.DashboardLayout",
+    "components": [
+        {
+            "area": "left",
+            "components": [{"name":"localhost.SideMenu", "id":"1"}]
+        },
+        {
+            "area": "right",
+            "components": [{"name":"localhost.HeaderHome", "id": "2"}, {"name":"localhost.LipsumContent", "id": "3"}]
+        }
+    ],
+    "data": {}
+}

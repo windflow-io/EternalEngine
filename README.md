@@ -26,17 +26,4 @@ will start Gradle, download the necessary dependencies, start the Tomcat web ser
     1. actual components are stored as .mjs modules in subfolder ./components
     2. html layouts are stored as html in subfolder ./layouts
     3. page data (lists of components for each area in the page) are stored in subfolder ./pages
-    
-### next steps
 
-1. Some kind of data needs to "populate" (components must be hydrated with content) from the page.
-2. Make a hand drawn layout for Mimo
-3. Mock it up
-4. Add Google Analytics
-5. Make our page nice
-
-### production considerations
-* Pre-Render with Puppeteer-Prerender
-* Remove CSS with uncss
-* Maybe Treeshake Vue and VueX but this can probably be done once.
-* Allow the addition of meta data including charset and viewport
