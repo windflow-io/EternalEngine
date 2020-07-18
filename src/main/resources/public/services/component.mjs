@@ -1,5 +1,5 @@
 import {app} from '../app/app.mjs'
-import {removeNamespace, namespaceOnly} from '/modules/windflowUtils.mjs'
+import {removeNamespace, namespaceOnly, withRetry} from '/modules/windflowUtils.mjs'
 
 export const COMPONENT_TYPES = {
     default: Symbol('Identifier for regular components'),
@@ -20,7 +20,7 @@ function assembleUrl({ namespacedName, type }) {
 
 const registeredComponents = {};
 
-export const load = async (namespacedName, { type = COMPONENT_TYPES.default } = {}) => {
+export const load = withRetry(async (namespacedName, { type = COMPONENT_TYPES.default } = {}) => {
     const name = removeNamespace(namespacedName);
     if (registeredComponents[name]) return name;
 
@@ -31,4 +31,4 @@ export const load = async (namespacedName, { type = COMPONENT_TYPES.default } = 
     registeredComponents[name] = true;
 
     return name;
-}
+});
