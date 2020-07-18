@@ -2,6 +2,7 @@ import { createApp } from '/vendor/vue3/vue.esm-browser.js';
 import VueX from '/vendor/vue3/vuex.esm-browser.js'
 import {FlowApplication} from '/modules/coreComponents.mjs'
 import {load as loadComponent, COMPONENT_TYPES} from '/services/component.mjs'
+import {alertNotifier as notifier} from '/modules/windflowUtils.mjs'
 
 const store = new VueX.createStore({
     state: {
@@ -44,8 +45,8 @@ const store = new VueX.createStore({
             page.components.forEach(section => section.components.forEach(component => allComponents.push(component)));
 
             const [layout, ...components] = await Promise.all([
-                loadComponent(page.layout, { type: COMPONENT_TYPES.layout }),
-                ...allComponents.map(component => loadComponent(component.name)),
+                loadComponent(page.layout, { type: COMPONENT_TYPES.layout, notifier }),
+                ...allComponents.map(component => loadComponent(component.name, { notifier })),
             ]);
 
             commit('setPageLayout', page.layout);

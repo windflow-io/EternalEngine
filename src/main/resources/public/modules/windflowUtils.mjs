@@ -67,3 +67,11 @@ export const withRetry = (callback, {
         return retry();
     };
 }
+
+/** Notifications **/
+
+export const alertNotifier = {
+    notify({ title }) {
+        alert(title);
+    },
+};
