@@ -1,7 +1,5 @@
 /** Query String **/
 
-import {app} from '../app/app.mjs'
-
 export const mapQueryString = (url) => {
     let o = {}
     let kvs = url.substring(url.indexOf("?") + 1).split("&");
@@ -10,21 +8,6 @@ export const mapQueryString = (url) => {
         o[kv[0]] = kv[1];
     }
     return o;
-}
-
-/** Component Loading **/
-
-const registeredComponents = {};
-
-export const loadComponent = async url => {
-    const module = await import(url);
-
-    if (!registeredComponents[module.default.name]) {
-        app.component(module.default.name, module.default);
-        registeredComponents[module.default.name] = module.default;
-    }
-
-    return module.default.name;
 }
 
 /** Namespacing **/
