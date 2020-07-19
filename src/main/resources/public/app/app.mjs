@@ -5,18 +5,18 @@ import * as componentService from '/services/component.mjs'
 import {
     alertNotifier as notifier,
     withErrorHandling,
-    withRetry,
+    withRetryHandling,
 } from '/modules/windflowUtils.mjs'
 
 const loadLayout = withErrorHandling(
-    withRetry(name => componentService.load(name, {
+    withRetryHandling(name => componentService.load(name, {
         type: componentService.COMPONENT_TYPES.layout,
     })),
     { notifier },
 );
 
 const loadComponent = withErrorHandling(
-    withRetry(componentService.load),
+    withRetryHandling(componentService.load),
     { notifier },
 );
 

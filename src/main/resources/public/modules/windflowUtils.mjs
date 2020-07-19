@@ -56,12 +56,12 @@ export const withErrorHandling = (callback, { logger = console, notifier }) => {
 
 /** Retry on Error **/
 
-export const withRetry = (callback, {
+export const withRetryHandling = (callback, {
     baseDelay = 400,
     logger = console,
     numberOfTries = 3,
 } = {}) => {
-    return function callbackWithRetry(...params) {
+    return function callbackWithRetryHandling(...params) {
         const retry = async (attempt = 1) => {
             try {
                 return await callback(...params);
