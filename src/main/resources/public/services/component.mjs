@@ -1,5 +1,5 @@
 import {app} from '../app/app.mjs'
-import {removeNamespace, namespaceOnly, withRetry} from '/modules/windflowUtils.mjs'
+import {removeNamespace, namespaceOnly} from '/modules/windflowUtils.mjs'
 
 export const COMPONENT_TYPES = {
     default: Symbol('Identifier for regular components'),
@@ -18,27 +18,21 @@ function assembleUrl({ namespacedName, type }) {
     return parts.join('/');
 }
 
-const importWithRetry = withRetry(url => import(url));
 const registeredComponents = {};
 
-export const load = async (namespacedName, {
-  logger = console,
-  notifier = null,
-  type = COMPONENT_TYPES.default,
-} = {}) => {
-    try {
-        const name = removeNamespace(namespacedName);
-        if (registeredComponents[name]) return name;
+export const load = async (namespacedName, { type = COMPONENT_TYPES.default } = {}) => {
+    const name = removeNamespace(namespacedName);
 
-        const url = assembleUrl({ namespacedName, type });
-        const module = await importWithRetry(url);
-
-        app.component(name, module.default);
-        registeredComponents[name] = true;
-
-        return name;
-    } catch (error) {
-      if (logger) logger.error(error);
-      if (notifier) notifier.notify({ title: error.message });
+    if (registeredComponents[name]) {
+      await registeredComponents[name];
+      return name;
     }
+
+    const url = assembleUrl({ namespacedName, type });
+    const modulePromise = registeredComponents[name] = import(url);
+    const module = await modulePromise;
+
+    app.component(name, module.default);
+
+    return name;
 }
