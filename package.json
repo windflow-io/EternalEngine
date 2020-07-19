@@ -1,0 +1,25 @@
+{
+  "dependencies": {
+    "browserify": "^16.5.1",
+    "os": "^0.1.1",
+    "purgecss": "^2.3.0"
+  },
+  "name": "windflow.io",
+  "description": "![Windfllow logo](https://i.imgur.com/zgUXAF6.png) # windflow server Windflow.io server is a dynamic web-component based platform for building apps and web sites. Components are styled with TailwindCSS.",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/windflow-io/WindflowServer.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/windflow-io/WindflowServer/issues"
+  },
+  "homepage": "https://github.com/windflow-io/WindflowServer#readme"
+}

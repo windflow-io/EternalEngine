@@ -12,9 +12,9 @@ public class TestController {
 
     @RequestMapping("/test")
     @ResponseBody
-    public String doTest(@Autowired JavaScript javaScript, @RequestParam("number") String number) {
-        Integer result = javaScript.testJavaScript(Integer.parseInt(number));
-        return number + " + 1 = " + result + " says Javascript";
+    public String doTest(@Autowired JavaScript javaScript) {
+        javaScript.testJavaScript();
+        return "ok";
     }
 
 }
