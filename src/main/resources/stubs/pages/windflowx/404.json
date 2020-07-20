@@ -4,10 +4,10 @@
         "code": "404",
         "httpStatus": "200"
     },
-    "layout": "windflowx.StackedLayout",
+    "layout": "windflowx.CenteredLayout",
     "components": [
         {
-            "area": "main",
+            "area": "center",
             "components":[
                 {"name":"windflowx.Error404", "id":"9"}
             ]

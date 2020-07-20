@@ -1,4 +1,4 @@
-![Windfllow logo](https://i.imgur.com/zgUXAF6.png)
+![Windflow logo](https://i.imgur.com/zgUXAF6.png)
 # windflow server
 Windflow.io server is a dynamic web-component based platform for building apps and web sites. Components are styled with TailwindCSS.
 

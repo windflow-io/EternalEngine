@@ -1,10 +1,10 @@
 {
     "metaData": {
-        "title": "Home",
+        "title": "Windflow.io",
         "description": "This is the home page",
         "httpStatus": "200"
     },
-    "layout": "io.windflow.StackedLayout",
+    "layout": "io.windflow.WindflowLayout",
     "components": [
         {
             "area": "main",
