@@ -53,8 +53,23 @@ export const FlowArea = {
         }
     },
     methods: {
-        /**@TODO: shove this in it's own place **/
         removeNamespace: removeNamespace
     },
     template: '<component :key="component.id" v-for="component in areaComponents" :is="removeNamespace(component.name)"/>',
+}
+
+<!-- @TODO: Markus -->
+export const FlowIcon = {
+    // functional
+    name: 'FlowIcon',
+    props: ['name'],
+    data() {
+        return {
+            svgData: ''
+        }
+    },
+    template: '<span v-html="svgData" class="w-3 h-3"></span>',
+    created() {
+        fetch('/icons/solid/' + this.name + '.svg').then(r => r.text()).then(d => this.svgData = d)
+    }
 }
