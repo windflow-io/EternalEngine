@@ -59,7 +59,6 @@ export const FlowArea = {
 }
 
 export const FlowIcon = {
-    // functional
     name: 'FlowIcon',
     props: ['icon'],
     data() {
@@ -70,11 +69,10 @@ export const FlowIcon = {
     template: '<svg xmlns="http://www.w3.org/2000/svg" :viewBox="viewBox" ref="svgTag"></svg>',
     mounted() {
         fetch('/icons/solid/' + this.icon + '.svg').then(r => r.text()).then(d => {
-            let svg = new DOMParser().parseFromString(d, "image/svg+xml").firstChild
-            console.log (svg);
-            this.viewBox = svg.getAttribute('viewBox')
+            let svg = new DOMParser().parseFromString(d, "image/svg+xml").firstChild;
+            this.viewBox = svg.getAttribute('viewBox');
             svg.childNodes.forEach(n => {
-                this.$refs.svgTag.appendChild(n);
+                this.$refs.svgTag.append(n);
             })
         })
     }
