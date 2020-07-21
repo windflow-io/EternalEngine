@@ -1,4 +1,4 @@
-import FlowLink from '/api/components/windflowx/FlowLink.mjs'
+import {FlowLink} from '/modules/coreComponents.mjs'
 
 export default {
     name: 'SideMenu',
