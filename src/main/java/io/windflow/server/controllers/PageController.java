@@ -21,9 +21,25 @@ public class PageController {
         try {
             return StubReader.loadStub(parser.getFilePath());
         } catch (UncheckedIOException ex) {
-            System.err.println("WINDFLOW ERROR: " + ex.getMessage());
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return StubReader.loadStub("/stubs/pages/windflowx/404.json");
+            try {
+                if (StubReader.checkDirectory(parser.getSiteRoot())) {
+                    System.err.println("WINDFLOW 404 ERROR: Web page does not exist: " + ex.getMessage());
+                    return StubReader.loadStub("/stubs/pages/windflowx/PageNotFound.json");
+                } else {
+                    System.err.println("WINDFLOW 404 ERROR: No site at this domain: " + ex.getMessage());
+                    return StubReader.loadStub("/stubs/pages/windflowx/DomainNotFound.json");
+                }
+            } catch (UncheckedIOException ex2) {
+                ex2.printStackTrace();
+                /**@TODO: We should make the client do something with this **/
+                return  "    {" +
+                        "         \"metaData\": {\n" +
+                        "             \"title\": \"Significant Error\",\n" +
+                        "             \"description\":\"" + ex2.getMessage() +"\",\n" +
+                        "             \"httpStatus\": \"500\"\n" +
+                        "         }\n" +
+                        "     }";
+            }
         }
     }
 
@@ -31,6 +47,7 @@ public class PageController {
 
         private HttpServletRequest request;
         private String filePath;
+        private String siteRoot;
 
         RequestParser(HttpServletRequest request) {
             String requestedPath = request.getRequestURI().replace("/api/pages", "").toLowerCase();
@@ -41,10 +58,15 @@ public class PageController {
             host = host.startsWith("www.") ? host.replace("www.", "") : host;
             urlPath = (urlPath.length() == 0 ? "/index" : "/" + urlPath);
             this.filePath = "/stubs/pages/" + host + urlPath + ".json";
+            this.siteRoot = "/stubs/pages/" + host;
         }
 
         public String getFilePath() {
             return this.filePath;
+        }
+
+        public String getSiteRoot() {
+            return this.siteRoot;
         }
 
     }

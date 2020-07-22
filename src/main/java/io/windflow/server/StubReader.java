@@ -11,6 +11,7 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 
 public class StubReader {
+
     public static String loadStub(String path) {
         Resource resource = new ClassPathResource(path);
         try (Reader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)) {
@@ -18,5 +19,9 @@ public class StubReader {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    public static boolean checkDirectory(String directory) {
+        return new ClassPathResource(directory).exists();
     }
 }

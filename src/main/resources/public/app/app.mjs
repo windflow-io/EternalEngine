@@ -38,6 +38,10 @@ const store = new VueX.createStore({
             commit('setPageData', page.data);
 
             document.title = page.metaData.title;
+
+
+
+            document.getElementsByTagName("meta").namedItem('description').setAttribute("content", page.metaData.description);
             /**@TODO: Allow the adding of meta data (including charset and viewport) **/
 
             const allComponents = [];

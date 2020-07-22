@@ -1,0 +1,16 @@
+{
+    "metaData": {
+        "title": "No site at this domain",
+        "description": "There is no website hosted at this domain",
+        "httpStatus": "404"
+    },
+    "layout": "windflowx.CenteredLayout",
+    "components": [
+        {
+            "area": "center",
+            "components":[
+                {"name":"windflowx.DomainNotFoundMessage", "id":"9"}
+            ]
+        }],
+    "data": {}
+}

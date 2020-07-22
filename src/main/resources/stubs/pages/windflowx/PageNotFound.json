@@ -1,15 +1,15 @@
 {
     "metaData": {
-        "title": "Not Found",
-        "code": "404",
-        "httpStatus": "200"
+        "title": "404 - Not Found",
+        "description": "There is no web page at this address",
+        "httpStatus": "404"
     },
     "layout": "windflowx.CenteredLayout",
     "components": [
         {
             "area": "center",
             "components":[
-                {"name":"windflowx.Error404", "id":"9"}
+                {"name":"windflowx.PageNotFoundMessage", "id":"10"}
             ]
         }],
     "data": {}

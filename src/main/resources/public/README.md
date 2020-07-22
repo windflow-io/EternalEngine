@@ -28,3 +28,6 @@ Tasks
 
    * http://iamnotmyself.com/2020/02/14/implementing-websocket-plugins-for-vuex/
    * https://tutorialedge.net/javascript/vuejs/vuejs-websocket-tutorial/
+   * javax.servlet.ServletException: Circular view path [error]: would dispatch back to the current handler URL [/error] again. Check your ViewResolver setup! (Hint: This may be the result of an unspecified view, due to default view name generation.)
+   * https://devcenter.heroku.com/articles/increasing-application-performance-with-http-cache-headers
+   * Cache production
