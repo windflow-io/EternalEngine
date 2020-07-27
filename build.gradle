@@ -15,4 +15,5 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.graalvm:graal-sdk:1.0.0-rc7'
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.3.2.RELEASE'
 }

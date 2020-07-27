@@ -21,27 +21,13 @@ public class PageController {
         try {
             return StubReader.loadStub(parser.getFilePath());
         } catch (UncheckedIOException ex) {
-            try {
-                if (StubReader.checkDirectory(parser.getSiteRoot())) {
-                    System.err.println("WINDFLOW 404 ERROR: Web page does not exist: " + ex.getMessage());
-                    return StubReader.loadStub("/stubs/pages/windflowx/PageNotFound.json");
-                } else {
-                    System.err.println("WINDFLOW 404 ERROR: No site at this domain: " + ex.getMessage());
-                    return StubReader.loadStub("/stubs/pages/windflowx/DomainNotFound.json");
-                }
-            } catch (UncheckedIOException ex2) {
-                System.err.println("WINDFLOW 404 ERROR: Could not find the default 404 pages");
-                ex2.printStackTrace();
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
-                /**@TODO: We should make the client do something with this **/
-                return  "    {" +
-                        "         \"metaData\": {\n" +
-                        "             \"title\": \"Windflow.io Error\",\n" +
-                        "             \"description\":\"Default error page not found: " + ex2.getMessage() +"\",\n" +
-                        "             \"httpStatus\": \"404\"\n" +
-                        "         }\n" +
-                        "     }";
+            if (StubReader.checkDirectory(parser.getSiteRoot())) {
+                System.err.println("WINDFLOW 404 ERROR: Web page does not exist: " + ex.getMessage());
+                return StubReader.loadStub("/stubs/pages/windflowx/PageNotFound.json");
+            } else {
+                System.err.println("WINDFLOW 404 ERROR: No site at this domain: " + ex.getMessage());
+                return StubReader.loadStub("/stubs/pages/windflowx/DomainNotFound.json");
             }
         }
     }

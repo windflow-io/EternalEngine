@@ -8,8 +8,34 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.HttpServletResponse;
+
 @Controller
 public class TestController {
+
+    @RequestMapping(value = "/create404", produces = "application/json")
+    @ResponseBody
+    public String create404(HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        System.err.println("Simulating an error 404");
+        return "{\"error\":\"404\"}";
+    }
+
+    @RequestMapping(value = "/create500", produces = "application/json")
+    @ResponseBody
+    public String create500(HttpServletResponse response) {
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        System.err.println("Simulating an error 500");
+        return "{\"error\":\"500\"}";
+    }
+
+    @RequestMapping(value = "/createServerError", produces = "application/json")
+    @ResponseBody
+    public String createServerError(HttpServletResponse response) {
+        throw new RuntimeException("Some crap");
+    }
+
+
 
     @RequestMapping("/test")
     @ResponseBody
