@@ -1,7 +1,5 @@
 /** Query String **/
 
-import {app} from '../app/app.mjs'
-
 export const mapQueryString = (url) => {
     let o = {}
     let kvs = url.substring(url.indexOf("?") + 1).split("&");
@@ -10,21 +8,6 @@ export const mapQueryString = (url) => {
         o[kv[0]] = kv[1];
     }
     return o;
-}
-
-/** Component Loading **/
-
-const registeredComponents = {};
-
-export const loadComponent = async url => {
-    const module = await import(url);
-
-    if (!registeredComponents[module.default.name]) {
-        app.component(module.default.name, module.default);
-        registeredComponents[module.default.name] = module.default;
-    }
-
-    return module.default.name;
 }
 
 /** Namespacing **/
@@ -57,3 +40,51 @@ window.addEventListener(
         listeners.forEach(listener => listener(window.location.pathname, previousRoute))
     }
 );
+
+/** Handle Errors **/
+
+export const withErrorHandling = (callback, { logger = console, notifier }) => {
+    return async function callbackWithErrorHandling(...params) {
+        try {
+            return await callback(...params);
+        } catch (error) {
+            if (logger) logger.error(error);
+            if (notifier) notifier.notify({ title: error.message });
+        }
+    }
+}
+
+/** Retry on Error **/
+
+export const withRetryHandling = (callback, {
+    baseDelay = 400,
+    logger = console,
+    numberOfTries = 3,
+} = {}) => {
+    return function callbackWithRetryHandling(...params) {
+        const retry = async (attempt = 1) => {
+            try {
+                return await callback(...params);
+            } catch (error) {
+                if (attempt >= numberOfTries) throw error;
+
+                // Use an increasing delay to prevent flodding the server with
+                // requests in case of a short downtime.
+                const delay = baseDelay * attempt;
+
+                if (logger) logger.warn('Retry because of', error);
+
+                return new Promise(resolve => setTimeout(() => resolve(retry(attempt + 1)), delay));
+            }
+        }
+        return retry();
+    };
+}
+
+/** Notifications **/
+
+export const alertNotifier = {
+    notify({ title }) {
+        alert(title);
+    },
+};
