@@ -1,3 +1,5 @@
+import {app} from '../app/app.mjs'
+
 /** Query String **/
 
 export const mapQueryString = (url) => {
@@ -86,5 +88,45 @@ export const withRetryHandling = (callback, {
 export const alertNotifier = {
     notify({ title }) {
         alert(title);
+    },
+};
+
+/** Service: Component */
+
+export const COMPONENT_TYPES = {
+    default: Symbol('Identifier for regular components'),
+    layout: Symbol('Identifier for layout components'),
+};
+
+const componentEndpoints = {
+    [COMPONENT_TYPES.default]: '/api/components',
+    [COMPONENT_TYPES.layout]: '/api/layouts',
+};
+
+const registeredComponents = {};
+
+function assembleComponentUrl({ namespacedName, type }) {
+    const endpoint = componentEndpoints[type];
+    const parts = [endpoint, namespaceOnly(namespacedName), `${removeNamespace(namespacedName)}.mjs`];
+
+    return parts.join('/');
+}
+
+export const componentService = {
+    async load(namespacedName, { type = COMPONENT_TYPES.default } = {}) {
+        const name = removeNamespace(namespacedName);
+
+        if (registeredComponents[name]) {
+            await registeredComponents[name];
+            return name;
+        }
+
+        const url = assembleComponentUrl({ namespacedName, type });
+        const modulePromise = registeredComponents[name] = import(url);
+        const module = await modulePromise;
+
+        app.component(name, module.default);
+
+        return name;
     },
 };

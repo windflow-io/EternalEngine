@@ -1,16 +1,17 @@
 import { createApp } from '/vendor/vue3/vue.esm-browser.js';
 import VueX from '/vendor/vue3/vuex.esm-browser.js'
 import {FlowApplication} from '/modules/coreComponents.mjs'
-import * as componentService from '/services/component.mjs'
 import {
+    COMPONENT_TYPES,
     alertNotifier as notifier,
     withErrorHandling,
     withRetryHandling,
+    componentService,
 } from '/modules/windflowUtils.mjs'
 
 const loadLayout = withErrorHandling(
     withRetryHandling(name => componentService.load(name, {
-        type: componentService.COMPONENT_TYPES.layout,
+        type: COMPONENT_TYPES.layout,
     })),
     { notifier },
 );
