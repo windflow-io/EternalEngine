@@ -7,14 +7,15 @@ import {
     withErrorHandling,
     withRetryHandling,
     componentService,
+    pageService,
 } from '/modules/windflowUtils.mjs'
 
-const loadLayout = withErrorHandling(
-    withRetryHandling(name => componentService.load(name, {
-        type: COMPONENT_TYPES.layout,
-    })),
-    { notifier },
-);
+const bypass4xxErrors = error => error.status >= 400 && error.status < 500;
+const loadPage = withRetryHandling(pageService.load, { bypass: bypass4xxErrors });
+
+const loadLayout = withRetryHandling(name => componentService.load(name, {
+    type: COMPONENT_TYPES.layout,
+}));
 
 const loadComponent = withErrorHandling(
     withRetryHandling(componentService.load),
@@ -49,28 +50,54 @@ const store = new VueX.createStore({
     },
     actions: {
         async fetchPageData({context, commit, state}, payload) {
-            const page = await fetch('/api/pages/' + payload.host + payload.path)
-                .then((response) => response.json());
+            let page;
 
-            commit('setPageMeta', page.metaData);
-            commit('setPageData', page.data);
-
-            document.title = page.metaData.title;
-
-
-
-            document.getElementsByTagName("meta").namedItem('description').setAttribute("content", page.metaData.description);
-            /**@TODO: Allow the adding of meta data (including charset and viewport) **/
+            try {
+                page = await loadPage({ host: payload.host, path: payload.path });
+            } catch (error) {
+                /**@TODO: Maybe add error logging with something like Sentry or DataDog **/
+                console.log(error);
+                page = {
+                    metaData: {
+                        title: 'Error',
+                        description: 'Please try again later',
+                        httpStatus: '500',
+                    },
+                    layout: 'windflowx.CenteredLayout',
+                    components: [
+                        {
+                            area: 'center',
+                            components: [{ name: 'windflowx.ErrorMessage', id: '1' }],
+                        },
+                    ],
+                    data: {},
+                };
+            }
 
             const allComponents = [];
             page.components.forEach(section => section.components.forEach(component => allComponents.push(component)));
+            const componentPromise = Promise.all(allComponents.map(component => loadComponent(component.name)));
 
-            const [layout, ...components] = await Promise.all([
-                loadLayout(page.layout),
-                ...allComponents.map(component => loadComponent(component.name)),
-            ]);
+            try {
+                await loadLayout(page.layout);
+            } catch (error) {
+                /**@TODO: Maybe add error logging with something like Sentry or DataDog **/
+                console.log(error);
+                // If we can't resolve the layout, we can't render anything,
+                // so we redirect to a plain static HTML page.
+                window.location.replace('/error');
+            }
 
+            commit('setPageMeta', page.metaData);
+            commit('setPageData', page.data);
             commit('setPageLayout', page.layout);
+
+            document.title = page.metaData.title;
+            document.getElementsByTagName("meta").namedItem('description').setAttribute("content", page.metaData.description);
+            /**@TODO: Allow the adding of meta data (including charset and viewport) **/
+
+            await componentPromise;
+
             commit('setPageComponents', page.components);
         }
     }
