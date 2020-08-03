@@ -1,4 +1,4 @@
-import {addUrlListener, removeNamespace, mapQueryString} from '/modules/windflowUtils.mjs'
+import {addUrlListener, removeNamespace, mapQueryString, pushUrl} from '/modules/windflowUtils.mjs'
 
 export const FlowApplication = {
     name: 'FlowApplication',

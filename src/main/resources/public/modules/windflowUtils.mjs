@@ -1,3 +1,15 @@
+import {app} from '../app/app.mjs'
+
+/** Errors */
+
+class NetworkError extends Error {
+    constructor(message, status) {
+        super(message || 'NetworkError');
+        this.name = 'NetworkError';
+        this.status = status;
+    }
+}
+
 /** Query String **/
 
 export const mapQueryString = (url) => {
@@ -60,13 +72,14 @@ export const withRetryHandling = (callback, {
     baseDelay = 400,
     logger = console,
     numberOfTries = 3,
+    bypass = error => false,
 } = {}) => {
     return function callbackWithRetryHandling(...params) {
         const retry = async (attempt = 1) => {
             try {
                 return await callback(...params);
             } catch (error) {
-                if (attempt >= numberOfTries) throw error;
+                if (bypass(error) || attempt >= numberOfTries) throw error;
 
                 // Use an increasing delay to prevent flodding the server with
                 // requests in case of a short downtime.
@@ -86,5 +99,66 @@ export const withRetryHandling = (callback, {
 export const alertNotifier = {
     notify({ title }) {
         alert(title);
+    },
+};
+
+/** API */
+
+const apiEndpoint = '/api';
+
+export const api = async (endpoint) => {
+    const response = await fetch(`${apiEndpoint}${endpoint}`);
+    if (!response.ok) throw new NetworkError(response.statusText, response.status);
+
+    return response.json();
+};
+
+/** Service: Page */
+
+const pageEndpoint = '/pages';
+
+export const pageService = {
+    load({ host, path }) {
+        return api(`${pageEndpoint}/${host}${path}`);
+    }
+};
+
+/** Service: Component */
+
+export const COMPONENT_TYPES = {
+    default: Symbol('Identifier for regular components'),
+    layout: Symbol('Identifier for layout components'),
+};
+
+const componentEndpoints = {
+    [COMPONENT_TYPES.default]: '/api/components',
+    [COMPONENT_TYPES.layout]: '/api/layouts',
+};
+
+const registeredComponents = {};
+
+function assembleComponentUrl({ namespacedName, type }) {
+    const endpoint = componentEndpoints[type];
+    const parts = [endpoint, namespaceOnly(namespacedName), `${removeNamespace(namespacedName)}.mjs`];
+
+    return parts.join('/');
+}
+
+export const componentService = {
+    async load(namespacedName, { type = COMPONENT_TYPES.default } = {}) {
+        const name = removeNamespace(namespacedName);
+
+        if (registeredComponents[name]) {
+            await registeredComponents[name];
+            return name;
+        }
+
+        const url = assembleComponentUrl({ namespacedName, type });
+        const modulePromise = registeredComponents[name] = import(url);
+        const module = await modulePromise;
+
+        app.component(name, module.default);
+
+        return name;
     },
 };
