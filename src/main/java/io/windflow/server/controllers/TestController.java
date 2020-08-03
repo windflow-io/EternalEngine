@@ -1,6 +1,6 @@
 package io.windflow.server.controllers;
 
-import io.windflow.server.StubReader;
+import io.windflow.server.TextFileReader;
 import io.windflow.server.experiment.JavaScript;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -39,20 +39,20 @@ public class TestController {
 
     @RequestMapping("/test")
     @ResponseBody
-    public String doTest(@Autowired JavaScript javaScript, @RequestParam("number") String number) {
-        Integer result = javaScript.testJavaScript(Integer.parseInt(number));
-        return number + " + 1 = " + result + " says Javascript";
+    public String doTest(@Autowired JavaScript javaScript) {
+        javaScript.testJavaScript();
+        return "ok";
     }
 
     @RequestMapping(value = "/test2", produces = "text/plain")
     @ResponseBody
     public String doTest2() {
-        String content = StubReader.loadStub("/public/vendor/tailwindcss/tailwind.min.css");
+        String content = TextFileReader.getText("/public/vendor/tailwindcss/tailwind.min.css");
 
         char[] c = content.toCharArray();
 
-        StringBuffer b = new StringBuffer();
-        StringBuffer r = new StringBuffer();
+        StringBuilder b = new StringBuilder();
+        StringBuilder r = new StringBuilder();
         boolean recording = true;
 
 

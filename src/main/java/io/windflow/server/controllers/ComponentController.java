@@ -1,6 +1,6 @@
 package io.windflow.server.controllers;
 
-import io.windflow.server.StubReader;
+import io.windflow.server.TextFileReader;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -13,8 +13,7 @@ public class ComponentController {
     @ResponseBody
     public String mjs(@PathVariable("namespace") String namespace, @PathVariable("filename") String filename) {
 
-        String reader = StubReader.loadStub("/stubs/components/" + namespace.toLowerCase() + "/" + filename);
-        return reader;
+        return TextFileReader.getText("/stubs/components/" + namespace.toLowerCase() + "/" + filename);
     }
 
 }

@@ -1,6 +1,6 @@
 package io.windflow.server.controllers;
 
-import io.windflow.server.StubReader;
+import io.windflow.server.TextFileReader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,15 +19,15 @@ public class PageController {
         RequestParser parser = new RequestParser(request);
 
         try {
-            return StubReader.loadStub(parser.getFilePath());
+            return TextFileReader.getText(parser.getFilePath());
         } catch (UncheckedIOException ex) {
 
-            if (StubReader.checkDirectory(parser.getSiteRoot())) {
+            if (TextFileReader.checkDirectory(parser.getSiteRoot())) {
                 System.err.println("WINDFLOW 404 ERROR: Web page does not exist: " + ex.getMessage());
-                return StubReader.loadStub("/stubs/pages/windflowx/PageNotFound.json");
+                return TextFileReader.getText("/stubs/pages/windflowx/PageNotFound.json");
             } else {
                 System.err.println("WINDFLOW 404 ERROR: No site at this domain: " + ex.getMessage());
-                return StubReader.loadStub("/stubs/pages/windflowx/DomainNotFound.json");
+                return TextFileReader.getText("/stubs/pages/windflowx/DomainNotFound.json");
             }
         }
     }

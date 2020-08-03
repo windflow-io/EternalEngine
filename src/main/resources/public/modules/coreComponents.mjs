@@ -26,7 +26,7 @@ export const FlowApplication = {
         this.pageLoad(this.host, this.path);
     },
     methods: {
-        urlChanged(current, previous) {
+        urlChanged(current) {
             this.currentPath = current;
             this.pageLoad(this.host, current);
         },
