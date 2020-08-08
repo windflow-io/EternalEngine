@@ -1,6 +1,6 @@
 import { createApp } from '/vendor/vue3/vue.esm-browser.js';
 import VueX from '/vendor/vue3/vuex.esm-browser.js'
-import {FlowApplication} from '/modules/coreComponents.mjs'
+import {FlowApplication,ErrorLayout} from '/modules/coreComponents.mjs'
 import {
     COMPONENT_TYPES,
     alertNotifier as notifier,
@@ -21,6 +21,20 @@ const loadComponent = withErrorHandling(
     withRetryHandling(componentService.load),
     { notifier },
 );
+
+const errorPage = {
+    metaData: {
+        title: 'Error',
+        description: 'Please try again later',
+        httpStatus: '500',
+    },
+    layout: ErrorLayout.name,
+    components: [],
+    data: {
+        headline: 'Error',
+        subHeadline: 'Please try again later',
+    },
+};
 
 const store = new VueX.createStore({
     state: {
@@ -54,38 +68,12 @@ const store = new VueX.createStore({
 
             try {
                 page = await loadPage({ host: payload.host, path: payload.path });
-            } catch (error) {
-                /**@TODO: Maybe add error logging with something like Sentry or DataDog **/
-                console.log(error);
-                page = {
-                    metaData: {
-                        title: 'Error',
-                        description: 'Please try again later',
-                        httpStatus: '500',
-                    },
-                    layout: 'windflowx.CenteredLayout',
-                    components: [
-                        {
-                            area: 'center',
-                            components: [{ name: 'windflowx.ErrorMessage', id: '1' }],
-                        },
-                    ],
-                    data: {},
-                };
-            }
-
-            const allComponents = [];
-            page.components.forEach(section => section.components.forEach(component => allComponents.push(component)));
-            const componentPromise = Promise.all(allComponents.map(component => loadComponent(component.name)));
-
-            try {
                 await loadLayout(page.layout);
             } catch (error) {
                 /**@TODO: Maybe add error logging with something like Sentry or DataDog **/
                 console.log(error);
-                // If we can't resolve the layout, we can't render anything,
-                // so we redirect to a plain static HTML page.
-                window.location.replace('/error');
+                await componentService.register(ErrorLayout);
+                page = errorPage;
             }
 
             commit('setPageMeta', page.metaData);
@@ -96,7 +84,9 @@ const store = new VueX.createStore({
             document.getElementsByTagName("meta").namedItem('description').setAttribute("content", page.metaData.description);
             /**@TODO: Allow the adding of meta data (including charset and viewport) **/
 
-            await componentPromise;
+            const allComponents = [];
+            page.components.forEach(section => section.components.forEach(component => allComponents.push(component)));
+            await Promise.all(allComponents.map(component => loadComponent(component.name)));
 
             commit('setPageComponents', page.components);
         }

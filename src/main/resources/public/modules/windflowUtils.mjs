@@ -145,6 +145,15 @@ function assembleComponentUrl({ namespacedName, type }) {
 }
 
 export const componentService = {
+    async register(component) {
+        if (registeredComponents[component.name]) {
+            await registeredComponents[component.name];
+            return;
+        }
+
+        registeredComponents[component.name] = { default: component };
+        app.component(component.name, component);
+    },
     async load(namespacedName, { type = COMPONENT_TYPES.default } = {}) {
         const name = removeNamespace(namespacedName);
 
