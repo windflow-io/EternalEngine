@@ -1,7 +1,9 @@
 package io.windflow.server.controllers;
 
 import io.windflow.server.TextFileReader;
+import io.windflow.server.entities.Page;
 import io.windflow.server.experiment.JavaScript;
+import io.windflow.server.persistence.PageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -9,9 +11,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 public class TestController {
+
+    @Autowired PageRepository pageRepository;
 
     @RequestMapping(value = "/create404", produces = "application/json")
     @ResponseBody
@@ -35,7 +42,35 @@ public class TestController {
         throw new RuntimeException("Some crap");
     }
 
+    @RequestMapping(value = "/createPageData", produces = "application/json")
+    @ResponseBody
+    public String insertData() {
+        Page page1 = new Page();
+        String[] jsonStrings = {
+                "{\"name\":\"Mark\", \"street\":\"Egret\"}",
+                "{\"name\":\"Tarryn\", \"street\":\"Egret\"}",
+                "{\"name\":\"Jo\", \"street\":\"Egret\"}",
+                "{\"name\":\"Fiona\", \"street\":\"Hilltop\"}",
+                "{\"name\":\"Ryan\", \"street\":\"Hilltop\"}"
+        };
 
+        for (String json : jsonStrings) {
+            Page p = new Page();
+            System.out.println(json);
+
+            p.setJson(json);
+            pageRepository.save(p);
+        }
+
+        return "{\"status\":\"ok\"}";
+    }
+
+    @RequestMapping(value = "/queryPageData", produces = "application/json")
+    @ResponseBody
+    public String QueryData(@RequestParam String street) {
+        List<Page> jsonList = pageRepository.findByStreet(street);
+        return "[" + jsonList.stream().map(Page::getJson).collect(Collectors.joining(",")) + "]";
+    }
 
     @RequestMapping("/test")
     @ResponseBody
