@@ -53,6 +53,23 @@ window.addEventListener(
     }
 );
 
+/** Load Script **/
+
+export const loadScript = (url, globalName = null) => {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.async = true;
+        script.addEventListener('load', () => {
+            resolve(globalName ? window[globalName] : true);
+        });
+        script.addEventListener('error', () => {
+            reject(new Error(`Error loading ${url}`));
+        });
+        script.src = url;
+        document.head.appendChild(script);
+    });
+}
+
 /** Handle Errors **/
 
 export const withErrorHandling = (callback, { logger = console, notifier }) => {
