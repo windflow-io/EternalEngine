@@ -1,10 +1,13 @@
 import {addUrlListener, removeNamespace, mapQueryString, pushUrl} from '/modules/windflowUtils.mjs'
+import {CodeEditor} from './CodeEditor.mjs';
 
 export const FlowApplication = {
     name: 'FlowApplication',
+    components: {CodeEditor},
     template: `
         <div>
             <component :is="removeNamespace(layoutComponent)" :key="currentPath"/>          
+            <CodeEditor/>
         </div>
     `,
     data() {
@@ -88,4 +91,22 @@ export const FlowLink = {
             event.preventDefault();
         }
     }
+}
+
+export const ErrorLayout = {
+    name: 'ErrorLayout',
+    template:
+        `<div class="flex flex-row h-screen items-center justify-center p-10 bg-gray-900">
+            <div class="relative z-10 max-w-4xl opacity-100">
+                <section class="flex flex-col">
+                    <h1 class="flex text-6xl justify-center font-semibold text-gray-300">
+                        {{ $store.state.pageData.headline }}
+                    </h1>
+                    <h2 class="flex text-3xl justify-center text-gray-700">
+                        {{ $store.state.pageData.subHeadline }}
+                    </h2>
+                </section>
+            </div>
+        </div>
+         `,
 }
