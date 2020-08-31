@@ -32,3 +32,10 @@ PERFORMANCE OPTIMISATION:
    * Rollup.js can come later.
    * Implement PurgeCSS
    * Render the head
+   * Memcache: https://devcenter.heroku.com/articles/spring-boot-memcache
+   
+   * Markus: Don't reload layout nor components that are staying in their place.
+   * Mark: Java to "machine compiled" to save Heroku cash
+   * We don't have to host their domains (hosting their domains in pricing)
+   * DNSimple allows sharing
+  
