@@ -14,6 +14,7 @@ public class ComponentController {
     public String mjs(@PathVariable("namespace") String namespace, @PathVariable("filename") String filename) {
 
         return TextFileReader.getText("/stubs/components/" + namespace.toLowerCase() + "/" + filename);
+
     }
 
 }

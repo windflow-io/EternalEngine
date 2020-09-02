@@ -24,15 +24,24 @@ public class Page {
 
     String path;
 
-    String version;
+    public PageType getType() {
+        return type;
+    }
+
+    public void setType(PageType type) {
+        this.type = type;
+    }
+
+    @Enumerated(EnumType.STRING)
+    PageType type;
+
+    Float version;
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
     String json;
 
     LocalDate lastUpdated;
-
-    LocalDate expires;
 
     /** Getters and Setters **/
 
@@ -60,15 +69,15 @@ public class Page {
         this.path = path;
     }
 
-    public String getVersion() {
+    public Float getVersion() {
         return version;
     }
 
-    public void setVersion(String version) {
+    public void setVersion(Float version) {
         this.version = version;
     }
 
-    @JsonRawValue
+    @Lob @JsonRawValue
     public String getJson() {
         return json;
     }
@@ -81,18 +90,14 @@ public class Page {
         return lastUpdated;
     }
 
-    public LocalDate getExpires() {
-        return expires;
-    }
-
-    public void setExpires(LocalDate expires) {
-        this.expires = expires;
-    }
-
     /*** Methods ***/
 
     @PreUpdate @PrePersist
     private void setTheDate() {
         lastUpdated = LocalDate.now();
+    }
+
+    public static enum PageType {
+        Page404, Page500, PageDefault, PageNormal, PageNoSite
     }
 }
