@@ -1,0 +1,19 @@
+{
+    "metaData": {
+        "title": "Home",
+        "description": "This is the home page",
+        "httpStatus": "200"
+    },
+    "layout": "windflowx.LeftMenuLayout",
+    "components": [
+        {
+            "area": "left",
+            "components": [{"name":"localhost.SideMenu", "id":"1"}]
+        },
+        {
+            "area": "right",
+            "components": [{"name":"localhost.HeaderHome", "id": "2"}, {"name":"localhost.LipsumContent", "id": "3"}]
+        }
+    ],
+    "data": {}
+}

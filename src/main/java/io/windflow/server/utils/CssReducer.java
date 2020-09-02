@@ -1,3 +1,4 @@
+/**@TODO: Marked for deletion, pending Markus' success implementing NodeJVM∂ **/
 package io.windflow.server.utils;
 
 import org.springframework.http.converter.json.GsonBuilderUtils;
@@ -6,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
+@Deprecated
 public class CssReducer {
 
     public Collection<String> getMatches() {

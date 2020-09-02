@@ -1,12 +1,10 @@
 package io.windflow.server.experiment;
 
-import io.windflow.server.TextFileReader;
 import org.graalvm.polyglot.*;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.io.File;
 import java.io.IOException;
 

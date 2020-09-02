@@ -1,6 +1,6 @@
 package io.windflow.server.controllers;
 
-import io.windflow.server.TextFileReader;
+import io.windflow.server.utils.TextFileReader;
 import io.windflow.server.entities.Page;
 import io.windflow.server.experiment.JavaScript;
 import io.windflow.server.persistence.PageRepository;
@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Controller
@@ -82,30 +82,36 @@ public class TestController {
     @RequestMapping(value = "/test2", produces = "text/plain")
     @ResponseBody
     public String doTest2() {
-        String content = TextFileReader.getText("/public/vendor/tailwindcss/tailwind.min.css");
+        try {
+            String content = TextFileReader.getText("/public/vendor/tailwindcss/tailwind.min.css");
 
-        char[] c = content.toCharArray();
+            char[] c = content.toCharArray();
 
-        StringBuilder b = new StringBuilder();
-        StringBuilder r = new StringBuilder();
-        boolean recording = true;
+            StringBuilder b = new StringBuilder();
+            StringBuilder r = new StringBuilder();
+            boolean recording = true;
 
 
-        for (int i = 0; i < c.length; i++) {
+            for (int i = 0; i < c.length; i++) {
 
-            char ch = c[i];
+                char ch = c[i];
 
-            if (recording) b.append(ch);
+                if (recording) b.append(ch);
 
-            if (ch == '{') {
-                r.append(b);
-                r.append("\n");
-                b.setLength(0);
-                recording = false;
-            } else if (ch == '}') {
-                recording = true;
+                if (ch == '{') {
+                    r.append(b);
+                    r.append("\n");
+                    b.setLength(0);
+                    recording = false;
+                } else if (ch == '}') {
+                    recording = true;
+                }
             }
+            return r.toString();
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return null;
         }
-        return r.toString();
     }
 }

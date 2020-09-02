@@ -1,7 +1,7 @@
 package io.windflow.server.entities;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
@@ -15,7 +15,7 @@ public class Component {
     String componentName;
     Float version;
 
-    LocalDate lastUpdated;
+    LocalDateTime lastUpdated;
 
     @Lob
     String javaScript;
@@ -54,7 +54,7 @@ public class Component {
         this.version = version;
     }
 
-    public LocalDate getLastUpdated() {
+    public LocalDateTime getLastUpdated() {
         return lastUpdated;
     }
 
@@ -71,7 +71,7 @@ public class Component {
     @PreUpdate
     @PrePersist
     private void setTheDate() {
-        lastUpdated = LocalDate.now();
+        lastUpdated = LocalDateTime.now();
     }
 
 }

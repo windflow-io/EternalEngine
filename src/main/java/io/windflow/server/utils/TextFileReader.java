@@ -1,4 +1,4 @@
-package io.windflow.server;
+package io.windflow.server.utils;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -9,12 +9,10 @@ import java.nio.charset.StandardCharsets;
 
 public class TextFileReader {
 
-    public static String getText(String path) {
+    public static String getText(String path) throws IOException {
         Resource resource = new ClassPathResource(path);
         try (Reader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)) {
             return FileCopyUtils.copyToString(reader);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
         }
     }
 

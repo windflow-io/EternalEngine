@@ -6,15 +6,14 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class Page {
 
-    /* AuthenticationData */
-    /* ComponentName */
+    /*@TODO: Authorization mechanism please */
 
     @Id
     @GeneratedValue
@@ -24,24 +23,25 @@ public class Page {
 
     String path;
 
-    public PageType getType() {
-        return type;
-    }
-
-    public void setType(PageType type) {
-        this.type = type;
-    }
-
     @Enumerated(EnumType.STRING)
     PageType type;
 
-    Float version;
+    Float version = 0f;
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
     String json;
 
-    LocalDate lastUpdated;
+    LocalDateTime lastUpdated;
+
+    public Page() {}
+
+    public Page (String domain, String path, PageType type, String json) {
+        this.domain = domain;
+        this.path = path;
+        this.type = type;
+        this.json = json;
+    }
 
     /** Getters and Setters **/
 
@@ -69,6 +69,14 @@ public class Page {
         this.path = path;
     }
 
+    public PageType getType() {
+        return type;
+    }
+
+    public void setType(PageType type) {
+        this.type = type;
+    }
+
     public Float getVersion() {
         return version;
     }
@@ -86,7 +94,8 @@ public class Page {
         this.json = json;
     }
 
-    public LocalDate getLastUpdated() {
+
+    public LocalDateTime getLastUpdated() {
         return lastUpdated;
     }
 
@@ -94,7 +103,7 @@ public class Page {
 
     @PreUpdate @PrePersist
     private void setTheDate() {
-        lastUpdated = LocalDate.now();
+        lastUpdated = LocalDateTime.now();
     }
 
     public static enum PageType {

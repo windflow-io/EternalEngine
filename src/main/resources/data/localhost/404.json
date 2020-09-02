@@ -1,6 +1,6 @@
 {
     "metaData": {
-        "title": "404 - Not Found",
+        "title": "404 - Custom 404 Page",
         "description": "Localhost doesn't seem to have this page!",
         "httpStatus": "404"
     },

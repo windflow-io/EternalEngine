@@ -22,17 +22,18 @@ const loadComponent = withErrorHandling(
     { notifier },
 );
 
+/* @TODO: This still feels weird in here. */
 const errorPage = {
     metaData: {
-        title: 'Error',
-        description: 'Please try again later',
-        httpStatus: '500',
+        title: 'Error', /* @TODO: make dynamic */
+        description: 'Please try again later', /* @TODO: make dynamic */
+        httpStatus: '500',  /* @TODO: make dynamic */
     },
     layout: ErrorLayout.name,
     components: [],
     data: {
-        headline: 'Error',
-        subHeadline: 'Please try again later',
+        headline: 'Error', /*TODO: Rename to errorTitle and make dynamic*/
+        subHeadline: 'Please try again later',/*TODO: Rename to errorDetail and make dynamic*/
     },
 };
 
@@ -70,8 +71,9 @@ const store = new VueX.createStore({
                 page = await loadPage({ host: payload.host, path: payload.path });
                 await loadLayout(page.layout);
             } catch (error) {
-                /**@TODO: Maybe add error logging with something like Sentry or DataDog **/
-                console.log(error);
+                /**@TODO: Maybe add error logging with something like Sentry or DataDog (send ALL errors to server at some point later) **/
+                console.log ("Failed to load page data or layout template - no error specified by server.")
+                /**@TODO: Can we let the error page know what happened? **/
                 await componentService.register(ErrorLayout);
                 page = errorPage;
             }
