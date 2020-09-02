@@ -2,7 +2,12 @@
     "metaData": {
         "title": "Home",
         "description": "This is the home page",
-        "httpStatus": "200"
+        "httpStatus": "200",
+        "metaTags" : [
+            {"name": "og:image", "content": "https://ogp.me/logo.png"},
+            {"name": "og:title", "content": "This page features OpenGraph"},
+            {"name": "og:description", "content": "Yes, OpenGraph. That's right ladies and gentlemen"}
+        ]
     },
     "layout": "windflowx.LeftMenuLayout",
     "components": [

@@ -18,7 +18,11 @@ import java.util.stream.Collectors;
 @Controller
 public class TestController {
 
-    @Autowired PageRepository pageRepository;
+    PageRepository pageRepository;
+
+    public TestController(@Autowired PageRepository pageRepository) {
+        this.pageRepository = pageRepository;
+    }
 
     @RequestMapping(value = "/create404", produces = "application/json")
     @ResponseBody
@@ -114,4 +118,11 @@ public class TestController {
             return null;
         }
     }
+
+    @RequestMapping(value = "/test3", produces = "text/plain")
+    @ResponseBody
+    public String doTest3() {
+        return "";
+    }
+
 }

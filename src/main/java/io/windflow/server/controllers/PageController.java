@@ -1,11 +1,10 @@
 package io.windflow.server.controllers;
 
 import io.windflow.server.entities.Page;
-import io.windflow.server.exceptions.WindflowError;
-import io.windflow.server.exceptions.WindflowNotFoundException;
+import io.windflow.server.error.WindflowError;
+import io.windflow.server.error.WindflowNotFoundException;
 import io.windflow.server.persistence.PageRepository;
 import io.windflow.server.utils.HttpError;
-import io.windflow.server.utils.UrlHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,7 @@ import java.util.Optional;
 public class PageController {
 
     private final PageRepository pageRepository;
-    Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public PageController(@Autowired PageRepository pageRepository) {
         this.pageRepository = pageRepository;
@@ -29,8 +28,6 @@ public class PageController {
     @RequestMapping(value = {"/api/pages/**"}, produces = "application/json")
     @ResponseBody
     public String servePage(HttpServletRequest request, HttpServletResponse response) {
-
-        System.out.println(pageRepository.existsBy());
 
         UrlHelper url = new UrlHelper(request);
         Optional<Page> optPage = pageRepository.findByDomainAndPath(url.getDomain(), url.getPath());
@@ -74,11 +71,33 @@ public class PageController {
         return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getMessage());
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    @ResponseBody
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public HttpError handleRuntimeException(RuntimeException ex) {
-        return new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), WindflowError.ERROR_001, ex.getMessage());
+    /*** Helper Class ***/
+
+    public class UrlHelper {
+
+        private HttpServletRequest request;
+        private String domain;
+        private String path;
+
+        public UrlHelper(HttpServletRequest request) {
+            String requestedPath = request.getRequestURI().replace("/api/pages", "").toLowerCase();
+            String hostAndPort = requestedPath.split("/")[1];
+            String urlPath = requestedPath.replace("/" + hostAndPort + "/", "");
+            urlPath = urlPath.endsWith("/") ? urlPath.substring(0, urlPath.length() -1) : urlPath;
+            String host = !hostAndPort.contains(":") ? hostAndPort : hostAndPort.substring(0, hostAndPort.indexOf(":"));
+            this.domain = host.startsWith("www.") ? host.replace("www.", "") : host;
+            this.path = (urlPath.length() == 0 ? "/" : "/" + urlPath);
+        }
+
+        public String getDomain() {
+            return this.domain;
+        }
+
+        public String getPath() {
+            return this.path;
+        }
+
     }
+
 
 }

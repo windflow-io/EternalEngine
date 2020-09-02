@@ -1,6 +1,6 @@
 package io.windflow.server.utils;
 
-import io.windflow.server.exceptions.WindflowError;
+import io.windflow.server.error.WindflowError;
 
 public class HttpError {
 

@@ -17,7 +17,7 @@ import java.io.IOException;
 public class InitialData {
 
     PageRepository pageRepository;
-    Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Value(value = "${io.windflow.resetDataOnStartup:undefined}")
     String resetDataOnStartup;

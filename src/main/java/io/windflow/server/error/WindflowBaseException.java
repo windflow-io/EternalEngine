@@ -1,15 +1,15 @@
-package io.windflow.server.exceptions;
+package io.windflow.server.error;
 
-public class WindflowNotFoundException extends RuntimeException {
+public class WindflowBaseException extends RuntimeException {
 
     WindflowError windflowError;
     String errorDetail = null;
 
-    public WindflowNotFoundException(WindflowError windflowError) {
+    public WindflowBaseException(WindflowError windflowError) {
         this.windflowError = windflowError;
     }
 
-    public WindflowNotFoundException(WindflowError windflowError, String errorDetail) {
+    public WindflowBaseException(WindflowError windflowError, String errorDetail) {
         this.windflowError = windflowError;
         this.errorDetail = errorDetail;
     }

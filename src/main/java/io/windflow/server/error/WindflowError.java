@@ -1,11 +1,12 @@
-package io.windflow.server.exceptions;
+package io.windflow.server.error;
 
 public enum WindflowError {
     ERROR_001("500 Internal Server Error", "An unexpected server error occurred"),
     ERROR_002("404 Not Found","Page was not found"),
     ERROR_003("404 Domain Not Found", "Domain was not found"),
     ERROR_004("No Sites Configured", "No Windflow.io sites are configured in this database"),
-    ERROR_005("Database is Empty", "The Windflow database contains no data");
+    ERROR_005("Database is Empty", "The Windflow database contains no data"),
+    ERROR_006("Invalid Page Data", "JSON Page Data Invalid");
 
     String title;
     String description;
