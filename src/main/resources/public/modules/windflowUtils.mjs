@@ -57,6 +57,11 @@ window.addEventListener(
 
 export const loadScript = (url, globalName = null) => {
     return new Promise((resolve, reject) => {
+        if (window[globalName]) {
+            resolve(window[globalName]);
+            return;
+        }
+
         const script = document.createElement('script');
         script.async = true;
         script.addEventListener('load', () => {
@@ -68,6 +73,50 @@ export const loadScript = (url, globalName = null) => {
         script.src = url;
         document.head.appendChild(script);
     });
+}
+
+/** Load Editor **/
+
+export async function loadEditor() {
+    if (window.monaco) return window.monaco;
+
+    const require = await loadScript('/vendor/monacoEditor/loader.js', 'require');
+    require.config({ paths: { 'vs': '/vendor/monacoEditor/vs' }});
+
+    return new Promise((resolve) => {
+        require(['vs/editor/editor.main'], () => resolve(window.monaco));
+    });
+}
+
+/** Load Stylesheet **/
+
+export const loadStyleshet = (url) => {
+    return new Promise((resolve, reject) => {
+        if (document.querySelector(`link[href="${url}"]`)) {
+            resolve();
+            return;
+        }
+
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.addEventListener('load', () => {
+            resolve();
+        });
+        link.addEventListener('error', () => {
+            reject(new Error(`Error loading ${url}`));
+        });
+        link.href = url;
+        document.head.appendChild(link);
+    });
+}
+
+/** Edit Mode **/
+
+export const enableEditMode = async () => {
+    await Promise.all([
+        loadEditor(),
+        loadStyleshet('/vendor/tailwindcss/tailwind.min.css'),
+    ]);
 }
 
 /** Handle Errors **/
