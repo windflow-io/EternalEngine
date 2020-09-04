@@ -1,24 +1,11 @@
-import {loadScript} from './windflowUtils.mjs';
-
-function loadMonacoEditor() {
-  return new Promise(async (resolve) => {
-    if (window.monaco) {
-        resolve(window.monaco);
-        return;
-    }
-
-    const require = await loadScript('/vendor/monacoEditor/loader.js', 'require');
-    require.config({ paths: { 'vs': '/vendor/monacoEditor/vs' }});
-    require(['vs/editor/editor.main'], () => resolve(window.monaco));
-  });
-}
+import {loadEditor} from './windflowUtils.mjs';
 
 export const CodeEditor = {
   name: 'CodeEditor',
   props: {
     options: {
         default: () => ({
-            language: 'javascript',
+            language: 'html',
         }),
         type: Object,
     },
@@ -37,7 +24,7 @@ export const CodeEditor = {
   },
   methods: {
     async init() {
-        const monaco = await loadMonacoEditor();
+        const monaco = await loadEditor();
         this.loading = false;
         // Wait until re-render so that the editor container has correct dimensions.
         await this.$nextTick();

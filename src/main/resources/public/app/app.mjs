@@ -4,11 +4,16 @@ import {FlowApplication,ErrorLayout} from '/modules/coreComponents.mjs'
 import {
     COMPONENT_TYPES,
     alertNotifier as notifier,
+    enableEditMode,
     withErrorHandling,
     withRetryHandling,
     componentService,
     pageService,
 } from '/modules/windflowUtils.mjs'
+
+const EDIT_MODE_HASH = 'edit';
+const EDIT_MODE = window.location.hash === `#${EDIT_MODE_HASH}`;
+if (EDIT_MODE) enableEditMode();
 
 const bypass4xxErrors = error => error.status >= 400 && error.status < 500;
 const loadPage = withRetryHandling(pageService.load, { bypass: bypass4xxErrors });
