@@ -83,7 +83,7 @@ const store = new VueX.createStore({
             commit('setPageLayout', page.layout);
 
             document.title = page.metaData.title;
-            document.getElementsByTagName("meta").namedItem('description').setAttribute("content", page.metaData.description);
+            //document.getElementsByTagName("meta").namedItem('description').setAttribute("content", page.metaData.description);
             /**@TODO: Allow the adding of meta data (including charset and viewport) **/
 
             const allComponents = [];

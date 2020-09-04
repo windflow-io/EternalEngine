@@ -17,6 +17,7 @@ public class PageData {
         String description;
         Integer httpStatus;
         Set<MetaTag> metaTags = new HashSet<>();
+        Set<MetaTag> links = new HashSet<>();
 
         public String getTitle() {
             return title;
@@ -49,6 +50,14 @@ public class PageData {
         public void setMetaTags(Set<MetaTag> metaTags) {
             this.metaTags = metaTags;
         }
+
+        public Set<MetaTag> getLinks() {
+            return links;
+        }
+
+        public void setLinks(Set<MetaTag> links) {
+            this.links = links;
+        }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -70,6 +79,47 @@ public class PageData {
 
         public void setContent(String content) {
             this.content = content;
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Links {
+
+        String rel;
+        String type;
+        String href;
+        String sizes;
+
+        public String getRel() {
+            return rel;
+        }
+
+        public void setRel(String rel) {
+            this.rel = rel;
+        }
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
+
+        public String getHref() {
+            return href;
+        }
+
+        public void setHref(String href) {
+            this.href = href;
+        }
+
+        public String getSizes() {
+            return sizes;
+        }
+
+        public void setSizes(String sizes) {
+            this.sizes = sizes;
         }
     }
 

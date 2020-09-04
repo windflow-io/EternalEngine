@@ -14,6 +14,12 @@ public class WindflowBaseException extends RuntimeException {
         this.errorDetail = errorDetail;
     }
 
+    public WindflowBaseException(WindflowError windflowError, String errorDetail, Exception ex) {
+        super(ex);
+        this.windflowError = windflowError;
+        this.errorDetail = errorDetail;
+    }
+
     @Override
     public String getMessage() {
         return windflowError.title + ": " + windflowError.description + (errorDetail != null ?  ": " + errorDetail : "");

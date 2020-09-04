@@ -2,7 +2,11 @@
     "metaData": {
         "title": "404 - Custom 404 Page",
         "description": "Localhost doesn't seem to have this page!",
-        "httpStatus": "404"
+        "httpStatus": "404",
+        "metaTags": [
+            {"name": "robots", "content": "noindex, follow"}
+        ]
+
     },
     "layout": "windflowx.CenteredLayout",
     "components": [

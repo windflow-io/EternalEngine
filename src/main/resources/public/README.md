@@ -31,11 +31,13 @@ PERFORMANCE OPTIMISATION:
    * Convert all SVG icons into .mjs functional components
    * Rollup.js can come later.
    * Implement PurgeCSS
-   * Render the head
    * Memcache: https://devcenter.heroku.com/articles/spring-boot-memcache
-   
-   * Markus: Don't reload layout nor components that are staying in their place.
    * Mark: Java to "machine compiled" to save Heroku cash
    * We don't have to host their domains (hosting their domains in pricing)
    * DNSimple allows sharing
+   * Cache Breaking URL's
+   * CORS JavaScript on CDN
+   * Prerender HTML Tags
+   * Do not use the UI to upload content to Google Cloud Storage
+     - gsutil cp -Z *.css gs://cdn.windflow.io/www.windflow.io/
   

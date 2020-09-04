@@ -4,15 +4,23 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.windflow.server.beans.PageData;
 import io.windflow.server.entities.Page;
+import io.windflow.server.error.WindflowError;
+import io.windflow.server.error.WindflowWebException;
 import io.windflow.server.persistence.PageRepository;
+import io.windflow.server.utils.HttpError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
 @Controller
@@ -25,48 +33,47 @@ public class WebController {
         this.pageRepository = pageRepository;
     }
 
-    @GetMapping(value = "/")
-    public String root(HttpServletRequest request, Model model) {
-        return spa(request, model);
-    }
+    @GetMapping(value = {"/**/{regex:[-a-zA-Z0-9]*}", "/"})
+    public String spa(HttpServletRequest request, HttpServletResponse response, Model model) throws JsonProcessingException {
 
-    @GetMapping(value = "/**/{regex:[-a-zA-Z0-9]*}")
-    public String spa(HttpServletRequest request, Model model) {
+        /** @TODO: Send PageData down with Index **/
 
-        Page pageToServe = null;
-
+        /** Look for the page **/
         Optional<Page> optPage = pageRepository.findByDomainAndPath(request.getServerName(), request.getServletPath());
         if (optPage.isPresent()) {
-            pageToServe = optPage.get();
-        } else {
-            Optional<Page> opt404Page = pageRepository.findByDomainAndType(request.getServerName(), Page.PageType.Page404);
-            if (opt404Page.isPresent()) {
-                pageToServe = opt404Page.get();
-            }
+            model.addAttribute("data", prepareModel(optPage.get()));
+            response.setStatus(HttpServletResponse.SC_OK);
+            return "spa200";
         }
 
-        if (pageToServe != null) {
-            try {
-                PageData pageData = new ObjectMapper().readValue(pageToServe.getJson(), PageData.class);
-                System.out.println(pageData);
-            } catch (JsonProcessingException e) {
-                e.printStackTrace();
-            }
+        /** Look for the error 404 **/
+
+        Optional<Page> optCustom404 = pageRepository.findByDomainAndType(request.getServerName(), Page.PageType.Page404);
+        if (optPage.isPresent()) {
+            model.addAttribute("data", prepareModel(optCustom404.get()));
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return "spa200";
         }
 
-
-
-        return "spa";
+        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        return "spaError";
 
     }
 
-    /**@TODO: What do we do if we cannot interpret the page data? **/
+    /*** Private Methods ***/
 
-//    @ExceptionHandler(RuntimeException.class)
-//    @ResponseBody
-//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-//    public HttpError handleRuntimeException(RuntimeException ex) {
-//        return new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), WindflowError.ERROR_001, ex.getMessage());
-//    }
+    private PageData prepareModel(Page page) throws JsonProcessingException {
+        return new ObjectMapper().readValue(page.getJson(), PageData.class);
+    }
 
+    @ExceptionHandler(JsonProcessingException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public String handleRuntimeException(JsonProcessingException ex, HttpServletRequest request, HttpServletResponse response) {
+        String domainAndPath = "domain:" + request.getServerName() + " and path:" + request.getServletPath();
+        logger.error("Error interpreting page data: " + domainAndPath + " " + ex.getMessage());
+        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        ex.printStackTrace();
+        return "spaError";
+    }
 }

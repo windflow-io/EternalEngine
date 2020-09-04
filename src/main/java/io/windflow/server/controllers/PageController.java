@@ -52,14 +52,6 @@ public class PageController {
             throw new WindflowNotFoundException(WindflowError.ERROR_005);
 
         }
-
-        /**
-         * 1. The page
-         * 2. The site found but not the page
-         * 3. The site not found
-         * 4. No sites found
-         */
-
     }
 
     /**@TODO Common Errors must be moved to a common error handling class **/
