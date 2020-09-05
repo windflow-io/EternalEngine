@@ -15,8 +15,8 @@ const EDIT_MODE_HASH = 'edit';
 const EDIT_MODE = window.location.hash === `#${EDIT_MODE_HASH}`;
 if (EDIT_MODE) enableEditMode();
 
-const bypass4xxErrors = error => error.status >= 400 && error.status < 500;
-const loadPage = withRetryHandling(pageService.load, { bypass: bypass4xxErrors });
+const bypassIrrelevantErrors = error => error.status <= 500;
+const loadPage = withRetryHandling(pageService.load, { bypass: bypassIrrelevantErrors });
 
 const loadLayout = withRetryHandling(name => componentService.load(name, {
     type: COMPONENT_TYPES.layout,
