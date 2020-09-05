@@ -1,5 +1,5 @@
 export default {
-    name: 'DomainNotFoundMessage',
+    name: 'DomainNotFound',
     template: `
         <section class="flex flex-col">
             <h1 class="flex text-6xl justify-center font-semibold text-gray-300">404</h1>

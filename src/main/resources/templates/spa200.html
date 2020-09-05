@@ -1,9 +1,10 @@
 <!doctype html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <!-- SPA Page Template HTML -->
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title th:text="Title"></title>
+        <title th:text="${pageData.getTitle()}"></title>
         <meta name="description" content=""/>
         <link rel="stylesheet" href="/vendor/tailwindcss/tailwind.min.css">
         <link rel="icon" type="image/png" href="/img/favicon-32x32.png" sizes="32x32" />

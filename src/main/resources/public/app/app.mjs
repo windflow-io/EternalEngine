@@ -35,7 +35,7 @@ const errorPage = {
         httpStatus: '500',  /* @TODO: make dynamic */
     },
     layout: ErrorLayout.name,
-    components: [],
+    areas: [],
     data: {
         headline: 'Error', /*TODO: Rename to errorTitle and make dynamic*/
         subHeadline: 'Please try again later',/*TODO: Rename to errorDetail and make dynamic*/
@@ -44,27 +44,39 @@ const errorPage = {
 
 const store = new VueX.createStore({
     state: {
-        pageMeta: {
-            title: null,
-            description: null,
-            httpStatus: null
-        },
-        pageLayout: null,
-        pageComponents: [],
+        pageHttpStatus: undefined,
+        pageEncoding: 'utf-8',
+        pageLang: 'en',
+        pageTitle: undefined,
+        pageMeta: {},
+        pageLayout: undefined,
+        pageAreas: [],
         pageData: {},
     },
     mutations: {
+        setPageHttpStatus(state, value) {
+            if (value) state.pageHttpStatus = value;
+        },
+        setPageEncoding(state, value) {
+            if (value) state.pageEncoding = value;
+        },
+        setPageLang(state, value) {
+            if (value) state.pageLang = value;
+        },
+        setPageTitle(state, value) {
+            if (value) state.pageTitle = value;
+        },
         setPageMeta(state, value) {
-            state.pageMeta = value;
+            if (value) state.pageMeta = value;
         },
         setPageLayout(state, value) {
-            state.pageLayout = value;
+            if (value) state.pageLayout = value;
         },
-        setPageComponents(state, value) {
-            state.pageComponents = value;
+        setPageAreas(state, value) {
+            if (value) state.pageAreas = value;
         },
         setPageData(state, value) {
-            state.pageData = value;
+            if (value) state.pageData = value;
         }
 
     },
@@ -83,19 +95,25 @@ const store = new VueX.createStore({
                 page = errorPage;
             }
 
+            commit('setPageHttpStatus', page.httpStatus)
+            commit('setPageEncoding', page.encoding);
+            commit('setPageLang', page.lang);
+            commit('setPageTitle', page.title);
+            commit('setPageHttpStatus', page.httpStatus);
             commit('setPageMeta', page.metaData);
-            commit('setPageData', page.data);
             commit('setPageLayout', page.layout);
+            commit('setPageAreas', page.areas);
+            commit('setPageData', page.data);
 
             document.title = page.metaData.title;
             //document.getElementsByTagName("meta").namedItem('description').setAttribute("content", page.metaData.description);
             /**@TODO: Allow the adding of meta data (including charset and viewport) **/
 
             const allComponents = [];
-            page.components.forEach(section => section.components.forEach(component => allComponents.push(component)));
+            page.areas.forEach(section => section.components.forEach(component => allComponents.push(component)));
             await Promise.all(allComponents.map(component => loadComponent(component.name)));
 
-            commit('setPageComponents', page.components);
+            commit('setPageAreas', page.areas);
         }
     }
 })

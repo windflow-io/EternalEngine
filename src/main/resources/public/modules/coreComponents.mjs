@@ -50,9 +50,13 @@ export const FlowArea = {
     },
     props: ['name'],
     computed: {
-        areaComponents() {
-            const area = this.$store.state.pageComponents.find(({ area }) => area === this.name);
-            return area ? area.components : [];
+        areaComponents: {
+            get: function() {
+                const area = this.$store.state.pageAreas.find(({ area }) => area === this.name);
+                let k = area ? area.components : [];
+                console.log(k)
+                return k;
+            }
         }
     },
     methods: {
@@ -100,11 +104,15 @@ export const ErrorLayout = {
             <div class="relative z-10 max-w-4xl opacity-100">
                 <section class="flex flex-col">
                     <h1 class="flex text-6xl justify-center font-semibold text-gray-300">
-                        {{ $store.state.pageData.headline }}
+                        {{ $store.state.pageData.errorTitle }}
                     </h1>
                     <h2 class="flex text-3xl justify-center text-gray-700">
-                        {{ $store.state.pageData.subHeadline }}
+                        {{ $store.state.pageData.errorDescription }}
                     </h2>
+                    <h2 class="flex text-xl justify-center text-gray-700">
+                        {{ $store.state.pageData.errorDetail }}
+                    </h2>
+                    
                 </section>
             </div>
         </div>

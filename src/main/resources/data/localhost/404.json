@@ -1,15 +1,14 @@
 {
+    "title": "404 - Custom 404 Page",
+    "httpStatus": "404",
     "metaData": {
-        "title": "404 - Custom 404 Page",
-        "description": "Localhost doesn't seem to have this page!",
-        "httpStatus": "404",
         "metaTags": [
-            {"name": "robots", "content": "noindex, follow"}
+            {"name": "robots", "content": "noindex, follow"},
+            {"name": "description", "content": "This is the custom 404 page"}
         ]
-
     },
     "layout": "windflowx.CenteredLayout",
-    "components": [
+    "areas": [
         {
             "area": "center",
             "components":[

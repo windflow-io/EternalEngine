@@ -1,6 +1,11 @@
 # Windflow.io
 These are general notes for Mark van Wyk. Required tests to make sure the new system is working correctly:
 
+Important Now:
+ * Read the 404/500 headers - display the correct error on the error page.
+ * Create all the tags for each page in JavaScript
+ * 
+ * Do the CDN thing
 
 Tasks
  * Create server component example

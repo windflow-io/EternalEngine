@@ -41,17 +41,20 @@ public class WebController {
         /** Look for the page **/
         Optional<Page> optPage = pageRepository.findByDomainAndPath(request.getServerName(), request.getServletPath());
         if (optPage.isPresent()) {
-            model.addAttribute("data", prepareModel(optPage.get()));
+            PageData pageData = prepareModel(optPage.get());
+            model.addAttribute("pageData", pageData);
             response.setStatus(HttpServletResponse.SC_OK);
             return "spa200";
         }
 
         /** Look for the error 404 **/
-
         Optional<Page> optCustom404 = pageRepository.findByDomainAndType(request.getServerName(), Page.PageType.Page404);
-        if (optPage.isPresent()) {
-            model.addAttribute("data", prepareModel(optCustom404.get()));
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        if (optCustom404.isPresent()) {
+            PageData pageData = prepareModel(optCustom404.get());
+            System.out.println("DATA");
+            System.out.println(pageData);
+            model.addAttribute("pageData", pageData);
+            response.setStatus(HttpServletResponse.SC_OK);
             return "spa200";
         }
 
@@ -67,7 +70,6 @@ public class WebController {
     }
 
     @ExceptionHandler(JsonProcessingException.class)
-    @ResponseBody
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleRuntimeException(JsonProcessingException ex, HttpServletRequest request, HttpServletResponse response) {
         String domainAndPath = "domain:" + request.getServerName() + " and path:" + request.getServletPath();

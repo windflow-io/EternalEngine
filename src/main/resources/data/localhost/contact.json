@@ -1,11 +1,13 @@
 {
+    "title": "Contact",
+    "httpStatus": "200",
     "metaData": {
-        "title": "Contact",
-        "description": "This is the contact page",
-        "httpStatus": "200"
+        "metaTags" : [
+            {"name": "description", "content":  "contact page meta description page"}
+        ]
     },
     "layout": "windflowx.LeftMenuLayout",
-    "components": [
+    "areas": [
         {
             "area": "left",
             "components": [{"name":"localhost.SideMenu", "id":"4"}]

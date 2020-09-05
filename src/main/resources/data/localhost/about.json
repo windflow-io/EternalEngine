@@ -1,11 +1,13 @@
 {
+    "title": "What about it!",
+    "httpStatus": "200",
     "metaData": {
-        "title": "What about it!",
-        "description": "This is the about page",
-        "httpStatus": "200"
+        "metaTags" : [
+            {"name": "description", "content":  "this is the meta description of the about page"}
+        ]
     },
     "layout": "windflowx.LeftMenuLayout",
-    "components": [
+    "areas": [
         {
             "area": "left",
             "components": [{"name":"localhost.SideMenu", "id":"6"}]

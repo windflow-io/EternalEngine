@@ -3,6 +3,7 @@ package io.windflow.server.beans;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -10,38 +11,18 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PageData {
 
+    String title;
+    String lang;
+    String encoding;
+    Integer httpStatus;
     MetaData metaData;
+    String layout;
+    HashSet<Area> areas = new HashSet();
 
     public class MetaData {
-        String title;
-        String description;
-        Integer httpStatus;
+
         Set<MetaTag> metaTags = new HashSet<>();
-        Set<MetaTag> links = new HashSet<>();
-
-        public String getTitle() {
-            return title;
-        }
-
-        public void setTitle(String title) {
-            this.title = title;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public void setDescription(String description) {
-            this.description = description;
-        }
-
-        public Integer getHttpStatus() {
-            return httpStatus;
-        }
-
-        public void setHttpStatus(Integer httpStatus) {
-            this.httpStatus = httpStatus;
-        }
+        Set<Link> links = new HashSet<>();
 
         public Set<MetaTag> getMetaTags() {
             return metaTags;
@@ -51,17 +32,18 @@ public class PageData {
             this.metaTags = metaTags;
         }
 
-        public Set<MetaTag> getLinks() {
+        public Set<Link> getLinks() {
             return links;
         }
 
-        public void setLinks(Set<MetaTag> links) {
+        public void setLinks(Set<Link> links) {
             this.links = links;
         }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class MetaTag {
+
         String name;
         String content;
 
@@ -83,7 +65,7 @@ public class PageData {
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class Links {
+    public static class Link {
 
         String rel;
         String type;
@@ -123,6 +105,84 @@ public class PageData {
         }
     }
 
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Area {
+
+        String area;
+        HashSet<Component> components = new HashSet<Component>();
+
+        public String getArea() {
+            return area;
+        }
+
+        public void setArea(String area) {
+            this.area = area;
+        }
+
+        public HashSet<Component> getComponents() {
+            return components;
+        }
+
+        public void setComponents(HashSet<Component> components) {
+            this.components = components;
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Component {
+
+        String id;
+        String name;
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getLang() {
+        return lang;
+    }
+
+    public void setLang(String lang) {
+        this.lang = lang;
+    }
+
+    public String getEncoding() {
+        return encoding;
+    }
+
+    public void setEncoding(String encoding) {
+        this.encoding = encoding;
+    }
+
+    public Integer getHttpStatus() {
+        return httpStatus;
+    }
+
+    public void setPageHttpStatus(Integer httpStatus) {
+        this.httpStatus = httpStatus;
+    }
+
     public MetaData getMetaData() {
         return metaData;
     }
@@ -131,10 +191,28 @@ public class PageData {
         this.metaData = metaData;
     }
 
+    public String getLayout() {
+        return layout;
+    }
+
+    public void setLayout(String layout) {
+        this.layout = layout;
+    }
+
+    public HashSet<Area> getAreas() {
+        return areas;
+    }
+
+    public void setAreas(HashSet<Area> areas) {
+        this.areas = areas;
+    }
+
     @Override
     public String toString() {
         try {
-            return new ObjectMapper().writeValueAsString(this);
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.enable(SerializationFeature.INDENT_OUTPUT);
+            return mapper.writeValueAsString(this);
         } catch (JsonProcessingException e) {
             return "Could not express object as JSON";
         }

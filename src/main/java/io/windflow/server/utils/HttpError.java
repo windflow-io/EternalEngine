@@ -24,7 +24,7 @@ public class HttpError {
         return httpStatus;
     }
 
-    public void setHttpStatus(Integer httpStatus) {
+    public void setPageHttpStatus(Integer httpStatus) {
         this.httpStatus = httpStatus;
     }
 
