@@ -50,13 +50,12 @@ export const FlowArea = {
     },
     props: ['name'],
     computed: {
-        areaComponents: {
-            get: function() {
-                const area = this.$store.state.pageAreas.find(({ area }) => area === this.name);
-                let k = area ? area.components : [];
-                console.log(k)
-                return k;
-            }
+        areaComponents() {
+            const area = this.$store.state.pageAreas.find(({ area }) => area === this.name);
+            let k = area ? area.components : [];
+            console.log ("ISSUE HERE")
+            console.log(k)
+            return k;
         }
     },
     methods: {
