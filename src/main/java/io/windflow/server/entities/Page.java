@@ -43,6 +43,20 @@ public class Page {
         this.json = json;
     }
 
+    /*** Methods ***/
+
+    @PreUpdate @PrePersist
+    private void setTheDate() {
+        lastUpdated = LocalDateTime.now();
+    }
+
+    /** Inner Classes **/
+
+    public static enum PageType {
+        PageNormal,
+        Page404
+    }
+
     /** Getters and Setters **/
 
     public UUID getId() {
@@ -94,19 +108,9 @@ public class Page {
         this.json = json;
     }
 
-
     public LocalDateTime getLastUpdated() {
         return lastUpdated;
     }
 
-    /*** Methods ***/
 
-    @PreUpdate @PrePersist
-    private void setTheDate() {
-        lastUpdated = LocalDateTime.now();
-    }
-
-    public static enum PageType {
-        Page404, Page500, PageDefault, PageNormal, PageNoSite
-    }
 }

@@ -1,5 +1,7 @@
 package io.windflow.server.entities;
 
+import org.hibernate.annotations.Type;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -13,12 +15,38 @@ public class Component {
 
     String namespace;
     String componentName;
-    Float version;
+    Float version = 0f;
+
+    @Type(type="org.hibernate.type.TextType")
+    String javaScript;
 
     LocalDateTime lastUpdated;
 
-    @Lob
-    String javaScript;
+    ComponentType componentType;
+
+    public Component() {}
+
+    public Component(String namespace, String componentName, ComponentType componentType, String javaScript) {
+        this.namespace = namespace;
+        this.componentName = componentName;
+        this.javaScript = javaScript;
+        this.componentType = componentType;
+    }
+
+    /*** Methods ***/
+
+    @PreUpdate
+    @PrePersist
+    private void setTheDate() {
+        lastUpdated = LocalDateTime.now();
+    }
+
+    /*** Inner Classes ***/
+
+    public static enum ComponentType {
+        LAYOUT, COMPONENT
+    }
+
 
     /*** Getters and Setters ***/
 
@@ -66,12 +94,11 @@ public class Component {
         this.javaScript = javaScript;
     }
 
-    /*** Methods ***/
-
-    @PreUpdate
-    @PrePersist
-    private void setTheDate() {
-        lastUpdated = LocalDateTime.now();
+    public ComponentType getComponentType() {
+        return componentType;
     }
 
+    public void setComponentType(ComponentType componentType) {
+        this.componentType = componentType;
+    }
 }

@@ -11,6 +11,7 @@ import io.windflow.server.utils.HttpError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,6 +29,9 @@ public class WebController {
 
     PageRepository pageRepository;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Value(value = "${io.windflow.cdn:undefined}")
+    String cdn;
 
     public WebController(@Autowired PageRepository pageRepository) {
         this.pageRepository = pageRepository;
@@ -51,8 +55,6 @@ public class WebController {
         Optional<Page> optCustom404 = pageRepository.findByDomainAndType(request.getServerName(), Page.PageType.Page404);
         if (optCustom404.isPresent()) {
             PageData pageData = prepareModel(optCustom404.get());
-            System.out.println("DATA");
-            System.out.println(pageData);
             model.addAttribute("pageData", pageData);
             response.setStatus(HttpServletResponse.SC_OK);
             return "spa200";
@@ -66,7 +68,9 @@ public class WebController {
     /*** Private Methods ***/
 
     private PageData prepareModel(Page page) throws JsonProcessingException {
-        return new ObjectMapper().readValue(page.getJson(), PageData.class);
+        PageData pageData = new ObjectMapper().readValue(page.getJson(), PageData.class);
+        pageData.setCdn(this.cdn);
+        return pageData;
     }
 
     @ExceptionHandler(JsonProcessingException.class)

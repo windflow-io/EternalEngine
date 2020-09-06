@@ -1,6 +1,7 @@
 package io.windflow.server.configuration;
 
 import io.windflow.server.entities.Page;
+import io.windflow.server.persistence.ComponentRepository;
 import io.windflow.server.persistence.PageRepository;
 import io.windflow.server.utils.TextFileReader;
 import org.slf4j.Logger;
@@ -17,13 +18,15 @@ import java.io.IOException;
 public class InitialData {
 
     PageRepository pageRepository;
+    ComponentRepository componentRepository;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Value(value = "${io.windflow.resetDataOnStartup:undefined}")
     String resetDataOnStartup;
 
-    InitialData(@Autowired  PageRepository pageRepository) {
+    InitialData(@Autowired  PageRepository pageRepository, @Autowired ComponentRepository componentRepository) {
         this.pageRepository = pageRepository;
+        this.componentRepository = componentRepository;
     }
 
     @PostConstruct
@@ -31,21 +34,34 @@ public class InitialData {
         if ((resetDataOnStartup.equals("undefined") && pageRepository.count() == 0) || resetDataOnStartup.equals("true")) {
             logger.info("Truncating pages and adding default data. Usually happens once. See prop io.windflow.resetDataOnStartup");
             pageRepository.truncate();
-            savePage("localhost", "/", Page.PageType.PageNormal, "/data/localhost/index.json");
-            savePage("localhost", "/about", Page.PageType.PageNormal, "/data/localhost/about.json");
-            savePage("localhost", "/contact", Page.PageType.PageNormal, "/data/localhost/contact.json");
-            savePage("localhost", null, Page.PageType.Page404, "/data/localhost/404.json");
+            savePage("localhost", "/", Page.PageType.PageNormal, "/data/localhost/pages/index.json");
+            savePage("localhost", "/about", Page.PageType.PageNormal, "/data/localhost/pages/about.json");
+            savePage("localhost", "/contact", Page.PageType.PageNormal, "/data/localhost/pages/contact.json");
+            savePage("localhost", null, Page.PageType.Page404, "/data/localhost/pages/404.json");
         }
     }
 
     @PostConstruct
     public void initialComponents() {
-
+        if ((resetDataOnStartup.equals("undefined") && pageRepository.count() == 0) || resetDataOnStartup.equals("true")) {
+            logger.info("Truncating components (and layouts) and adding default data. Usually happens once. See prop io.windflow.resetDataOnStartup");
+            componentRepository.truncate();
+            saveComponent("localhost", "CenteredLayout", io.windflow.server.entities.Component.ComponentType.LAYOUT, "/data/localhost/layouts/CenteredLayout.mjs");
+            saveComponent("localhost", "LeftMenuLayout", io.windflow.server.entities.Component.ComponentType.LAYOUT, "/data/localhost/layouts/LeftMenuLayout.mjs");
+        }
     }
 
     private void savePage(String domain, String path, Page.PageType type, String filePath) {
         try {
             pageRepository.save(new Page(domain, path, type, TextFileReader.getText(filePath)));
+        } catch (IOException ex) {
+            logger.warn("Could not load file: " + ex.getMessage() + ". Ignoring, but be prepared for an error page on first visit!");
+        }
+    }
+
+    private void saveComponent(String namespace, String name, io.windflow.server.entities.Component.ComponentType componentType, String filePath) {
+        try {
+            componentRepository.save(new io.windflow.server.entities.Component(namespace, name, componentType, TextFileReader.getText(filePath)));
         } catch (IOException ex) {
             logger.warn("Could not load file: " + ex.getMessage() + ". Ignoring, but be prepared for an error page on first visit!");
         }

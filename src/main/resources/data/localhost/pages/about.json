@@ -6,7 +6,7 @@
             {"name": "description", "content":  "this is the meta description of the about page"}
         ]
     },
-    "layout": "windflowx.LeftMenuLayout",
+    "layout": "localhost.LeftMenuLayout",
     "areas": [
         {
             "area": "left",

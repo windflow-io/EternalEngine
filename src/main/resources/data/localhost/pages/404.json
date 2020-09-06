@@ -7,7 +7,7 @@
             {"name": "description", "content": "This is the custom 404 page"}
         ]
     },
-    "layout": "windflowx.CenteredLayout",
+    "layout": "localhost.CenteredLayout",
     "areas": [
         {
             "area": "center",

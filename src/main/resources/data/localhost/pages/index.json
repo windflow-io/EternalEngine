@@ -16,7 +16,7 @@
             {"rel":"stylesheet" ,"type": "text/css", "href": "INSERT CSS LINK HERE"}
         ]
     },
-    "layout": "windflowx.LeftMenuLayout",
+    "layout": "localhost.LeftMenuLayout",
     "areas": [
         {
             "area": "left",

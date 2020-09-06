@@ -53,7 +53,8 @@ const store = new VueX.createStore({
         pageLayout: undefined,
         pageAreas: [],
         pageData: {},
-        error: {}
+        error: {},
+        cdn: {}
     },
     mutations: {
         setPageHttpStatus(state, value) {
@@ -79,7 +80,14 @@ const store = new VueX.createStore({
         },
         setPageData(state, value) {
             if (value) state.pageData = value;
+        },
+        setError(state, value) {
+            if (value) state.error = value;
+        },
+        setCdn(state, value) {
+            if (value) state.cdn = value;
         }
+
 
     },
     actions: {
@@ -106,6 +114,7 @@ const store = new VueX.createStore({
             commit('setPageMeta', page.metaData);
             commit('setPageLayout', page.layout);
             commit('setPageData', page.data);
+            commit('setCdn', page.cdn)
 
             document.title = page.metaData.title;
             //document.getElementsByTagName("meta").namedItem('description').setAttribute("content", page.metaData.description);

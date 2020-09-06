@@ -6,7 +6,7 @@
             {"name": "description", "content":  "contact page meta description page"}
         ]
     },
-    "layout": "windflowx.LeftMenuLayout",
+    "layout": "localhost.LeftMenuLayout",
     "areas": [
         {
             "area": "left",
