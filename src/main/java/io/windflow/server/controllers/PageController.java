@@ -39,11 +39,11 @@ public class PageController {
                 return optNotFound.get().getJson();
             }
             logger.warn("Page does not exist");
-            throw new WindflowNotFoundException(WindflowError.ERROR_002, "domain:" + url.getDomain() + " and path:" + url.getPath());
+            throw new WindflowNotFoundException(WindflowError.ERROR_002, "domain: " + url.getDomain() + " and path: " + url.getPath());
         } else if (pageRepository.existsByType(Page.PageType.PageNormal)) {
             logger.warn("Domain does not exist");
             response.setStatus(HttpStatus.NOT_FOUND.value());
-            throw new WindflowNotFoundException(WindflowError.ERROR_003, "domain:" + url.getDomain());
+            throw new WindflowNotFoundException(WindflowError.ERROR_003, "domain: " + url.getDomain());
         } else if (pageRepository.existsBy()) {
             logger.warn("No sites configured");
             throw new WindflowNotFoundException(WindflowError.ERROR_004);
@@ -60,7 +60,7 @@ public class PageController {
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public HttpError handleWindflowNotFoundException(WindflowNotFoundException windEx) {
-        return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getMessage());
+        return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly());
     }
 
     /*** Helper Class ***/

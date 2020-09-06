@@ -105,7 +105,7 @@ export const ErrorLayout = {
                     <h2 class="flex text-3xl justify-center text-gray-700">
                         {{ $store.state.pageData.errorDescription }}
                     </h2>
-                    <h2 class="flex text-xl justify-center text-gray-700">
+                    <h2 class="flex text-xl justify-center text-gray-700 mt-4">
                         {{ $store.state.pageData.errorDetail }}
                     </h2>
                     

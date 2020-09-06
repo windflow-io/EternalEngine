@@ -25,6 +25,11 @@ public class WindflowBaseException extends RuntimeException {
         return windflowError.title + ": " + windflowError.description + (errorDetail != null ?  ": " + errorDetail : "");
     }
 
+    public String getDetailOnly() {
+        return errorDetail;
+    }
+
+
     /** Getters and Setters **/
 
     public WindflowError getWindflowError() {
