@@ -102,7 +102,6 @@ const store = new VueX.createStore({
             commit('setPageHttpStatus', page.httpStatus);
             commit('setPageMeta', page.metaData);
             commit('setPageLayout', page.layout);
-            commit('setPageAreas', page.areas);
             commit('setPageData', page.data);
 
             document.title = page.metaData.title;

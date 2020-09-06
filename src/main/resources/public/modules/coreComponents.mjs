@@ -52,10 +52,7 @@ export const FlowArea = {
     computed: {
         areaComponents() {
             const area = this.$store.state.pageAreas.find(({ area }) => area === this.name);
-            let k = area ? area.components : [];
-            console.log ("ISSUE HERE")
-            console.log(k)
-            return k;
+            return area ? area.components : [];
         }
     },
     methods: {
