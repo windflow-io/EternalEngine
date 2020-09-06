@@ -37,8 +37,9 @@ const errorPage = {
     layout: ErrorLayout.name,
     areas: [],
     data: {
-        headline: 'Error', /*TODO: Rename to errorTitle and make dynamic*/
-        subHeadline: 'Please try again later',/*TODO: Rename to errorDetail and make dynamic*/
+        errorTitle: 'Error', /*TODO: Rename to errorTitle and make dynamic*/
+        errorDescription: 'Please try again later',/*TODO: Rename to errorDetail and make dynamic*/
+        errorDetail: 'Something fucked up',/*TODO: Rename to errorDetail and make dynamic*/
     },
 };
 
@@ -52,6 +53,7 @@ const store = new VueX.createStore({
         pageLayout: undefined,
         pageAreas: [],
         pageData: {},
+        error: {}
     },
     mutations: {
         setPageHttpStatus(state, value) {
@@ -88,6 +90,7 @@ const store = new VueX.createStore({
                 page = await loadPage({ host: payload.host, path: payload.path });
                 await loadLayout(page.layout);
             } catch (error) {
+                console.log (error);
                 /**@TODO: Maybe add error logging with something like Sentry or DataDog (send ALL errors to server at some point later) **/
                 console.log ("Failed to load page data or layout template - no error specified by server.")
                 /**@TODO: Can we let the error page know what happened? **/
