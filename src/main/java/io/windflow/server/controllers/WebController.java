@@ -77,7 +77,7 @@ public class WebController {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleRuntimeException(JsonProcessingException ex, HttpServletRequest request, HttpServletResponse response) {
         String domainAndPath = "domain:" + request.getServerName() + " and path:" + request.getServletPath();
-        logger.error("Error interpreting page data: " + domainAndPath + " " + ex.getMessage());
+        logger.error(WindflowError.ERROR_006 + ": " + domainAndPath + " " + ex.getMessage());
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         ex.printStackTrace();
         return "spaError";

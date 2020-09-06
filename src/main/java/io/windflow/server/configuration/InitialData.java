@@ -32,7 +32,7 @@ public class InitialData {
     @PostConstruct
     public void initialPage() {
         if ((resetDataOnStartup.equals("undefined") && pageRepository.count() == 0) || resetDataOnStartup.equals("true")) {
-            logger.info("Truncating pages and adding default data. Usually happens once. See prop io.windflow.resetDataOnStartup");
+            logger.warn("Truncating pages and adding default data. Usually happens once. See prop io.windflow.resetDataOnStartup");
             pageRepository.truncate();
             savePage("localhost", "/", Page.PageType.PageNormal, "/data/localhost/pages/index.json");
             savePage("localhost", "/about", Page.PageType.PageNormal, "/data/localhost/pages/about.json");
@@ -44,10 +44,26 @@ public class InitialData {
     @PostConstruct
     public void initialComponents() {
         if ((resetDataOnStartup.equals("undefined") && pageRepository.count() == 0) || resetDataOnStartup.equals("true")) {
-            logger.info("Truncating components (and layouts) and adding default data. Usually happens once. See prop io.windflow.resetDataOnStartup");
+            logger.warn("Truncating components (and layouts) and adding default data. Usually happens once. See prop io.windflow.resetDataOnStartup");
             componentRepository.truncate();
+
+            // Layouts
+
             saveComponent("localhost", "CenteredLayout", io.windflow.server.entities.Component.ComponentType.LAYOUT, "/data/localhost/layouts/CenteredLayout.mjs");
             saveComponent("localhost", "LeftMenuLayout", io.windflow.server.entities.Component.ComponentType.LAYOUT, "/data/localhost/layouts/LeftMenuLayout.mjs");
+
+            // Components
+
+            saveComponent("localhost", "ContactForm", io.windflow.server.entities.Component.ComponentType.COMPONENT, "/data/localhost/components/ContactForm.mjs");
+            saveComponent("localhost", "HeaderAbout", io.windflow.server.entities.Component.ComponentType.COMPONENT, "/data/localhost/components/HeaderAbout.mjs");
+            saveComponent("localhost", "HeaderContact", io.windflow.server.entities.Component.ComponentType.COMPONENT, "/data/localhost/components/HeaderContact.mjs");
+            saveComponent("localhost", "HeaderHome", io.windflow.server.entities.Component.ComponentType.COMPONENT, "/data/localhost/components/HeaderHome.mjs");
+            saveComponent("localhost", "LipsumContent", io.windflow.server.entities.Component.ComponentType.COMPONENT, "/data/localhost/components/LipsumContent.mjs");
+            saveComponent("localhost", "MainContent", io.windflow.server.entities.Component.ComponentType.COMPONENT, "/data/localhost/components/MainContent.mjs");
+            saveComponent("localhost", "MainContact", io.windflow.server.entities.Component.ComponentType.COMPONENT, "/data/localhost/components/MainContact.mjs");
+            saveComponent("localhost", "PageNotFoundMessage", io.windflow.server.entities.Component.ComponentType.COMPONENT, "/data/localhost/components/PageNotFoundMessage.mjs");
+            saveComponent("localhost", "SideMenu", io.windflow.server.entities.Component.ComponentType.COMPONENT, "/data/localhost/components/SideMenu.mjs");
+
         }
     }
 

@@ -12,7 +12,7 @@
         {
             "area": "center",
             "components":[
-                {"name":"windflowx.PageNotFoundMessage", "id":"10"}
+                {"name":"localhost.PageNotFoundMessage", "id":"10"}
             ]
         }],
     "data": {}

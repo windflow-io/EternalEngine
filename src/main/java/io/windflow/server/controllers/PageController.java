@@ -38,17 +38,17 @@ public class PageController {
             if (optNotFound.isPresent()) {
                 return optNotFound.get().getJson();
             }
-            logger.warn("Page does not exist");
+            logger.warn("002 Page does not exist");
             throw new WindflowNotFoundException(WindflowError.ERROR_002, "domain: " + url.getDomain() + " and path: " + url.getPath());
         } else if (pageRepository.existsByType(Page.PageType.PageNormal)) {
-            logger.warn("Domain does not exist");
+            logger.warn("003 Domain does not exist");
             response.setStatus(HttpStatus.NOT_FOUND.value());
             throw new WindflowNotFoundException(WindflowError.ERROR_003, "domain: " + url.getDomain());
         } else if (pageRepository.existsBy()) {
-            logger.warn("No sites configured");
+            logger.warn("004 No sites configured");
             throw new WindflowNotFoundException(WindflowError.ERROR_004);
         } else {
-            logger.warn("Database is empty");
+            logger.warn("005 Database is empty");
             throw new WindflowNotFoundException(WindflowError.ERROR_005);
 
         }

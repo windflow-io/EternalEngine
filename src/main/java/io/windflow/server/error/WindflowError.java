@@ -3,10 +3,11 @@ package io.windflow.server.error;
 public enum WindflowError {
     ERROR_001("500 Internal Server Error", "An unexpected server error occurred"),
     ERROR_002("404 Not Found","Page was not found"),
-    ERROR_003("404 Domain Not Found", "Domain was not found"),
-    ERROR_004("No Sites Configured", "No Windflow.io sites are configured in this database"),
-    ERROR_005("Database is Empty", "The Windflow database contains no data"),
-    ERROR_006("Invalid Page Data", "JSON Page Data Invalid");
+    ERROR_003("404 Domain Not Found", "No matching domain in the database"),
+    ERROR_004("No Sites Configured", "No EngineEternal sites are configured in this database"),
+    ERROR_005("Database is Empty", "The EngineEternal database contains no data"),
+    ERROR_006("Invalid Page Data", "Cannot Parse JSON page data"),
+    ERROR_007("Component Not Found", "Missing component");
 
     String title;
     String description;
@@ -14,7 +15,6 @@ public enum WindflowError {
     WindflowError(String title, String description) {
         this.title = title;
         this.description = description;
-
     }
 
     /*** Methods ***/
@@ -41,6 +41,5 @@ public enum WindflowError {
     public void setDescription(String description) {
         this.description = description;
     }
-
 
 }
