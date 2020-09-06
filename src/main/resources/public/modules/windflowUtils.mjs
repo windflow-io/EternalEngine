@@ -3,10 +3,11 @@ import {app} from '../app/app.mjs'
 /** Errors */
 
 class NetworkError extends Error {
-    constructor(message, status) {
+    constructor(message, status, data = null) {
         super(message || 'NetworkError');
         this.name = 'NetworkError';
         this.status = status;
+        this.data = data;
     }
 }
 
@@ -174,9 +175,10 @@ const apiEndpoint = '/api';
 
 export const api = async (endpoint) => {
     const response = await fetch(`${apiEndpoint}${endpoint}`);
-    if (!response.ok) throw new NetworkError(response.statusText, response.status);
+    const data = await response.json();
+    if (!response.ok) throw new NetworkError(response.statusText, response.status, data);
 
-    return response.json();
+    return data;
 };
 
 /** Service: Page */
