@@ -28,20 +28,20 @@ const loadComponent = withErrorHandling(
 );
 
 /* @TODO: This still feels weird in here. */
-const errorPage = {
+const makeErrorPage = ({ errorTitle, errorDescription, errorDetail, httpStatus }) => ({
     metaData: {
-        title: 'Error', /* @TODO: make dynamic */
-        description: 'Please try again later', /* @TODO: make dynamic */
-        httpStatus: '500',  /* @TODO: make dynamic */
+        title: errorTitle,
+        description: errorDescription,
+        httpStatus,
     },
     layout: ErrorLayout.name,
     areas: [],
     data: {
-        errorTitle: 'Error', /*TODO: Rename to errorTitle and make dynamic*/
-        errorDescription: 'Please try again later',/*TODO: Rename to errorDetail and make dynamic*/
-        errorDetail: 'Something fucked up',/*TODO: Rename to errorDetail and make dynamic*/
+        errorTitle,
+        errorDescription,
+        errorDetail,
     },
-};
+});
 
 const store = new VueX.createStore({
     state: {
@@ -95,7 +95,7 @@ const store = new VueX.createStore({
                 console.log ("Failed to load page data or layout template - no error specified by server.")
                 /**@TODO: Can we let the error page know what happened? **/
                 await componentService.register(ErrorLayout);
-                page = errorPage;
+                page = makeErrorPage(error.data);
             }
 
             commit('setPageHttpStatus', page.httpStatus)
