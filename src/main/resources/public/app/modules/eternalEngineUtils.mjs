@@ -81,8 +81,8 @@ export const loadScript = (url, globalName = null) => {
 export async function loadEditor() {
     if (window.monaco) return window.monaco;
 
-    const require = await loadScript('/vendor/monacoEditor/loader.js', 'require');
-    require.config({ paths: { 'vs': '/vendor/monacoEditor/vs' }});
+    const require = await loadScript('/app/vendor/monacoEditor/loader.js', 'require');
+    require.config({ paths: { 'vs': '/app/vendor/monacoEditor/vs' }});
 
     return new Promise((resolve) => {
         require(['vs/editor/editor.main'], () => resolve(window.monaco));

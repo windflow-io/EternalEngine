@@ -18,6 +18,7 @@ public class PageData {
     MetaData metaData;
     String layout;
     HashSet<Area> areas = new HashSet();
+    String cdn = "";
 
     public class MetaData {
 
@@ -236,6 +237,14 @@ public class PageData {
 
     public void setHttpStatus(Integer httpStatus) {
         this.httpStatus = httpStatus;
+    }
+
+    public String getCdn() {
+        return cdn;
+    }
+
+    public void setCdn(String cdn) {
+        this.cdn = cdn;
     }
 
     @Override

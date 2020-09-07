@@ -3,9 +3,11 @@
     <!-- SPA Page Template HTML -->
     <head>
         <title th:text="${pageData.getTitle()}"></title>
-        <link rel="preload" href="https://cdn.windflow.io/app/app/app.mjs" as="script" type="text/javascript">
+        <link rel="preload" href="https://cdn.windflow.io/app/core/app.mjs" as="script" type="text/javascript" crossorigin="anonymous">
+
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+
         <link th:each="link : ${pageData.getMetaData().getLinks()}" th:rel="${link.getRel()}"  th:href="${link.getHref()}" th:as="${link.getAs()}" crossorigin>
         <link rel="stylesheet" type="text/css" href="https://cdn.windflow.io/app/vendor/tailwindcss/tailwind.min.css">
         <link rel="icon" type="image/png" href="https://cdn.windflow.io/app/img/favicon-32x32.png" sizes="32x32" />
@@ -13,6 +15,6 @@
     </head>
     <body>
         <div id="app"></div>
-        <script type="module" src="/app/app.mjs"></script>
+        <script type="module" th:src="${pageData.getCdn() + '/app/core/app.mjs'}"></script>
     </body>
 </html>

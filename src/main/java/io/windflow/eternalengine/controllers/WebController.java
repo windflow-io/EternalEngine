@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -39,6 +40,7 @@ public class WebController {
     }
 
     @GetMapping(value = {"/**/{regex:[-a-zA-Z0-9]*}", "/"})
+    @CrossOrigin(origins = "https://cdn.windflow.io/")
     public String spa(HttpServletRequest request, HttpServletResponse response, Model model) throws JsonProcessingException {
 
         /** @TODO: Send PageData down with Index **/
@@ -47,10 +49,9 @@ public class WebController {
         Optional<Page> optPage = pageRepository.findByDomainAndPath(request.getServerName(), request.getServletPath());
         if (optPage.isPresent()) {
             PageData pageData = prepareModel(optPage.get());
+            pageData.setCdn(cdn);
             model.addAttribute("pageData", pageData);
             response.setStatus(HttpServletResponse.SC_OK);
-            response.addHeader("Access-Control-Allow-Origin","https://cdn.windflow.io/");
-            response.addHeader("Vary", "Origin");
             return "spa200";
         }
 

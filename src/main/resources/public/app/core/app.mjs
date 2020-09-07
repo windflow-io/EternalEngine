@@ -1,6 +1,6 @@
-import { createApp } from '/vendor/vue3/vue.esm-browser.js';
-import VueX from '/vendor/vue3/vuex.esm-browser.js'
-import {FlowApplication,ErrorLayout} from '/modules/coreComponents.mjs'
+import { createApp } from '/app/vendor/vue3/vue.esm-browser.js';
+import VueX from '/app/vendor/vue3/vuex.esm-browser.js'
+import {FlowApplication,ErrorLayout} from '/app/modules/coreComponents.mjs'
 import {
     COMPONENT_TYPES,
     alertNotifier as notifier,
@@ -9,7 +9,7 @@ import {
     withRetryHandling,
     componentService,
     pageService,
-} from '/modules/eternalEngineUtils.mjs'
+} from '/app/modules/eternalEngineUtils.mjs'
 
 const EDIT_MODE_HASH = 'edit';
 const EDIT_MODE = window.location.hash === `#${EDIT_MODE_HASH}`;
