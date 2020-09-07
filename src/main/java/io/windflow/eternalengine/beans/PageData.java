@@ -13,7 +13,7 @@ public class PageData {
 
     String title;
     String lang;
-    String encoding;
+    String charset;
     Integer httpStatus;
     MetaData metaData;
     String layout;
@@ -167,12 +167,12 @@ public class PageData {
         this.lang = lang;
     }
 
-    public String getEncoding() {
-        return encoding;
+    public String getCharset() {
+        return charset;
     }
 
-    public void setEncoding(String encoding) {
-        this.encoding = encoding;
+    public void setCharset(String charset) {
+        this.charset = charset;
     }
 
     public Integer getHttpStatus() {

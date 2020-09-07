@@ -1,19 +1,20 @@
 {
     "title": "Home",
     "lang" : "en",
-    "encoding" : "utf-8",
+    "charset": "utf-8",
     "httpStatus": "200",
     "metaData": {
         "metaTags" : [
+            {"name": "viewport", "content":  "width=device-width, initial-scale=1"},
             {"name": "description", "content":  "Welcome to the description of th index page"},
             {"name": "og:image", "content": "https://ogp.me/logo.png"},
             {"name": "og:title", "content": "This page features OpenGraph"},
             {"name": "og:description", "content": "Yes, OpenGraph. That's right ladies and gentlemen"}
         ],
         "links": [
-            {"rel":"icon" ,"type": "img/png", "href": "", "sizes": ""},
-            {"rel":"icon" ,"type": "img/png", "href": "", "sizes": ""},
-            {"rel":"stylesheet" ,"type": "text/css", "href": "INSERT CSS LINK HERE"}
+            {"rel":"icon" ,"type": "img/png", "href": "https://cdn.windflow.io/app/img/favicon-32x32.png", "sizes": "32x32"},
+            {"rel":"icon" ,"type": "img/png", "href": "https://cdn.windflow.io/app/img/favicon-16x16.png", "sizes": "16x16"},
+            {"rel":"stylesheet" ,"type": "text/css", "href": "https://cdn.windflow.io/app/vendor/tailwindcss/tailwind.min.css"}
         ]
     },
     "layout": "localhost.LeftMenuLayout",

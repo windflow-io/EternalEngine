@@ -79,9 +79,6 @@ const store = new VueX.createStore({
         },
         setPageData(state, value) {
             if (value) state.pageData = value;
-        },
-        setError(state, value) {
-            if (value) state.error = value;
         }
     },
     actions: {
@@ -104,20 +101,21 @@ const store = new VueX.createStore({
             commit('setPageEncoding', page.encoding);
             commit('setPageLang', page.lang);
             commit('setPageTitle', page.title);
-            commit('setPageHttpStatus', page.httpStatus);
             commit('setPageMeta', page.metaData);
             commit('setPageLayout', page.layout);
             commit('setPageData', page.data);
 
             document.title = page.title;
-            //document.getElementsByTagName("meta").namedItem('description').setAttribute("content", page.metaData.description);
-            /**@TODO: Allow the adding of meta data (including charset and viewport) **/
+            document.documentElement.lang = page.lang;
+
+            /**@TODO: Insert the head elements in here **/
 
             const allComponents = [];
             page.areas.forEach(section => section.components.forEach(component => allComponents.push(component)));
             await Promise.all(allComponents.map(component => loadComponent(component.name)));
 
             commit('setPageAreas', page.areas);
+
         }
     }
 })
