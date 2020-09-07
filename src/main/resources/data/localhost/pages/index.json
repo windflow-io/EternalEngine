@@ -9,11 +9,6 @@
             {"name": "og:image", "content": "https://ogp.me/logo.png"},
             {"name": "og:title", "content": "This page features OpenGraph"},
             {"name": "og:description", "content": "Yes, OpenGraph. That's right ladies and gentlemen"}
-        ],
-        "links": [
-            {"rel":"icon" ,"type": "img/png", "href": "", "sizes": ""},
-            {"rel":"icon" ,"type": "img/png", "href": "", "sizes": ""},
-            {"rel":"stylesheet" ,"type": "text/css", "href": "INSERT CSS LINK HERE"}
         ]
     },
     "layout": "localhost.LeftMenuLayout",

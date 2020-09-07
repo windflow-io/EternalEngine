@@ -2,16 +2,19 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
     <!-- SPA Page Template HTML -->
     <head>
+        <title th:text="${pageData.getTitle()}"></title>
+        <link rel="preload" href="https://cdn.windflow.io/www.windflow.io/windflow-logo-white.png" as="image" type="image/png">
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title th:text="${pageData.getTitle()}"></title>
-        <meta name="description" content=""/>
-        <link rel="stylesheet" href="/vendor/tailwindcss/tailwind.min.css">
-        <link rel="icon" type="image/png" href="/img/favicon-32x32.png" sizes="32x32" />
-        <link rel="icon" type="image/png" href="/img/favicon-16x16.png" sizes="16x16" />
+        <link th:each="link : ${pageData.getMetaData().getLinks()}" th:rel="${link.getRel()}"  th:href="${link.getHref()}" th:as="${link.getAs()}" crossorigin>
+        <link rel="stylesheet" type="text/css" href="https://cdn.windflow.io/app/vendor/tailwindcss/tailwind.min.css">
+        <link rel="icon" type="image/png" href="https://cdn.windflow.io/app/img/favicon-32x32.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="https://cdn.windflow.io/app/img/favicon-16x16.png" sizes="16x16" />
     </head>
     <body>
         <div id="app"></div>
+        <!--
         <script type="module" src="/app/app.mjs"></script>
+        -->
     </body>
 </html>

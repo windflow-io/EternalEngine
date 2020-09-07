@@ -3,6 +3,7 @@ package io.windflow.eternalengine.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.windflow.eternalengine.beans.PageData;
+import io.windflow.eternalengine.configuration.InitialData;
 import io.windflow.eternalengine.entities.Page;
 import io.windflow.eternalengine.error.WindflowError;
 import io.windflow.eternalengine.persistence.PageRepository;
@@ -19,7 +20,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Controller
 public class WebController {
@@ -45,6 +49,8 @@ public class WebController {
             PageData pageData = prepareModel(optPage.get());
             model.addAttribute("pageData", pageData);
             response.setStatus(HttpServletResponse.SC_OK);
+            response.addHeader("Access-Control-Allow-Origin","https://cdn.windflow.io/");
+            response.addHeader("Vary", "Origin");
             return "spa200";
         }
 
@@ -65,7 +71,13 @@ public class WebController {
     /*** Private Methods ***/
 
     private PageData prepareModel(Page page) throws JsonProcessingException {
-        return new ObjectMapper().readValue(page.getJson(), PageData.class);
+        PageData pageData = new ObjectMapper().readValue(page.getJson(), PageData.class);
+        Set<PageData.Link> links = pageData.getMetaData().getLinks();
+        InitialData.preloadable().forEach(file -> {
+            links.add(new PageData.Link("preload", cdn + file, "script", cdn != null));
+        });
+        //System.out.println(pageData);
+        return pageData;
     }
 
     @ExceptionHandler(JsonProcessingException.class)

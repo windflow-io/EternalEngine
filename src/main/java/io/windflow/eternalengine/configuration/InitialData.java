@@ -12,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 
 @Component
@@ -65,6 +67,15 @@ public class InitialData {
             saveComponent("localhost", "SideMenu", io.windflow.eternalengine.entities.Component.ComponentType.COMPONENT, "/data/localhost/components/SideMenu.mjs");
 
         }
+    }
+
+    public static List<String> preloadable() {
+        return Arrays.asList(
+                "/app/app.mjs",
+                "/vendor/vue3/vue.esm-browser.js",
+                "/vendor/vue3/vuex.esm-browser.js",
+                "/modules/coreComponents.mjs",
+                "/modules/eternalEngineUtils.mjs");
     }
 
     private void savePage(String domain, String path, Page.PageType type, String filePath) {

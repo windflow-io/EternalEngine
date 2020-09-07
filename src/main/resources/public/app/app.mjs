@@ -9,7 +9,7 @@ import {
     withRetryHandling,
     componentService,
     pageService,
-} from '/modules/windflowUtils.mjs'
+} from '/modules/eternalEngineUtils.mjs'
 
 const EDIT_MODE_HASH = 'edit';
 const EDIT_MODE = window.location.hash === `#${EDIT_MODE_HASH}`;

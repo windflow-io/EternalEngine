@@ -2,7 +2,6 @@
 These are general notes for Mark van Wyk. Required tests to make sure the new system is working correctly:
 
 Important Now:
- * Rename the properties and classes too (Eternal Engine, windflowUtils, packageNames)
  * Create the meta tags in the actual page (force noindex on error pages)
  * Create all the header tags for each page in JavaScript
  * Do the CDN thing (CDN is not in the page. Remove it completely)
@@ -49,5 +48,5 @@ PERFORMANCE OPTIMISATION:
    * CORS JavaScript on CDN
    * Prerender HTML Tags
    * Do not use the UI to upload content to Google Cloud Storage
-     - gsutil cp -Z *.css gs://cdn.windflow.io/www.windflow.io/
+     gsutil cp -z html,css,js,mjs,svg,ttf * gs://cdn.windflow.io/app
   

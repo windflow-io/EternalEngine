@@ -67,10 +67,21 @@ public class PageData {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Link {
 
+        public Link() {}
+
+        public Link (String rel, String href, String as, Boolean crossOrigin) {
+            this.rel = rel;
+            this.href = href;
+            this.as = as;
+            this.crossOrigin = crossOrigin;
+        }
+
         String rel;
         String type;
         String href;
         String sizes;
+        String as;
+        boolean crossOrigin = false;
 
         public String getRel() {
             return rel;
@@ -102,6 +113,22 @@ public class PageData {
 
         public void setSizes(String sizes) {
             this.sizes = sizes;
+        }
+
+        public String getAs() {
+            return as;
+        }
+
+        public void setAs(String as) {
+            this.as = as;
+        }
+
+        public Boolean getCrossOrigin() {
+            return crossOrigin;
+        }
+
+        public void setCrossOrigin(Boolean crossOrigin) {
+            this.crossOrigin = crossOrigin;
         }
     }
 

@@ -1,4 +1,4 @@
-import {addUrlListener, removeNamespace, mapQueryString, pushUrl} from '/modules/windflowUtils.mjs'
+import {addUrlListener, removeNamespace, mapQueryString, pushUrl} from '/modules/eternalEngineUtils.mjs'
 import {CodeEditor} from './CodeEditor.mjs';
 
 export const FlowApplication = {

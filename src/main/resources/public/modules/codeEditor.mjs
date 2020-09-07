@@ -1,4 +1,4 @@
-import {loadEditor} from './windflowUtils.mjs';
+import {loadEditor} from '/modules/eternalEngineUtils.mjs';
 
 export const CodeEditor = {
   name: 'CodeEditor',
