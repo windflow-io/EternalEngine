@@ -2,8 +2,8 @@
 # Windflow.io's Eternal Engine
 Windflow Eternal Engine is an open-source, web-component-based platform for building apps and web sites in Vue.js and TailwindCSS. It serves web sites and apps as an assortment of web components dynamically constructed from a database.
 The components, order, layout, styles and content are all dynamic.
-EternalEngine provides out-of-the-box component and content management functionality, bringing Wordpress-like features to Vue.js developers.
-EternalEngine includes bare-necessity web components to get you going. They are 100% editable in-place, via the front-end editor. A vast array of more complex components are freely copy-and-pastable from Windflow.io's component library
+Eternal Engine provides out-of-the-box component and content management functionality, bringing Wordpress-like features to Vue.js developers.
+Eternal Engine includes bare-necessity web components to get you going. They are 100% editable in-place, via the front-end editor. A vast array of more complex components are freely copy-and-pastable from Windflow.io's component library
 
 Windflow Eternal Engine is for you if:
  1. You're a Vue.js developer or TailwindCSS fan.
