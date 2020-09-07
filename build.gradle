@@ -5,8 +5,8 @@ plugins {
 	id 'java'
 }
 
-group = 'io.windflow'
-version = '0.0.1-SNAPSHOT'
+group = 'io.windflow.eternalengine'
+version = '0.9'
 
 repositories {
 	mavenCentral()

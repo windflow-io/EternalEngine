@@ -1,18 +1,18 @@
 ![Windflow logo](https://i.imgur.com/zgUXAF6.png)
-# Windflow.io's Engine Eternal
-Engine Eternal is an open-source, web-component-based platform for building apps and web sites in Vue.js and TailwindCSS. It serves web sites and apps as an assortment of web components dynamically constructed from a database.
+# Windflow.io's Eternal Engine
+Windflow Eternal Engine is an open-source, web-component-based platform for building apps and web sites in Vue.js and TailwindCSS. It serves web sites and apps as an assortment of web components dynamically constructed from a database.
 The components, order, layout, styles and content are all dynamic.
-Engine Eternal provides out-of-the-box component and content management functionality, bringing Wordpress-like features to Vue.js developers.
-Engine Eternal includes bare-necessity web components to get you going. They are 100% editable in-place, via the front-end editor. A vast array of more complex components are freely copy-and-pastable from Windflow.io's component library
+EternalEngine provides out-of-the-box component and content management functionality, bringing Wordpress-like features to Vue.js developers.
+EternalEngine includes bare-necessity web components to get you going. They are 100% editable in-place, via the front-end editor. A vast array of more complex components are freely copy-and-pastable from Windflow.io's component library
 
-Engine Eternal is for you if:
+Windflow Eternal Engine is for you if:
  1. You're a Vue.js developer or TailwindCSS fan.
  2. You want to build hand-crafted Vue.js web sites and apps.
  3. You want to offer your clients Wordpress-like CMS functionality
  4. You don't want to rewrite components for everything.
  5. You don't want to bother with build tools or databases.
 
-<blockquote>If you would like to try Engine Eternal Server without installing it, go create a free developer account on our hosted service at <a href="https://windflow.io">windflow.io</a> and give it a test run.</blockquote>
+<blockquote>If you would like to try Windflow Eternal Engine without installing it, go create a free developer account on our hosted service at <a href="https://windflow.io">windflow.io</a> and give it a test run.</blockquote>
 
 Client code is written in highly-readable plain-old ES6 modular JavaScript with no client-side build tools. By default index.html and app.mjs are un-opinionated. All the data, layouts, graphics, fonts, etc are/will be requested from the server. The application is then "built" on the client side.
 

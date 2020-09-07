@@ -2,10 +2,15 @@
 These are general notes for Mark van Wyk. Required tests to make sure the new system is working correctly:
 
 Important Now:
- * rename the properties too (engineEternal)
- * Read the 404/500 headers - display the correct error on the error page.
+ * Rename the properties and classes too (Eternal Engine, windflowUtils, packageNames)
+ * Create the meta tags in the actual page (force noindex on error pages)
  * Create all the header tags for each page in JavaScript
- * Do the CDN thing
+ * Do the CDN thing (CDN is not in the page. Remove it completely)
+    - Add a meta tag and read it
+    - CORS Proxy (test first)
+ * Preload everything in page
+ * Only load Monoco on edit
+ 
 
 Tasks
  * Create server component example

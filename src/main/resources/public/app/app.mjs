@@ -54,7 +54,6 @@ const store = new VueX.createStore({
         pageAreas: [],
         pageData: {},
         error: {},
-        cdn: {}
     },
     mutations: {
         setPageHttpStatus(state, value) {
@@ -83,12 +82,7 @@ const store = new VueX.createStore({
         },
         setError(state, value) {
             if (value) state.error = value;
-        },
-        setCdn(state, value) {
-            if (value) state.cdn = value;
         }
-
-
     },
     actions: {
         async fetchPageData({context, commit, state}, payload) {
@@ -114,9 +108,8 @@ const store = new VueX.createStore({
             commit('setPageMeta', page.metaData);
             commit('setPageLayout', page.layout);
             commit('setPageData', page.data);
-            commit('setCdn', page.cdn)
 
-            document.title = page.metaData.title;
+            document.title = page.title;
             //document.getElementsByTagName("meta").namedItem('description').setAttribute("content", page.metaData.description);
             /**@TODO: Allow the adding of meta data (including charset and viewport) **/
 
