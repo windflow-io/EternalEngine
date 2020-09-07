@@ -74,9 +74,9 @@ public class WebController {
         PageData pageData = new ObjectMapper().readValue(page.getJson(), PageData.class);
         Set<PageData.Link> links = pageData.getMetaData().getLinks();
         InitialData.preloadable().forEach(file -> {
-            links.add(new PageData.Link("preload", cdn + file, "script", cdn != null));
+
+            //links.add(new PageData.Link("preload", cdn + file, "script", cdn != null));
         });
-        //System.out.println(pageData);
         return pageData;
     }
 
