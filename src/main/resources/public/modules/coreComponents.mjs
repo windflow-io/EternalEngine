@@ -1,13 +1,10 @@
 import {addUrlListener, removeNamespace, mapQueryString, pushUrl} from '/modules/windflowUtils.mjs'
-import {CodeEditor} from './CodeEditor.mjs';
 
 export const FlowApplication = {
     name: 'FlowApplication',
-    components: {CodeEditor},
     template: `
         <div>
-            <component :is="removeNamespace(layoutComponent)" :key="currentPath"/>          
-            <CodeEditor/>
+            <component :is="removeNamespace(layoutComponent)" :key="currentPath"/>
         </div>
     `,
     data() {
