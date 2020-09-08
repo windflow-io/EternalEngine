@@ -114,7 +114,7 @@ export const loadStyleshet = (url) => {
 
 /** Edit Mode **/
 
-export const enableEditMode = async () => {
+export const loadEditModeAssets = async () => {
     await Promise.all([
         loadEditor(),
         loadStyleshet('/vendor/tailwindcss/tailwind.min.css'),

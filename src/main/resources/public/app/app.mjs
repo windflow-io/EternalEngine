@@ -2,13 +2,11 @@ import { createApp } from '/vendor/vue3/vue.esm-browser.js';
 import VueX from '/vendor/vue3/vuex.esm-browser.js'
 import {FlowApplication} from '/modules/coreComponents.mjs'
 import {
-    enableEditMode,
     bootstrapPage,
+    loadEditModeAssets,
 } from '/modules/windflowUtils.mjs'
 
 const EDIT_MODE_HASH = 'edit';
-const EDIT_MODE = window.location.hash === `#${EDIT_MODE_HASH}`;
-if (EDIT_MODE) enableEditMode();
 
 const store = new VueX.createStore({
     state: {
@@ -21,6 +19,7 @@ const store = new VueX.createStore({
         pageAreas: [],
         pageData: {},
         error: {},
+        editMode: false,
     },
     mutations: {
         setPageHttpStatus(state, value) {
@@ -46,10 +45,13 @@ const store = new VueX.createStore({
         },
         setPageData(state, value) {
             if (value) state.pageData = value;
-        }
+        },
+        setEditMode(state, value) {
+            state.editMode = value;
+        },
     },
     actions: {
-        async fetchPageData({context, commit, state}, payload) {
+        async fetchPageData({context, commit, dispatch, state}, payload) {
             const page = await bootstrapPage({ host: payload.host, path: payload.path });
 
             commit('setPageHttpStatus', page.httpStatus)
@@ -64,8 +66,15 @@ const store = new VueX.createStore({
             document.title = page.title;
             document.documentElement.lang = page.lang;
 
+            const isInEditMode = window.location.hash === `#${EDIT_MODE_HASH}`;
+            if (isInEditMode) dispatch('enableEditMode');
+
             /**@TODO: Insert the head elements in here **/
-        }
+        },
+        async enableEditMode({commit}) {
+            await loadEditModeAssets();
+            commit('setEditMode', true);
+        },
     }
 })
 
