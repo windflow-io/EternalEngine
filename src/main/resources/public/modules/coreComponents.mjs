@@ -55,7 +55,14 @@ export const FlowArea = {
     methods: {
         removeNamespace: removeNamespace
     },
-    template: '<component :key="component.id" v-for="component in areaComponents" :is="removeNamespace(component.name)"/>',
+    template: `
+        <component
+            v-for="component in areaComponents"
+            :key="component.id"
+            :is="removeNamespace(component.name)"
+            v-bind="$store.state.pageData.components[component.id]"
+        />
+    `,
 }
 
 export const FlowIcon = {

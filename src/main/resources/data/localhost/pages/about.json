@@ -27,5 +27,22 @@
             ]
         }
     ],
-    "data": {}
+    "data": {
+        "components": {
+            "8": {
+                "heading": {
+                    "text": "Lorem Ipsum",
+                    "level": 2
+                },
+                "paragraph": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod."
+            },
+            "9": {
+                "heading": {
+                    "text": "Dolor sit",
+                    "level": 3
+                },
+                "paragraph": "At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
+            }
+        }
+    }
 }
