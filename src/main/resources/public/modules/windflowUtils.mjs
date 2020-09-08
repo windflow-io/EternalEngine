@@ -142,6 +142,7 @@ export const makeErrorPage = ({
     errorDetail = null,
     httpStatus = 500,
 } = {}) => ({
+    title: errorTitle,
     metaData: {
         title: errorTitle,
         description: errorDescription,
