@@ -1,4 +1,5 @@
 import {app} from '../app/app.mjs'
+import {ErrorLayout} from '/modules/coreComponents.mjs'
 
 /** Errors */
 
@@ -132,6 +133,23 @@ export const withErrorHandling = (callback, { logger = console, notifier }) => {
         }
     }
 }
+
+/** Make Error Page **/
+
+export const makeErrorPage = ({ errorTitle, errorDescription, errorDetail, httpStatus }) => ({
+    metaData: {
+        title: errorTitle,
+        description: errorDescription,
+        httpStatus,
+    },
+    layout: ErrorLayout.name,
+    areas: [],
+    data: {
+        errorTitle,
+        errorDescription,
+        errorDetail,
+    },
+});
 
 /** Retry on Error **/
 

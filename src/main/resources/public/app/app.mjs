@@ -5,6 +5,7 @@ import {
     COMPONENT_TYPES,
     alertNotifier as notifier,
     enableEditMode,
+    makeErrorPage,
     withErrorHandling,
     withRetryHandling,
     componentService,
@@ -26,22 +27,6 @@ const loadComponent = withErrorHandling(
     withRetryHandling(componentService.load),
     { notifier },
 );
-
-/* @TODO: This still feels weird in here. */
-const makeErrorPage = ({ errorTitle, errorDescription, errorDetail, httpStatus }) => ({
-    metaData: {
-        title: errorTitle,
-        description: errorDescription,
-        httpStatus,
-    },
-    layout: ErrorLayout.name,
-    areas: [],
-    data: {
-        errorTitle,
-        errorDescription,
-        errorDetail,
-    },
-});
 
 const store = new VueX.createStore({
     state: {
