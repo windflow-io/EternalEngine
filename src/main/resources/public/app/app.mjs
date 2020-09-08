@@ -1,32 +1,14 @@
 import { createApp } from '/vendor/vue3/vue.esm-browser.js';
 import VueX from '/vendor/vue3/vuex.esm-browser.js'
-import {FlowApplication,ErrorLayout} from '/modules/coreComponents.mjs'
+import {FlowApplication} from '/modules/coreComponents.mjs'
 import {
-    COMPONENT_TYPES,
-    alertNotifier as notifier,
     enableEditMode,
-    makeErrorPage,
-    withErrorHandling,
-    withRetryHandling,
-    componentService,
-    pageService,
+    bootstrapPage,
 } from '/modules/windflowUtils.mjs'
 
 const EDIT_MODE_HASH = 'edit';
 const EDIT_MODE = window.location.hash === `#${EDIT_MODE_HASH}`;
 if (EDIT_MODE) enableEditMode();
-
-const bypassIrrelevantErrors = error => error.status <= 500;
-const loadPage = withRetryHandling(pageService.load, { bypass: bypassIrrelevantErrors });
-
-const loadLayout = withRetryHandling(name => componentService.load(name, {
-    type: COMPONENT_TYPES.layout,
-}));
-
-const loadComponent = withErrorHandling(
-    withRetryHandling(componentService.load),
-    { notifier },
-);
 
 const store = new VueX.createStore({
     state: {
@@ -68,19 +50,7 @@ const store = new VueX.createStore({
     },
     actions: {
         async fetchPageData({context, commit, state}, payload) {
-            let page;
-
-            try {
-                page = await loadPage({ host: payload.host, path: payload.path });
-                await loadLayout(page.layout);
-            } catch (error) {
-                console.log (error);
-                /**@TODO: Maybe add error logging with something like Sentry or DataDog (send ALL errors to server at some point later) **/
-                console.log ("Failed to load page data or layout template - no error specified by server.")
-                /**@TODO: Can we let the error page know what happened? **/
-                await componentService.register(ErrorLayout);
-                page = makeErrorPage(error.data);
-            }
+            const page = await bootstrapPage({ host: payload.host, path: payload.path });
 
             commit('setPageHttpStatus', page.httpStatus)
             commit('setPageEncoding', page.encoding);
@@ -88,19 +58,13 @@ const store = new VueX.createStore({
             commit('setPageTitle', page.title);
             commit('setPageMeta', page.metaData);
             commit('setPageLayout', page.layout);
+            commit('setPageAreas', page.areas);
             commit('setPageData', page.data);
 
             document.title = page.title;
             document.documentElement.lang = page.lang;
 
             /**@TODO: Insert the head elements in here **/
-
-            const allComponents = [];
-            page.areas.forEach(section => section.components.forEach(component => allComponents.push(component)));
-            await Promise.all(allComponents.map(component => loadComponent(component.name)));
-
-            commit('setPageAreas', page.areas);
-
         }
     }
 })
