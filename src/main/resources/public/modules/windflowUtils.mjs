@@ -242,3 +242,38 @@ export const componentService = {
         return name;
     },
 };
+
+/** Page **/
+
+const bypassIrrelevantErrors = error => error.status <= 500;
+const loadPage = withRetryHandling(pageService.load, { bypass: bypassIrrelevantErrors });
+
+const loadLayout = withRetryHandling(name => componentService.load(name, {
+    type: COMPONENT_TYPES.layout,
+}));
+
+const loadComponent = withRetryHandling(componentService.load);
+
+export const bootstrapPage = async ({ host, path }) => {
+    let page;
+
+    try {
+        page = await loadPage({ host, path });
+
+        const allComponents = [];
+        page.areas.forEach(section => section.components.forEach(component => allComponents.push(component)));
+
+        await Promise.all([
+            loadLayout(page.layout),
+            ...allComponents.map(component => loadComponent(component.name)),
+        ]);
+    } catch (error) {
+        /**@TODO: Maybe add error logging with something like Sentry or DataDog (send ALL errors to server at some point later) **/
+        console.error(error);
+
+        await componentService.register(ErrorLayout);
+        page = makeErrorPage(error.data);
+    }
+
+    return page;
+};
