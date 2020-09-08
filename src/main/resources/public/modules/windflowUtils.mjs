@@ -136,7 +136,12 @@ export const withErrorHandling = (callback, { logger = console, notifier }) => {
 
 /** Make Error Page **/
 
-export const makeErrorPage = ({ errorTitle, errorDescription, errorDetail, httpStatus }) => ({
+export const makeErrorPage = ({
+    errorTitle = 'Oops!',
+    errorDescription = 'An unexpected error occurred.',
+    errorDetail = null,
+    httpStatus = 500,
+} = {}) => ({
     metaData: {
         title: errorTitle,
         description: errorDescription,
