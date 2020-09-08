@@ -3,10 +3,8 @@ import VueX from '/vendor/vue3/vuex.esm-browser.js'
 import {FlowApplication,ErrorLayout} from '/modules/coreComponents.mjs'
 import {
     COMPONENT_TYPES,
-    alertNotifier as notifier,
     enableEditMode,
     makeErrorPage,
-    withErrorHandling,
     withRetryHandling,
     componentService,
     pageService,
@@ -23,10 +21,7 @@ const loadLayout = withRetryHandling(name => componentService.load(name, {
     type: COMPONENT_TYPES.layout,
 }));
 
-const loadComponent = withErrorHandling(
-    withRetryHandling(componentService.load),
-    { notifier },
-);
+const loadComponent = withRetryHandling(componentService.load);
 
 const store = new VueX.createStore({
     state: {
@@ -72,7 +67,12 @@ const store = new VueX.createStore({
 
             try {
                 page = await loadPage({ host: payload.host, path: payload.path });
-                await loadLayout(page.layout);
+                const allComponents = [];
+                page.areas.forEach(section => section.components.forEach(component => allComponents.push(component)));
+                await Promise.all([
+                    loadLayout(page.layout),
+                    ...allComponents.map(component => loadComponent(component.name)),
+                ]);
             } catch (error) {
                 console.log (error);
                 /**@TODO: Maybe add error logging with something like Sentry or DataDog (send ALL errors to server at some point later) **/
@@ -88,19 +88,13 @@ const store = new VueX.createStore({
             commit('setPageTitle', page.title);
             commit('setPageMeta', page.metaData);
             commit('setPageLayout', page.layout);
+            commit('setPageAreas', page.areas);
             commit('setPageData', page.data);
 
             document.title = page.title;
             document.documentElement.lang = page.lang;
 
             /**@TODO: Insert the head elements in here **/
-
-            const allComponents = [];
-            page.areas.forEach(section => section.components.forEach(component => allComponents.push(component)));
-            await Promise.all(allComponents.map(component => loadComponent(component.name)));
-
-            commit('setPageAreas', page.areas);
-
         }
     }
 })

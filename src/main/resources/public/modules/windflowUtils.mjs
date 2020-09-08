@@ -121,19 +121,6 @@ export const enableEditMode = async () => {
     ]);
 }
 
-/** Handle Errors **/
-
-export const withErrorHandling = (callback, { logger = console, notifier }) => {
-    return async function callbackWithErrorHandling(...params) {
-        try {
-            return await callback(...params);
-        } catch (error) {
-            if (logger) logger.error(error);
-            if (notifier) notifier.notify({ title: error.message });
-        }
-    }
-}
-
 /** Make Error Page **/
 
 export const makeErrorPage = ({
@@ -184,14 +171,6 @@ export const withRetryHandling = (callback, {
         return retry();
     };
 }
-
-/** Notifications **/
-
-export const alertNotifier = {
-    notify({ title }) {
-        alert(title);
-    },
-};
 
 /** API */
 
