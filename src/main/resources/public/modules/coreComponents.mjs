@@ -105,7 +105,6 @@ export const ErrorLayout = {
                     <h2 class="flex text-xl justify-center text-gray-700 mt-4">
                         {{ $store.state.pageData.errorDetail }}
                     </h2>
-                    
                 </section>
             </div>
         </div>
