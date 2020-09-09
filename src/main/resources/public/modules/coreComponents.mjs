@@ -1,4 +1,4 @@
-
+import { app } from '/app/app.mjs';
 import {
     addUrlListener,
     removeNamespace,
@@ -97,11 +97,265 @@ export const CodeEditor = {
   `,
 }
 
+export const FlowFormGroup = {
+    name: 'FlowFormGroup',
+    props: {
+        label: {
+            required: true,
+            type: String,
+        },
+        name: {
+            required: true,
+            type: String,
+        },
+    },
+    template: `
+        <div>
+            <label
+                :for="name"
+                class="block text-sm leading-5 font-medium text-gray-700"
+            >
+                {{ label }}
+            </label>
+            <div class="mt-1">
+                <slot/>
+            </div>
+        </div>
+    `,
+}
+
+export const FowFormFieldText = {
+    name: 'FowFormFieldText',
+    components: {
+        FlowFormGroup,
+    },
+    props: {
+        label: {
+            required: true,
+            type: String,
+        },
+        name: {
+            required: true,
+            type: String,
+        },
+        value: {
+            default: '',
+            type: [Number, String],
+        },
+    },
+    template: `
+        <flow-form-group
+            :label="label"
+            :name="name"
+        >
+            <input
+                :id="name"
+                :value="value"
+                :name="name"
+                class="border border-gray-400 block w-full p-2 sm:text-sm sm:leading-5 rounded-md shadow-sm"
+                @input.stop="$emit('input', $event.target.value)"
+            >
+        </flow-form-group>
+    `,
+}
+
+export const FowFormFieldTextarea = {
+    name: 'FowFormFieldTextarea',
+    components: {
+        FlowFormGroup,
+    },
+    props: {
+        label: {
+            required: true,
+            type: String,
+        },
+        name: {
+            required: true,
+            type: String,
+        },
+        value: {
+            default: '',
+            type: String,
+        },
+    },
+    template: `
+        <flow-form-group
+            :label="label"
+            :name="name"
+        >
+            <textarea
+                :id="name"
+                :value="value"
+                :name="name"
+                class="border border-gray-400 block w-full p-2 h-24 sm:text-sm sm:leading-5 rounded-md shadow-sm"
+                @input.stop="$emit('input', $event.target.value)"
+            />
+        </flow-form-group>
+    `,
+}
+
+export const FowFormFieldSelect = {
+    name: 'FowFormFieldSelect',
+    components: {
+        FlowFormGroup,
+    },
+    props: {
+        label: {
+            required: true,
+            type: String,
+        },
+        name: {
+            required: true,
+            type: String,
+        },
+        value: {
+            default: '',
+            type: String,
+        },
+        options: {
+            required: true,
+            type: String,
+        },
+    },
+    template: `
+        <flow-form-group
+            :label="label"
+            :name="name"
+        >
+            <select
+                :id="name"
+                :value="value"
+                :name="name"
+                class="border border-gray-400 block w-full p-2 sm:text-sm sm:leading-5 rounded-md shadow-sm"
+                @input.stop="$emit('input', $event.target.value)"
+            >
+                <option
+                    v-for="option in options"
+                    :key="option"
+                    :value="option"
+                >
+                    {{ option }}
+                </option>
+            </select>
+        </flow-form-group>
+    `,
+}
+
+const fieldMap = {
+    select: FowFormFieldSelect,
+    text: FowFormFieldText,
+    textarea: FowFormFieldTextarea,
+};
+
+export const FlowFormFields = {
+    name: 'FlowFormFields',
+    props: {
+        fields: {
+            required: true,
+            type: Object,
+        },
+        value: {
+            required: true,
+            type: Object,
+        },
+    },
+    computed: {
+        fieldNames() {
+            return Object.keys(this.fields);
+        }
+    },
+    created() {
+        this.fieldMap = fieldMap;
+    },
+    methods: {
+        update(fieldName, fieldValue) {
+            const newValue = {
+                ...this.value,
+                [fieldName]: fieldValue,
+            };
+            this.$emit('input', newValue);
+        },
+    },
+    template: `
+        <div class="space-y-6">
+            <component
+                v-for="fieldName in fieldNames"
+                :key="fieldName"
+                :is="fieldMap[fields[fieldName].type]"
+                v-bind="fields[fieldName]"
+                :name="fieldName"
+                :value="value[fieldName]"
+                @input="update(fieldName, $event)"
+            />
+        </div>
+    `,
+};
+
+export const FowFormFieldFieldset = {
+    name: 'FowFormFieldFieldset',
+    components: {
+        FlowFormFields,
+    },
+    props: {
+        fields: {
+            required: true,
+            type: Object,
+        },
+        label: {
+            required: true,
+            type: String,
+        },
+        value: {
+            required: true,
+            type: Object,
+        },
+    },
+    template: `
+        <div>
+            <div>{{ label }}</div>
+            <div class="mt-1 p-4 border border-gray-300">
+                <flow-form-fields
+                    :fields="fields"
+                    :value="value"
+                    @input="$emit('input', $event)"
+                />
+            </div>
+        </div>
+    `,
+};
+
+fieldMap.fieldset = FowFormFieldFieldset;
+
+export const FlowToolbarForm = {
+    name: 'FlowToolbarForm',
+    components: {
+        FlowFormFields,
+    },
+    props: {
+        schema: {
+            required: true,
+            type: Object,
+        },
+        value: {
+            default: () => ({}),
+            type: Object,
+        },
+    },
+    template: `
+        <flow-form-fields
+            :fields="schema"
+            :value="value"
+            @input="$emit('input', $event)"
+        />
+    `,
+};
+
 export const FlowToolbar = {
     name: 'FlowToolbar',
     components: {
         CodeEditor,
         FlowIcon,
+        FlowToolbarForm,
     },
     data() {
         return {
@@ -131,19 +385,16 @@ export const FlowToolbar = {
 
             return removeNamespace(this.namespacedComponentName);
         },
+        component() {
+            return app.component(this.componentName);
+        },
         content: {
             get() {
                 if (!this.$store.state.pageData.components) return '';
 
-                return JSON.stringify(
-                    this.$store.state.pageData.components[this.componentId],
-                    null,
-                    2,
-                );
+                return this.$store.state.pageData.components[this.componentId];
             },
-            set(value) {
-                const content = JSON.parse(value);
-
+            set(content) {
                 this.$store.commit('setPageData', {
                     ...this.$store.state.pageData,
                     components: {
@@ -271,11 +522,17 @@ export const FlowToolbar = {
                     class="absolute top w-full h-64"
                     style="top:100%;"
                 >
-                    <textarea
-                        v-if="mode === 'edit-content'"
-                        v-model="content"
-                        class="w-full h-full"
-                    />
+                    <div
+                        v-if="mode === 'edit-content' && component.schema"
+                        class="p-6 bg-white"
+                    >
+                        <flow-toolbar-form
+                            :schema="component.schema"
+                            :value="content"
+                            class="w-full h-full"
+                            @input="content = $event"
+                        />
+                    </div>
                     <code-editor
                         v-if="mode === 'edit-code'"
                         :value="code"

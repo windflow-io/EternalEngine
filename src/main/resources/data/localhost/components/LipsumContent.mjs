@@ -17,11 +17,11 @@ export default {
                 :is="\`h\${heading.level}\`"
                 class="font-semibold"
                 :class="{
-                    'text-4xl': heading.level === 1,
-                    'text-3xl': heading.level === 2,
-                    'text-2xl': heading.level === 3,
-                    'text-xl': heading.level === 4,
-                    'text-lg': heading.level === 5,
+                    'text-4xl': \`\${heading.level}\` === '1',
+                    'text-3xl': \`\${heading.level}\` === '2',
+                    'text-2xl': \`\${heading.level}\` === '3',
+                    'text-xl': \`\${heading.level}\` === '4',
+                    'text-lg': \`\${heading.level}\` === '5',
                 }"
             >
                 {{ heading.text }}
@@ -34,4 +34,26 @@ export default {
             </p>
         </div>
     `,
+    schema: {
+        heading: {
+            label: 'Heading',
+            type: 'fieldset',
+            fields: {
+                text: {
+                    label: 'Text',
+                    type: 'text',
+                },
+                level: {
+                    label: 'Level',
+                    type: 'select',
+                    options: [1, 2, 3, 4, 5, 6],
+                    default: 2,
+                },
+            },
+        },
+        paragraph: {
+            label: 'Paragraph',
+            type: 'textarea',
+        },
+    },
 }
