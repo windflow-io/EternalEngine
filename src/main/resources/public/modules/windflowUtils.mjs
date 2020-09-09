@@ -225,7 +225,7 @@ export const componentService = {
         registeredComponents[component.name] = { default: component };
         app.component(component.name, component);
     },
-    async load(namespacedName, { type = COMPONENT_TYPES.default } = {}) {
+    async importAndRegister(namespacedName, { type = COMPONENT_TYPES.default } = {}) {
         const name = removeNamespace(namespacedName);
 
         if (registeredComponents[name]) {
@@ -241,6 +241,10 @@ export const componentService = {
 
         return name;
     },
+    async load(namespacedName, { type = COMPONENT_TYPES.default } = {}) {
+        const url = assembleComponentUrl({ namespacedName, type });
+        return fetch(url).then(response => response.text());
+    },
 };
 
 /** Page **/
@@ -248,11 +252,11 @@ export const componentService = {
 const bypassIrrelevantErrors = error => error.status <= 500;
 const loadPage = withRetryHandling(pageService.load, { bypass: bypassIrrelevantErrors });
 
-const loadLayout = withRetryHandling(name => componentService.load(name, {
+const loadLayout = withRetryHandling(name => componentService.importAndRegister(name, {
     type: COMPONENT_TYPES.layout,
 }));
 
-const loadComponent = withRetryHandling(componentService.load);
+const loadComponent = withRetryHandling(componentService.importAndRegister);
 
 export const bootstrapPage = async ({ host, path }) => {
     let page;

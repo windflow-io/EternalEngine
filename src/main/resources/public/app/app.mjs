@@ -20,6 +20,7 @@ const store = new VueX.createStore({
         pageData: {},
         error: {},
         editMode: false,
+        editComponent: null,
     },
     mutations: {
         setPageHttpStatus(state, value) {
@@ -49,6 +50,9 @@ const store = new VueX.createStore({
         setEditMode(state, value) {
             state.editMode = value;
         },
+        setEditComponent(state, value = null) {
+            state.editComponent = value;
+        },
     },
     actions: {
         async fetchPageData({context, commit, dispatch, state}, payload) {
@@ -67,9 +71,16 @@ const store = new VueX.createStore({
             document.documentElement.lang = page.lang;
 
             const isInEditMode = window.location.hash === `#${EDIT_MODE_HASH}`;
-            if (isInEditMode) dispatch('enableEditMode');
+            if (isInEditMode) {
+                dispatch('enableEditMode');
+            } else {
+                commit('setEditMode', false);
+            }
 
             /**@TODO: Insert the head elements in here **/
+        },
+        updateComponent({}, { code, content, id }) {
+            /**@TODO: Persist to database **/
         },
         async enableEditMode({commit}) {
             await loadEditModeAssets();
