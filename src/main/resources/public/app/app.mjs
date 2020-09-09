@@ -8,6 +8,8 @@ import {
 
 const EDIT_MODE_HASH = 'edit';
 
+export const app = createApp(FlowApplication);
+
 const store = new VueX.createStore({
     state: {
         pageHttpStatus: undefined,
@@ -79,6 +81,53 @@ const store = new VueX.createStore({
 
             /**@TODO: Insert the head elements in here **/
         },
+        addComponent({ commit, state }, { area, name = `NewComponent` }) {
+            const id = Date.now();
+            app.component(name, {
+                name,
+                props: {
+                    heading: {
+                        default: 'Hello World',
+                        type: String,
+                    },
+                    paragraph: {
+                        default: 'Lorem Ipsum',
+                        type: String,
+                    },
+                },
+                schema: {
+                    heading: {
+                        type: 'text',
+                        label: 'Heading',
+                    },
+                    paragraph: {
+                        type: 'textarea',
+                        label: 'Paragraph',
+                    },
+                },
+                template: `
+                    <div>
+                        <h2>{{ heading }}</h2>
+                        <p>{{ paragraph }}</p>
+                    </div>
+                `,
+            });
+
+            const newAreas = state.pageAreas.map((pageArea) => {
+                if (pageArea.area !== area) return pageArea;
+
+                return {
+                    ...pageArea,
+                    components: [
+                        ...pageArea.components,
+                        { name: `localhost.${name}`, id },
+                    ],
+                }
+            });
+            commit('setPageAreas', newAreas);
+
+            return id;
+        },
         updateComponent({}, { code, content, id }) {
             /**@TODO: Persist to database **/
         },
@@ -89,6 +138,5 @@ const store = new VueX.createStore({
     }
 })
 
-export const app = createApp(FlowApplication);
 app.use(store);
 app.mount(`#app`);

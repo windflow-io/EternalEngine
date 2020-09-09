@@ -602,6 +602,11 @@ export const FlowArea = {
         }
     },
     methods: {
+        async addComponent() {
+            console.log('XXX');
+            const componentId = await this.$store.dispatch('addComponent', { area: this.name });
+            this.editComponent(componentId);
+        },
         editComponent(id) {
             if (!this.$store.state.editMode) return;
 
@@ -615,15 +620,26 @@ export const FlowArea = {
         removeNamespace: removeNamespace
     },
     template: `
-        <component
-            v-for="component in areaComponents"
-            :key="component.id"
-            :is="removeNamespace(component.name)"
-            v-bind="getComponentData(component.id)"
-            :style="$store.state.editMode && 'outline: rgba(0, 0, 0, 0.3) dashed 1px;'"
-            :class="$store.state.editMode && 'transition-colors transition-opacity duration-200 bg-opacity-0 hover:bg-gray-100 hover:bg-opacity-25'"
-            @click="editComponent(component.id)"
-        />
+        <div>
+            <component
+                v-for="component in areaComponents"
+                :key="component.id"
+                :is="removeNamespace(component.name)"
+                v-bind="getComponentData(component.id)"
+                :style="$store.state.editMode && 'outline: rgba(0, 0, 0, 0.3) dashed 1px;'"
+                :class="$store.state.editMode && 'transition-colors transition-opacity duration-200 bg-opacity-0 hover:bg-gray-100 hover:bg-opacity-25'"
+                @click="editComponent(component.id)"
+            />
+            <div
+                v-if="$store.state.editMode"
+                style="outline: rgba(0, 0, 0, 0.3) dashed 1px;"
+                class="flex p-8 justify-center items-center"
+            >
+                <button @click="addComponent">
+                    Add new component
+                </button>
+            </div>
+        </div>
     `,
 }
 
