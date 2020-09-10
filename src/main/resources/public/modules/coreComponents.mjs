@@ -451,7 +451,7 @@ export const FlowToolbar = {
     },
     template: `
         <div
-            class="fixed z-30 bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all text-gray-700"
+            class="fixed z-30 bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all text-gray-700 max-w-xl"
             style="left:calc(100% - 380px);top:50px;"
         >
             <div class="flex h-16">
