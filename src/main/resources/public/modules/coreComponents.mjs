@@ -637,7 +637,6 @@ export const FlowArea = {
                 :is="removeNamespace(component.name)"
                 v-bind="getComponentData(component.id)"
                 :style="$store.state.editMode && 'outline: rgba(0, 0, 0, 0.3) dashed 1px;'"
-                :class="$store.state.editMode && 'transition-colors transition-opacity duration-200 bg-opacity-0 hover:bg-gray-100 hover:bg-opacity-25'"
                 @click="editComponent(component.id)"
             />
             <div

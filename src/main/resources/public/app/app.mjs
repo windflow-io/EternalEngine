@@ -106,7 +106,7 @@ const store = new VueX.createStore({
                     },
                 },
                 template: `
-                    <div class="py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
+                    <div class="max-w-screen-xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
                         <h2 class="leading-9 font-extrabold tracking-tight text-gray-900 sm:leading-10 text-3xl">
                             {{ heading }}
                         </h2>
