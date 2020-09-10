@@ -414,8 +414,8 @@ export const FlowToolbar = {
         doDrag(mouse) {
             if (!this.dragging) return;
 
-            this.$el.style.top = (mouse.clientY - this.offsetY + window.pageYOffset) + 'px';
-            this.$el.style.left = (mouse.clientX - this.offsetX + window.pageXOffset) + 'px';
+            this.$el.style.top = (mouse.clientY - this.offsetY) + 'px';
+            this.$el.style.left = (mouse.clientX - this.offsetX) + 'px';
         },
         startDrag(mouse) {
             if (this.dragging) return;
