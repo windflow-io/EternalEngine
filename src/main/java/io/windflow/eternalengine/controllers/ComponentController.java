@@ -31,10 +31,11 @@ public class ComponentController {
      * @param componentFilename the filename of the component ending in .mjs
      * @return
      */
-    @RequestMapping(value = {"/api/components/{namespace}/{filename:^.+\\.mjs$}","/api/layouts/{namespace}/{filename:^.+\\.mjs$}"}, produces = "text/javascript")
-    @GetMapping
+    @RequestMapping(method = RequestMethod.GET, value = {"/api/components/{namespace}/{filename:^.+\\.mjs$}","/api/layouts/{namespace}/{filename:^.+\\.mjs$}"}, produces = "text/javascript")
     @ResponseBody
     public String getComponent(@PathVariable("namespace") String namespace, @PathVariable("filename") String componentFilename) {
+
+        System.out.println("GET!!!");
 
         String componentName = componentFilename.replace(".mjs", "");
 
@@ -49,13 +50,12 @@ public class ComponentController {
     }
 
     /***
-     * Get component from server
+     * Put a component on the server
      * @param namespace component namespace (domain) eg: com.mysite.components
      * @param componentFilename the filename of the component ending in .mjs
      * @return
      */
-    @RequestMapping(value = {"/api/{componentType}/{namespace}/{filename:^.+\\.mjs$}","/api/{componentType}/{namespace}/{filename:^.+\\.mjs$}"}, produces = "text/javascript")
-    @PutMapping
+    @RequestMapping(method = RequestMethod.PUT, value = "/api/{componentType}/{namespace}/{filename:^.+\\.mjs$}", produces = "text/javascript")
     @ResponseBody
     public String putComponent(@PathVariable("namespace") String componentType, @PathVariable("namespace") String namespace, @PathVariable("filename") String componentFilename, @RequestBody String javaScript) {
 
@@ -69,13 +69,12 @@ public class ComponentController {
             component = new Component();
             component.setNamespace(namespace);
             component.setComponentName(componentName);
-            component.setComponentType(componentType.equals("layout") ? Component.ComponentType.LAYOUT : Component.ComponentType.COMPONENT);
+            component.setComponentType(componentType.equals("layouts") ? Component.ComponentType.LAYOUT : Component.ComponentType.COMPONENT);
         }
 
         component.setJavaScript(javaScript);
 
         return componentRepository.save(component).getJavaScript();
-
 
     }
 
@@ -83,6 +82,7 @@ public class ComponentController {
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public HttpError handleWindflowNotFoundException(WindflowNotFoundException windEx) {
+        windEx.printStackTrace();
         return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly());
     }
 

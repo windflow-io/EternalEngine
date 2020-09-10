@@ -133,7 +133,18 @@ const store = new VueX.createStore({
             return id;
         },
         updateComponent({}, { code, content, id }) {
-            /**@TODO: Persist to database **/
+
+            console.log (code);
+
+            fetch('/api/components/io.windflow.test/TestComponent.mjs', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: code
+            })
+                .then(response => response.json())
+                .then(data => console.log(data));
         },
         async enableEditMode({commit}) {
             await loadEditModeAssets();
