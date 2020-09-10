@@ -1,47 +1,14 @@
 import { createApp } from '/vendor/vue3/vue.esm-browser.js';
 import VueX from '/vendor/vue3/vuex.esm-browser.js'
-import {FlowApplication,ErrorLayout} from '/modules/coreComponents.mjs'
+import {FlowApplication} from '/modules/coreComponents.mjs'
 import {
-    COMPONENT_TYPES,
-    alertNotifier as notifier,
-    enableEditMode,
-    withErrorHandling,
-    withRetryHandling,
-    componentService,
-    pageService,
+    bootstrapPage,
+    loadEditModeAssets,
 } from '/modules/windflowUtils.mjs'
 
 const EDIT_MODE_HASH = 'edit';
-const EDIT_MODE = window.location.hash === `#${EDIT_MODE_HASH}`;
-if (EDIT_MODE) enableEditMode();
 
-const bypassIrrelevantErrors = error => error.status <= 500;
-const loadPage = withRetryHandling(pageService.load, { bypass: bypassIrrelevantErrors });
-
-const loadLayout = withRetryHandling(name => componentService.load(name, {
-    type: COMPONENT_TYPES.layout,
-}));
-
-const loadComponent = withErrorHandling(
-    withRetryHandling(componentService.load),
-    { notifier },
-);
-
-/* @TODO: This still feels weird in here. */
-const makeErrorPage = ({ errorTitle, errorDescription, errorDetail, httpStatus }) => ({
-    metaData: {
-        title: errorTitle,
-        description: errorDescription,
-        httpStatus,
-    },
-    layout: ErrorLayout.name,
-    areas: [],
-    data: {
-        errorTitle,
-        errorDescription,
-        errorDetail,
-    },
-});
+export const app = createApp(FlowApplication);
 
 const store = new VueX.createStore({
     state: {
@@ -54,6 +21,8 @@ const store = new VueX.createStore({
         pageAreas: [],
         pageData: {},
         error: {},
+        editMode: false,
+        editComponent: null,
     },
     mutations: {
         setPageHttpStatus(state, value) {
@@ -79,23 +48,17 @@ const store = new VueX.createStore({
         },
         setPageData(state, value) {
             if (value) state.pageData = value;
-        }
+        },
+        setEditMode(state, value) {
+            state.editMode = value;
+        },
+        setEditComponent(state, value = null) {
+            state.editComponent = value;
+        },
     },
     actions: {
-        async fetchPageData({context, commit, state}, payload) {
-            let page;
-
-            try {
-                page = await loadPage({ host: payload.host, path: payload.path });
-                await loadLayout(page.layout);
-            } catch (error) {
-                console.log (error);
-                /**@TODO: Maybe add error logging with something like Sentry or DataDog (send ALL errors to server at some point later) **/
-                console.log ("Failed to load page data or layout template - no error specified by server.")
-                /**@TODO: Can we let the error page know what happened? **/
-                await componentService.register(ErrorLayout);
-                page = makeErrorPage(error.data);
-            }
+        async fetchPageData({context, commit, dispatch, state}, payload) {
+            const page = await bootstrapPage({ host: payload.host, path: payload.path });
 
             commit('setPageHttpStatus', page.httpStatus)
             commit('setPageEncoding', page.encoding);
@@ -103,23 +66,81 @@ const store = new VueX.createStore({
             commit('setPageTitle', page.title);
             commit('setPageMeta', page.metaData);
             commit('setPageLayout', page.layout);
+            commit('setPageAreas', page.areas);
             commit('setPageData', page.data);
 
             document.title = page.title;
             document.documentElement.lang = page.lang;
 
+            const isInEditMode = window.location.hash === `#${EDIT_MODE_HASH}`;
+            if (isInEditMode) {
+                dispatch('enableEditMode');
+            } else {
+                commit('setEditMode', false);
+            }
+
             /**@TODO: Insert the head elements in here **/
+        },
+        addComponent({ commit, state }, { area, name = `NewComponent` }) {
+            const id = Date.now();
+            app.component(name, {
+                name,
+                props: {
+                    heading: {
+                        default: 'Hello World',
+                        type: String,
+                    },
+                    paragraph: {
+                        default: 'Lorem Ipsum',
+                        type: String,
+                    },
+                },
+                schema: {
+                    heading: {
+                        type: 'text',
+                        label: 'Heading',
+                    },
+                    paragraph: {
+                        type: 'textarea',
+                        label: 'Paragraph',
+                    },
+                },
+                template: `
+                    <div class="max-w-screen-xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
+                        <h2 class="leading-9 font-extrabold tracking-tight text-gray-900 sm:leading-10 text-3xl">
+                            {{ heading }}
+                        </h2>
+                        <p class="mt-2 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                            {{ paragraph }}
+                        </p>
+                    </div>
+                `,
+            });
 
-            const allComponents = [];
-            page.areas.forEach(section => section.components.forEach(component => allComponents.push(component)));
-            await Promise.all(allComponents.map(component => loadComponent(component.name)));
+            const newAreas = state.pageAreas.map((pageArea) => {
+                if (pageArea.area !== area) return pageArea;
 
-            commit('setPageAreas', page.areas);
+                return {
+                    ...pageArea,
+                    components: [
+                        ...pageArea.components,
+                        { name: `localhost.${name}`, id },
+                    ],
+                }
+            });
+            commit('setPageAreas', newAreas);
 
-        }
+            return id;
+        },
+        updateComponent({}, { code, content, id }) {
+            /**@TODO: Persist to database **/
+        },
+        async enableEditMode({commit}) {
+            await loadEditModeAssets();
+            commit('setEditMode', true);
+        },
     }
 })
 
-export const app = createApp(FlowApplication);
 app.use(store);
 app.mount(`#app`);

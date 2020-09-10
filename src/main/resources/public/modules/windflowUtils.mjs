@@ -1,4 +1,5 @@
 import {app} from '../app/app.mjs'
+import {ErrorLayout} from '/modules/coreComponents.mjs'
 
 /** Errors */
 
@@ -113,25 +114,35 @@ export const loadStyleshet = (url) => {
 
 /** Edit Mode **/
 
-export const enableEditMode = async () => {
+export const loadEditModeAssets = async () => {
     await Promise.all([
         loadEditor(),
         loadStyleshet('/vendor/tailwindcss/tailwind.min.css'),
     ]);
 }
 
-/** Handle Errors **/
+/** Make Error Page **/
 
-export const withErrorHandling = (callback, { logger = console, notifier }) => {
-    return async function callbackWithErrorHandling(...params) {
-        try {
-            return await callback(...params);
-        } catch (error) {
-            if (logger) logger.error(error);
-            if (notifier) notifier.notify({ title: error.message });
-        }
-    }
-}
+export const makeErrorPage = ({
+    errorTitle = 'Oops!',
+    errorDescription = 'An unexpected error occurred.',
+    errorDetail = null,
+    httpStatus = 500,
+} = {}) => ({
+    title: errorTitle,
+    metaData: {
+        title: errorTitle,
+        description: errorDescription,
+        httpStatus,
+    },
+    layout: ErrorLayout.name,
+    areas: [],
+    data: {
+        errorTitle,
+        errorDescription,
+        errorDetail,
+    },
+});
 
 /** Retry on Error **/
 
@@ -160,14 +171,6 @@ export const withRetryHandling = (callback, {
         return retry();
     };
 }
-
-/** Notifications **/
-
-export const alertNotifier = {
-    notify({ title }) {
-        alert(title);
-    },
-};
 
 /** API */
 
@@ -222,7 +225,7 @@ export const componentService = {
         registeredComponents[component.name] = { default: component };
         app.component(component.name, component);
     },
-    async load(namespacedName, { type = COMPONENT_TYPES.default } = {}) {
+    async importAndRegister(namespacedName, { type = COMPONENT_TYPES.default } = {}) {
         const name = removeNamespace(namespacedName);
 
         if (registeredComponents[name]) {
@@ -238,4 +241,43 @@ export const componentService = {
 
         return name;
     },
+    async load(namespacedName, { type = COMPONENT_TYPES.default } = {}) {
+        const url = assembleComponentUrl({ namespacedName, type });
+        return fetch(url).then(response => response.text());
+    },
+};
+
+/** Page **/
+
+const bypassIrrelevantErrors = error => error.status <= 500;
+const loadPage = withRetryHandling(pageService.load, { bypass: bypassIrrelevantErrors });
+
+const loadLayout = withRetryHandling(name => componentService.importAndRegister(name, {
+    type: COMPONENT_TYPES.layout,
+}));
+
+const loadComponent = withRetryHandling(componentService.importAndRegister);
+
+export const bootstrapPage = async ({ host, path }) => {
+    let page;
+
+    try {
+        page = await loadPage({ host, path });
+
+        const allComponents = [];
+        page.areas.forEach(section => section.components.forEach(component => allComponents.push(component)));
+
+        await Promise.all([
+            loadLayout(page.layout),
+            ...allComponents.map(component => loadComponent(component.name)),
+        ]);
+    } catch (error) {
+        /**@TODO: Maybe add error logging with something like Sentry or DataDog (send ALL errors to server at some point later) **/
+        console.error(error);
+
+        await componentService.register(ErrorLayout);
+        page = makeErrorPage(error.data);
+    }
+
+    return page;
 };
