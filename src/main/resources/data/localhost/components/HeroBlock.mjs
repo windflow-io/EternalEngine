@@ -155,13 +155,13 @@ export default {
                 <main class="mt-10 mx-auto max-w-screen-xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
                 <div class="sm:text-center lg:text-left">
                     <h1
-                        class="tracking-tight leading-10 font-extrabold text-gray-900 sm:text-5xl sm:leading-none md:text-6xl"
+                        class="tracking-tight leading-10 font-extrabold text-gray-900 sm:leading-none"
                         :class="{
-                            'text-4xl': \`\${heading.level}\` === '1',
-                            'text-3xl': \`\${heading.level}\` === '2',
-                            'text-2xl': \`\${heading.level}\` === '3',
-                            'text-xl': \`\${heading.level}\` === '4',
-                            'text-lg': \`\${heading.level}\` === '5',
+                            'text-6xl': \`\${heading.level}\` === '1',
+                            'text-5xl': \`\${heading.level}\` === '2',
+                            'text-4xl': \`\${heading.level}\` === '3',
+                            'text-3xl': \`\${heading.level}\` === '4',
+                            'text-2xl': \`\${heading.level}\` === '5',
                         }"
                     >
                     {{ heading.text1 }}
