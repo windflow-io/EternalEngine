@@ -124,8 +124,8 @@ export const FlowFormGroup = {
     `,
 }
 
-export const FowFormFieldText = {
-    name: 'FowFormFieldText',
+export const FlowFormFieldText = {
+    name: 'FlowFormFieldText',
     components: {
         FlowFormGroup,
     },
@@ -159,8 +159,8 @@ export const FowFormFieldText = {
     `,
 }
 
-export const FowFormFieldTextarea = {
-    name: 'FowFormFieldTextarea',
+export const FlowFormFieldTextarea = {
+    name: 'FlowFormFieldTextarea',
     components: {
         FlowFormGroup,
     },
@@ -194,8 +194,8 @@ export const FowFormFieldTextarea = {
     `,
 }
 
-export const FowFormFieldSelect = {
-    name: 'FowFormFieldSelect',
+export const FlowFormFieldSelect = {
+    name: 'FlowFormFieldSelect',
     components: {
         FlowFormGroup,
     },
@@ -242,9 +242,9 @@ export const FowFormFieldSelect = {
 }
 
 const fieldMap = {
-    select: FowFormFieldSelect,
-    text: FowFormFieldText,
-    textarea: FowFormFieldTextarea,
+    select: FlowFormFieldSelect,
+    text: FlowFormFieldText,
+    textarea: FlowFormFieldTextarea,
 };
 
 export const FlowFormFields = {
@@ -291,8 +291,8 @@ export const FlowFormFields = {
     `,
 };
 
-export const FowFormFieldFieldset = {
-    name: 'FowFormFieldFieldset',
+export const FlowFormFieldFieldset = {
+    name: 'FlowFormFieldFieldset',
     components: {
         FlowFormFields,
     },
@@ -324,7 +324,7 @@ export const FowFormFieldFieldset = {
     `,
 };
 
-fieldMap.fieldset = FowFormFieldFieldset;
+fieldMap.fieldset = FlowFormFieldFieldset;
 
 export const FlowToolbarForm = {
     name: 'FlowToolbarForm',
