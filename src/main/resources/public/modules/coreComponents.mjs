@@ -210,11 +210,11 @@ export const FlowFormFieldSelect = {
         },
         value: {
             default: '',
-            type: String,
+            type: [Number, String],
         },
         options: {
             required: true,
-            type: String,
+            type: Array,
         },
     },
     template: `
