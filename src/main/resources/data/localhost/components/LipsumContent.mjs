@@ -1,6 +1,59 @@
 export default {
     name: 'LipsumContent',
+    props: {
+        heading: {
+            default: null,
+            type: Object,
+        },
+        paragraph: {
+            default: null,
+            type: String,
+        },
+    },
     template: `
-        <p class="mt-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-    `
+        <div>
+            <component
+                v-if="heading"
+                :is="\`h\${heading.level}\`"
+                class="font-semibold"
+                :class="{
+                    'text-4xl': \`\${heading.level}\` === '1',
+                    'text-3xl': \`\${heading.level}\` === '2',
+                    'text-2xl': \`\${heading.level}\` === '3',
+                    'text-xl': \`\${heading.level}\` === '4',
+                    'text-lg': \`\${heading.level}\` === '5',
+                }"
+            >
+                {{ heading.text }}
+            </component>
+            <p
+                v-if="paragraph"
+                class="mt-4"
+            >
+                {{ paragraph }}
+            </p>
+        </div>
+    `,
+    schema: {
+        heading: {
+            label: 'Heading',
+            type: 'fieldset',
+            fields: {
+                text: {
+                    label: 'Text',
+                    type: 'text',
+                },
+                level: {
+                    label: 'Level',
+                    type: 'select',
+                    options: [1, 2, 3, 4, 5, 6],
+                    default: 2,
+                },
+            },
+        },
+        paragraph: {
+            label: 'Paragraph',
+            type: 'textarea',
+        },
+    },
 }
