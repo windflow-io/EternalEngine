@@ -20,4 +20,5 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.3.2.RELEASE'
     runtimeOnly 'org.postgresql:postgresql'
     compile 'org.slf4j:log4j-over-slf4j:1.7.30'
+    
 }
