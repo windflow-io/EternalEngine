@@ -603,7 +603,6 @@ export const FlowArea = {
     },
     methods: {
         async addComponent() {
-            console.log('XXX');
             const componentId = await this.$store.dispatch('addComponent', { area: this.name });
             this.editComponent(componentId);
         },
