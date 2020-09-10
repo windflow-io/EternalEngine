@@ -17,6 +17,8 @@ public interface PageRepository extends JpaRepository<Page, UUID> {
 
     Optional<Page> findByDomainAndPath(String domain, String path);
 
+    Optional<Page> findByDomainAndPathAndPageType(String domain, String path, Page.PageType pageType);
+
     Optional<Page> findByDomainAndType(String domain, Page.PageType type);
 
     @Query(value="select * from page where json ->> 'street' = :street", nativeQuery = true)

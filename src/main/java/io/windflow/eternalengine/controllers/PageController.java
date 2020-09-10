@@ -25,7 +25,7 @@ public class PageController {
         this.pageRepository = pageRepository;
     }
 
-    @RequestMapping(value = {"/api/pages/**"}, produces = "application/json")
+    @RequestMapping(method = RequestMethod.GET, value = {"/api/pages/**"}, produces = "application/json")
     @ResponseBody
     public String servePage(HttpServletRequest request, HttpServletResponse response) {
 
@@ -50,8 +50,31 @@ public class PageController {
         } else {
             logger.warn("005 Database is empty");
             throw new WindflowNotFoundException(WindflowError.ERROR_005);
-
         }
+    }
+
+    @RequestMapping(method = RequestMethod.PUT, value = {"/api/pages/**"}, produces = "application/json")
+    @ResponseBody
+    public String savePage(HttpServletRequest request, HttpServletResponse response, @RequestBody String json) {
+
+        UrlHelper url = new UrlHelper(request);
+
+        Page page;
+        Optional<Page> optPage = pageRepository.findByDomainAndPathAndPageType(url.getDomain(), url.getPath(), Page.PageType.PageNormal);
+
+        if (optPage.isPresent()) {
+            page = optPage.get();
+        } else {
+            page = new Page();
+            page.setDomain(url.getDomain());
+            page.setPath(url.getPath());
+            page.setType(Page.PageType.PageNormal);
+            page.setJson(json);
+        }
+
+        page.setJson(json);
+
+        return pageRepository.save(page).getJson();
     }
 
     /**@TODO Common Errors must be moved to a common error handling class **/
