@@ -19,7 +19,8 @@
             "components":[
                 {"name":"localhost.HeroBlock", "id":"7"},
                 {"name":"localhost.FeatureSection", "id":"8"},
-                {"name":"localhost.CtaSection", "id":"9"}
+                {"name":"localhost.CtaSection", "id":"9"},
+                {"name":"localhost.FeatureSection", "id":"10"}
             ]
         }
     ],
@@ -66,6 +67,13 @@
                     "link": "https://www.google.com",
                     "style": "secondary"
                 }
+            },
+            "10": {
+                "heading": {
+                    "text": "Do more with less!",
+                    "level": 2
+                },
+                "paragraph": "Dolor ist amet consect adipisicing elit. Possimus magnam voluptatum cupiditate veritatis in accusamus."
             }
         }
     }
