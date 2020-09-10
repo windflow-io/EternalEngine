@@ -143,7 +143,7 @@ const store = new VueX.createStore({
                 },
                 body: code
             })
-                .then(response => response.json())
+                .then(response => response.text())
                 .then(data => console.log(data));
         },
         async enableEditMode({commit}) {
