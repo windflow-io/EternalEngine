@@ -106,9 +106,13 @@ const store = new VueX.createStore({
                     },
                 },
                 template: `
-                    <div>
-                        <h2>{{ heading }}</h2>
-                        <p>{{ paragraph }}</p>
+                    <div class="py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
+                        <h2 class="leading-9 font-extrabold tracking-tight text-gray-900 sm:leading-10 text-3xl">
+                            {{ heading }}
+                        </h2>
+                        <p class="mt-2 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+                            {{ paragraph }}
+                        </p>
                     </div>
                 `,
             });

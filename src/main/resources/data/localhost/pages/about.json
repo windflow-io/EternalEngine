@@ -12,36 +12,60 @@
         ]
 
     },
-    "layout": "localhost.LeftMenuLayout",
+    "layout": "localhost.SingleColumnLayout",
     "areas": [
         {
-            "area": "left",
-            "components": [{"name":"localhost.SideMenu", "id":"6"}]
-        },
-        {
-            "area": "right",
+            "area": "content",
             "components":[
-                {"name":"localhost.HeaderAbout", "id":"7"},
-                {"name":"localhost.LipsumContent", "id":"8"},
-                {"name":"localhost.LipsumContent", "id":"9"}
+                {"name":"localhost.HeroBlock", "id":"7"},
+                {"name":"localhost.FeatureSection", "id":"8"},
+                {"name":"localhost.CtaSection", "id":"9"}
             ]
         }
     ],
     "data": {
         "components": {
+            "7": {
+                "heading": {
+                    "text1": "Data to enrich your",
+                    "text2": "online business",
+                    "level": 1
+                },
+                "paragraph": "Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui lorem cupidatat commodo. Elit sunt amet fugiat veniam occaecat fugiat aliqua.",
+                "cta1": {
+                    "text": "Get started",
+                    "link": "https://www.google.com",
+                    "style": "primary"
+                },
+                "cta2": {
+                    "text": "Live demo",
+                    "link": "https://www.google.com",
+                    "style": "secondary"
+                }
+            },
             "8": {
                 "heading": {
-                    "text": "Lorem Ipsum",
+                    "text": "A better way to send money",
                     "level": 2
                 },
-                "paragraph": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod."
+                "paragraph": "Lorem ipsum dolor sit amet consect adipisicing elit. Possimus magnam voluptatum cupiditate veritatis in accusamus quisquam."
             },
             "9": {
                 "heading": {
-                    "text": "Dolor sit",
-                    "level": 3
+                    "text1": "Ready to dive in?",
+                    "text2": "Start your free trial today.",
+                    "level": 2
                 },
-                "paragraph": "At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
+                "cta1": {
+                    "text": "Get started",
+                    "link": "https://www.google.com",
+                    "style": "primary"
+                },
+                "cta2": {
+                    "text": "Learn more",
+                    "link": "https://www.google.com",
+                    "style": "secondary"
+                }
             }
         }
     }
