@@ -434,6 +434,9 @@ export const FlowToolbar = {
         exitEditMode() {
             pushUrl(`${window.location.pathname}${window.location.search}`);
         },
+        exitComponentEditMode() {
+            this.$store.commit('setEditComponent', null);
+        },
         async loadCode() {
             const code = await componentService.load(this.namespacedComponentName);
             this.code = code;
@@ -448,12 +451,12 @@ export const FlowToolbar = {
     },
     template: `
         <div
-            class="absolute z-30 rounded-lg bg-white bg-opacity-75 border-2 border-gray-700 text-gray-800 text-md"
-            style="left:calc(100% - 380px); top:50px"
+            class="fixed z-30 bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all text-gray-700"
+            style="left:calc(100% - 380px);top:50px;"
         >
             <div class="flex h-16">
                 <button
-                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-500 hover:text-gray-800 cursor-move"
+                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-300 hover:text-gray-800 cursor-move"
                     title="drag"
                     aria-label="drag"
                     @mousedown="startDrag"
@@ -462,7 +465,7 @@ export const FlowToolbar = {
                 </button>
                 <button
                     v-if="!componentId"
-                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-500 hover:text-gray-800"
+                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-300 hover:text-gray-800"
                     title="add component"
                     aria-label="add component"
                 >
@@ -470,7 +473,7 @@ export const FlowToolbar = {
                 </button>
                 <button
                     v-if="componentId"
-                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-500 hover:text-gray-800"
+                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-300 hover:text-gray-800"
                     title="edit content"
                     aria-label="edit content"
                     @click="mode = 'edit-content'"
@@ -479,7 +482,7 @@ export const FlowToolbar = {
                 </button>
                 <button
                     v-if="componentId"
-                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-500 hover:text-gray-800"
+                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-300 hover:text-gray-800"
                     title="edit code"
                     aria-label="edit code"
                     @click="mode = 'edit-code'"
@@ -487,14 +490,14 @@ export const FlowToolbar = {
                     <flow-icon icon="code" class="text-md" />
                 </button>
                 <button
-                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-500 hover:text-gray-800"
+                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-300 hover:text-gray-800"
                     title="rollback (coming soon)"
                     aria-label="rollback (coming soon)"
                 >
                     <flow-icon icon="undo-alt" class="text-md" />
                 </button>
                 <button
-                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-500 hover:text-gray-800"
+                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-300 hover:text-gray-800"
                     title="save"
                     aria-label="save"
                     @click="update"
@@ -502,7 +505,17 @@ export const FlowToolbar = {
                     <flow-icon icon="save" class="text-md"/>
                 </button>
                 <button
-                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-gray-500 hover:text-gray-800"
+                    v-if="componentId"
+                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-gray-300 hover:text-gray-800"
+                    title="exit component edit mode"
+                    aria-label="exit component edit mode"
+                    @click="exitComponentEditMode"
+                >
+                    <flow-icon icon="times" class="text-md" />
+                </button>
+                <button
+                    v-else
+                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-gray-300 hover:text-gray-800"
                     title="exit edit mode"
                     aria-label="exit edit mode"
                     @click="exitEditMode"
@@ -512,35 +525,33 @@ export const FlowToolbar = {
             </div>
             <div
                 v-if="componentName"
-                class="ml-4 text-xs"
+                class="bg-gray-100 px-4 py-3 text-xs"
             >
                 {{ componentName }}
             </div>
-            <transition name="fade">
+            <div
+                v-if="mode"
+                class="w-full"
+            >
                 <div
-                    v-if="mode"
-                    class="absolute top w-full h-64"
-                    style="top:100%;"
+                    v-if="mode === 'edit-content' && component.schema"
+                    class="p-6 bg-white"
+                    style="max-height: 42rem;overflow: auto;"
                 >
-                    <div
-                        v-if="mode === 'edit-content' && component.schema"
-                        class="p-6 bg-white"
-                    >
-                        <flow-toolbar-form
-                            :schema="component.schema"
-                            :value="content"
-                            class="w-full h-full"
-                            @input="content = $event"
-                        />
-                    </div>
-                    <code-editor
-                        v-if="mode === 'edit-code'"
-                        :value="code"
+                    <flow-toolbar-form
+                        :schema="component.schema"
+                        :value="content"
                         class="w-full h-full"
-                        @update="code = $event"
+                        @input="content = $event"
                     />
                 </div>
-            </transition>
+                <code-editor
+                    v-if="mode === 'edit-code'"
+                    :value="code"
+                    class="w-full h-full"
+                    @update="code = $event"
+                />
+            </div>
         </div>
     `,
 }
