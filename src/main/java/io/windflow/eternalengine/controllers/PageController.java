@@ -60,7 +60,7 @@ public class PageController {
         UrlHelper url = new UrlHelper(request);
 
         Page page;
-        Optional<Page> optPage = pageRepository.findByDomainAndPathAndPageType(url.getDomain(), url.getPath(), Page.PageType.PageNormal);
+        Optional<Page> optPage = pageRepository.findByDomainAndPathAndType(url.getDomain(), url.getPath(), Page.PageType.PageNormal);
 
         if (optPage.isPresent()) {
             page = optPage.get();
