@@ -4,6 +4,8 @@ import {FlowApplication} from '/modules/coreComponents.mjs'
 import {
     bootstrapPage,
     loadEditModeAssets,
+    pageService,
+    mapQueryString,
 } from '/modules/windflowUtils.mjs'
 
 const EDIT_MODE_HASH = 'edit';
@@ -132,19 +134,35 @@ const store = new VueX.createStore({
 
             return id;
         },
-        updateComponent({}, { code, content, id }) {
+        updateComponent({ commit, state }, { code, content, id }) {
+            commit('setPageData', {
+                ...state.pageData,
+                components: {
+                    ...state.pageData.components,
+                    [id]: content,
+                },
+            });
 
-            console.log (code);
+            const host = mapQueryString(window.location.href).host || location.host;
+            const path = location.pathname;
+            const data = {
+                title: state.pageTitle,
+                httpStatus: 200, // TODO
+                metaData: state.pageMeta,
+                layout: state.pageLayout,
+                areas: state.pageAreas,
+                data: state.pageData,
+            };
+            pageService.update({ data, host, path });
 
-            fetch('/api/components/io.windflow.test/TestComponent.mjs', {
+            fetch('/api/components/localhost/HeroBlock.mjs', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: code
             })
-                .then(response => response.text())
-                .then(data => console.log(data));
+            .then(response => response.text());
         },
         async enableEditMode({commit}) {
             await loadEditModeAssets();

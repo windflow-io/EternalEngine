@@ -175,9 +175,17 @@ export const withRetryHandling = (callback, {
 /** API */
 
 const apiEndpoint = '/api';
+const apiDefaultOptions = {
+    method: 'GET',
+    headers: { 'Content-Type': 'application/json' },
+};
 
-export const api = async (endpoint) => {
-    const response = await fetch(`${apiEndpoint}${endpoint}`);
+export const api = async (endpoint, customOptions) => {
+    const options = {
+        ...apiDefaultOptions,
+        ...customOptions,
+    }
+    const response = await fetch(`${apiEndpoint}${endpoint}`, options);
     const data = await response.json();
     if (!response.ok) throw new NetworkError(response.statusText, response.status, data);
 
@@ -191,7 +199,13 @@ const pageEndpoint = '/pages';
 export const pageService = {
     load({ host, path }) {
         return api(`${pageEndpoint}/${host}${path}`);
-    }
+    },
+    update({ data, host, path }) {
+        return api(`${pageEndpoint}/${host}${path}`, {
+            method: 'PUT',
+            body: JSON.stringify(data),
+        });
+    },
 };
 
 /** Service: Component */
