@@ -172,6 +172,26 @@ export const withRetryHandling = (callback, {
     };
 }
 
+/** http **/
+
+export const http = {
+    async get(url, options) {
+        const response = await fetch(url, options);
+        const contentType = response.headers.get('content-type');
+        let data;
+
+        if (contentType && contentType.includes('application/json')) {
+            data = await response.json();
+        } else {
+            data = await response.text();
+        }
+
+        if (!response.ok) throw new NetworkError(response.statusText, response.status, data);
+
+        return data;
+    },
+};
+
 /** API */
 
 const apiEndpoint = '/api';
@@ -185,11 +205,8 @@ export const api = async (endpoint, customOptions) => {
         ...apiDefaultOptions,
         ...customOptions,
     }
-    const response = await fetch(`${apiEndpoint}${endpoint}`, options);
-    const data = await response.json();
-    if (!response.ok) throw new NetworkError(response.statusText, response.status, data);
 
-    return data;
+    return http.get(`${apiEndpoint}${endpoint}`, options);
 };
 
 /** Service: Page */
@@ -257,7 +274,7 @@ export const componentService = {
     },
     async load(namespacedName, { type = COMPONENT_TYPES.default } = {}) {
         const url = assembleComponentUrl({ namespacedName, type });
-        return fetch(url).then(response => response.text());
+        return http.get(url);
     },
 };
 
