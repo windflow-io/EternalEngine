@@ -2,7 +2,6 @@ package io.windflow.eternalengine.controllers;
 
 import io.windflow.eternalengine.utils.TextFileReader;
 import io.windflow.eternalengine.entities.Page;
-import io.windflow.eternalengine.experiment.JavaScript;
 import io.windflow.eternalengine.persistence.PageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -74,13 +73,6 @@ public class TestController {
     public String QueryData(@RequestParam String street) {
         List<Page> jsonList = pageRepository.findByStreet(street);
         return "[" + jsonList.stream().map(Page::getJson).collect(Collectors.joining(",")) + "]";
-    }
-
-    @RequestMapping("/test")
-    @ResponseBody
-    public String doTest(@Autowired JavaScript javaScript) {
-        javaScript.testJavaScript();
-        return "ok";
     }
 
     @RequestMapping(value = "/test2", produces = "text/plain")

@@ -16,12 +16,13 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'com.vladmihalcea:hibernate-types-52:2.9.13'
-    implementation 'org.graalvm:graal-sdk:1.0.0-rc7'
-    compile 'org.graalvm.truffle:truffle-api:20.2.0'
-    compile 'org.graalvm.js:js:20.2.0'
-    compile 'org.graalvm.js:js-scriptengine:20.2.0'
+
+    //implementation 'org.graalvm:graal-sdk:1.0.0-rc7'
+    //compile 'org.graalvm.truffle:truffle-api:20.2.0'
+    //compile 'org.graalvm.js:js:20.2.0'
+    //compile 'org.graalvm.js:js-scriptengine:20.2.0'
+
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.3.2.RELEASE'
     runtimeOnly 'org.postgresql:postgresql'
     compile 'org.slf4j:log4j-over-slf4j:1.7.30'
-
 }
