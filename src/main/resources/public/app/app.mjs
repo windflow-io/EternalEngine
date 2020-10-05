@@ -1,153 +1,107 @@
-import { createApp } from '/vendor/vue3/vue.esm-browser.js';
-import VueX from '/vendor/vue3/vuex.esm-browser.js'
-import {FlowApplication} from '/modules/coreComponents.mjs'
 import {
-    bootstrapPage,
-    loadEditModeAssets,
-    pageService,
-    mapQueryString,
-} from '/modules/windflowUtils.mjs'
+    computed,
+    createApp,
+} from '../vendor/vue3/vue.esm-browser.js';
 
-const EDIT_MODE_HASH = 'edit';
+import {
+    FlowToolbar,
+} from '../modules/coreComponents.mjs';
+import {
+    http,
+    loadStylesheet,
+    makeApi,
+    makeComponentService,
+    makeContextCacheComponent,
+    makeContextCachePage,
+    makeContextComponentRegistry,
+    makeContextEditMode,
+    makeContextRouter,
+    makePageService,
+} from '../modules/windflowUtils.mjs';
 
-export const app = createApp(FlowApplication);
+export const CONTEXT_COMPONENT_REGISTRY = Symbol();
+export const CONTEXT_CACHE_COMPONENT = Symbol();
+export const CONTEXT_CACHE_PAGE = Symbol();
+export const CONTEXT_ROUTER = Symbol();
+export const CONTEXT_EDIT_MODE = Symbol();
 
-const store = new VueX.createStore({
-    state: {
-        pageMetaInfo: {},
-        pageLayout: undefined,
-        pageAreas: [],
-        pageData: {},
-        error: {},
-        editMode: false,
-        editComponent: null,
+export const FlowApplication = {
+    name: 'FlowApplication',
+    components: {
+        FlowToolbar,
     },
-    mutations: {
-        setPageMetaInfo(state, value) {
-            if (value) state.pageMetaInfo = value;
-        },
-        setPageLayout(state, value) {
-            if (value) state.pageLayout = value;
-        },
-        setPageAreas(state, value) {
-            if (value) state.pageAreas = value;
-        },
-        setPageData(state, value) {
-            if (value) state.pageData = value;
-        },
-        setEditMode(state, value) {
-            state.editMode = value;
-        },
-        setEditComponent(state, value = null) {
-            state.editComponent = value;
-        },
-    },
-    actions: {
-        async fetchPageData({context, commit, dispatch, state}, payload) {
-            const page = await bootstrapPage({ host: payload.host, path: payload.path });
+    setup() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const host = urlParams.get('host') || location.host;
 
-            commit('setPageMetaInfo', page.metaInfo);
-            commit('setPageLayout', page.layout);
-            commit('setPageAreas', page.areas);
-            commit('setPageData', page.data);
+        const api = makeApi({ http });
+        const componentService = makeComponentService({ api, host });
+        const pageService = makePageService({ api, host });
 
-            document.title = page.title;
-            document.documentElement.lang = page.lang;
+        const contextComponentRegistry = makeContextComponentRegistry();
+        app.provide(CONTEXT_COMPONENT_REGISTRY, contextComponentRegistry);
 
-            const isInEditMode = window.location.hash === `#${EDIT_MODE_HASH}`;
-            if (isInEditMode) {
-                dispatch('enableEditMode');
-            } else {
-                commit('setEditMode', false);
+        const { registerUpdatedComponent } = contextComponentRegistry;
+        const contextCacheComponent = makeContextCacheComponent({
+            componentService,
+            registerUpdatedComponent,
+        });
+        app.provide(CONTEXT_CACHE_COMPONENT, contextCacheComponent);
+
+        const contextCachePage = makeContextCachePage({ pageService });
+        app.provide(CONTEXT_CACHE_PAGE, contextCachePage);
+
+        const contextEditMode = makeContextEditMode({ loadStylesheet });
+        app.provide(CONTEXT_EDIT_MODE, contextEditMode);
+
+        const { loadPage } = contextCachePage;
+        const { registerComponent } = contextComponentRegistry;
+        const contextRouter = makeContextRouter({
+            loadPage,
+            registerComponent,
+        });
+        app.provide(CONTEXT_ROUTER, contextRouter);
+
+        const { currentPath, page } = contextRouter;
+        const { isInEditMode } = contextEditMode;
+
+        const { components } = contextComponentRegistry;
+        const layoutComponent = computed(() => {
+            return page.value ? components[page.value.layout] : null;
+        });
+
+        const areas = computed(() => {
+            if (!page.value) return null;
+
+            const areas = {};
+
+            for (const area of page.value.areas) {
+                areas[area.area] = {
+                    components: area.components,
+                };
             }
 
-            /**@TODO: Insert the head elements in here **/
-        },
-        addComponent({ commit, state }, { area, name = `NewComponent` }) {
-            const id = Date.now();
-            app.component(name, {
-                name,
-                props: {
-                    heading: {
-                        default: 'Hello World',
-                        type: String,
-                    },
-                    paragraph: {
-                        default: 'Lorem Ipsum',
-                        type: String,
-                    },
-                },
-                schema: {
-                    heading: {
-                        type: 'text',
-                        label: 'Heading',
-                    },
-                    paragraph: {
-                        type: 'textarea',
-                        label: 'Paragraph',
-                    },
-                },
-                template: `
-                    <div class="max-w-screen-xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
-                        <h2 class="leading-9 font-extrabold tracking-tight text-gray-900 sm:leading-10 text-3xl">
-                            {{ heading }}
-                        </h2>
-                        <p class="mt-2 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                            {{ paragraph }}
-                        </p>
-                    </div>
-                `,
-            });
+            return areas;
+        });
 
-            const newAreas = state.pageAreas.map((pageArea) => {
-                if (pageArea.area !== area) return pageArea;
+        return {
+            areas,
+            currentPath,
+            isInEditMode,
+            layoutComponent,
+        }
+    },
+    template: `
+        <div>
+            <flow-toolbar v-if="isInEditMode"/>
+            <component
+                :is="layoutComponent"
+                :key="currentPath"
+                :areas="areas"
+            />
+        </div>
+    `,
+};
 
-                return {
-                    ...pageArea,
-                    components: [
-                        ...pageArea.components,
-                        { name: `localhost.${name}`, id },
-                    ],
-                }
-            });
-            commit('setPageAreas', newAreas);
-
-            return id;
-        },
-        updateComponent({ commit, state }, { code, content, id }) {
-            commit('setPageData', {
-                ...state.pageData,
-                components: {
-                    ...state.pageData.components,
-                    [id]: content,
-                },
-            });
-
-            const host = mapQueryString(window.location.href).host || location.host;
-            const path = location.pathname;
-            const data = {
-                title: state.pageMetaInfo.title,
-                layout: state.pageLayout,
-                areas: state.pageAreas,
-                data: state.pageData,
-            };
-            pageService.update({ data, host, path });
-
-            fetch('/api/components/localhost/HeroBlock.mjs', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: code
-            })
-            .then(response => response.text());
-        },
-        async enableEditMode({commit}) {
-            await loadEditModeAssets();
-            commit('setEditMode', true);
-        },
-    }
-})
-
-app.use(store);
+const app = createApp(FlowApplication);
 app.mount(`#app`);

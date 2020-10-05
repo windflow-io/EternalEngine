@@ -53,7 +53,7 @@ public class ComponentController {
      * @param componentFilename the filename of the component ending in .mjs
      * @return
      */
-    @RequestMapping(method = RequestMethod.PUT, value = "/api/{componentType}/{namespace}/{filename:^.+\\.mjs$}", produces = "text/javascript")
+    @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST}, value = "/api/{componentType}/{namespace}/{filename:^.+\\.mjs$}", produces = "text/javascript")
     @ResponseBody
     public String putComponent(@PathVariable("namespace") String componentType, @PathVariable("namespace") String namespace, @PathVariable("filename") String componentFilename, @RequestBody String javaScript) {
 
