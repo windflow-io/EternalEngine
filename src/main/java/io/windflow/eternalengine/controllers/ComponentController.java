@@ -35,8 +35,6 @@ public class ComponentController {
     @ResponseBody
     public String getComponent(@PathVariable("namespace") String namespace, @PathVariable("filename") String componentFilename) {
 
-        System.out.println("GET!!!");
-
         String componentName = componentFilename.replace(".mjs", "");
 
         Optional<Component> optComponent = componentRepository.findByNamespaceAndComponentName(namespace, componentName);

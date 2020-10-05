@@ -59,7 +59,6 @@ public class TestController {
 
         for (String json : jsonStrings) {
             Page p = new Page();
-            System.out.println(json);
 
             p.setJson(json);
             pageRepository.save(p);
