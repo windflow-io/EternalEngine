@@ -1,11 +1,16 @@
 {
-    "title": "Contact",
-    "httpStatus": "200",
-    "metaData": {
-        "metaTags" : [
+    "metaInfo": {
+        "title": "Contact",
+        "htmlAttrs" : {
+            "lang" : "en"
+        },
+        "bodyAttrs" : {
+            "class" : "dark mode"
+        },
+        "meta": [
             {"name": "description", "content":  "contact page meta description page"}
         ],
-        "links": [
+        "link": [
             {"rel":"icon" ,"type": "img/png", "href": "https://cdn.windflow.io/app/img/favicon-32x32.png", "sizes": "32x32"},
             {"rel":"icon" ,"type": "img/png", "href": "https://cdn.windflow.io/app/img/favicon-16x16.png", "sizes": "16x16"},
             {"rel":"stylesheet" ,"type": "text/css", "href": "https://cdn.windflow.io/app/vendor/tailwindcss/tailwind.min.css"}

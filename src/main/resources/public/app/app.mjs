@@ -14,11 +14,7 @@ export const app = createApp(FlowApplication);
 
 const store = new VueX.createStore({
     state: {
-        pageHttpStatus: undefined,
-        pageEncoding: 'utf-8',
-        pageLang: 'en',
-        pageTitle: undefined,
-        pageMeta: {},
+        pageMetaInfo: {},
         pageLayout: undefined,
         pageAreas: [],
         pageData: {},
@@ -27,20 +23,8 @@ const store = new VueX.createStore({
         editComponent: null,
     },
     mutations: {
-        setPageHttpStatus(state, value) {
-            if (value) state.pageHttpStatus = value;
-        },
-        setPageEncoding(state, value) {
-            if (value) state.pageEncoding = value;
-        },
-        setPageLang(state, value) {
-            if (value) state.pageLang = value;
-        },
-        setPageTitle(state, value) {
-            if (value) state.pageTitle = value;
-        },
-        setPageMeta(state, value) {
-            if (value) state.pageMeta = value;
+        setPageMetaInfo(state, value) {
+            if (value) state.pageMetaInfo = value;
         },
         setPageLayout(state, value) {
             if (value) state.pageLayout = value;
@@ -62,11 +46,7 @@ const store = new VueX.createStore({
         async fetchPageData({context, commit, dispatch, state}, payload) {
             const page = await bootstrapPage({ host: payload.host, path: payload.path });
 
-            commit('setPageHttpStatus', page.httpStatus)
-            commit('setPageEncoding', page.encoding);
-            commit('setPageLang', page.lang);
-            commit('setPageTitle', page.title);
-            commit('setPageMeta', page.metaData);
+            commit('setPageMetaInfo', page.metaInfo);
             commit('setPageLayout', page.layout);
             commit('setPageAreas', page.areas);
             commit('setPageData', page.data);
@@ -146,9 +126,7 @@ const store = new VueX.createStore({
             const host = mapQueryString(window.location.href).host || location.host;
             const path = location.pathname;
             const data = {
-                title: state.pageTitle,
-                httpStatus: 200, // TODO
-                metaData: state.pageMeta,
+                title: state.pageMetaInfo.title,
                 layout: state.pageLayout,
                 areas: state.pageAreas,
                 data: state.pageData,

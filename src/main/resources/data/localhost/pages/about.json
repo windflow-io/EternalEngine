@@ -1,16 +1,21 @@
 {
-    "title": "What about it!",
-    "httpStatus": "200",
-    "metaData": {
-        "metaTags" : [
+    "metaInfo": {
+        "title": "What about it!",
+        "htmlAttrs" : {
+            "lang" : "en"
+        },
+        "bodyAttrs" : {
+            "class" : "dark mode"
+        },
+        "meta": [
+            {"charset" :  "utf-8"},
             {"name": "description", "content":  "this is the meta description of the about page"}
         ],
-        "links": [
+        "link": [
             {"rel":"icon" ,"type": "img/png", "href": "https://cdn.windflow.io/app/img/favicon-32x32.png", "sizes": "32x32"},
             {"rel":"icon" ,"type": "img/png", "href": "https://cdn.windflow.io/app/img/favicon-16x16.png", "sizes": "16x16"},
             {"rel":"stylesheet" ,"type": "text/css", "href": "https://cdn.windflow.io/app/vendor/tailwindcss/tailwind.min.css"}
         ]
-
     },
     "layout": "localhost.SingleColumnLayout",
     "areas": [

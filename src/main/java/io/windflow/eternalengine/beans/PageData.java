@@ -1,6 +1,7 @@
 package io.windflow.eternalengine.beans;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -11,40 +12,94 @@ import java.util.Set;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class PageData {
 
-    String title;
-    String lang;
-    String charset;
-    Integer httpStatus;
-    MetaData metaData;
+    MetaInfo metaInfo;
     String layout;
     HashSet<Area> areas = new HashSet();
 
-    public class MetaData {
+    public class MetaInfo {
+        String title;
+        HtmlAttrs htmlAttrs;
+        BodyAttrs bodyAttrs;
+        Set<Meta> meta = new HashSet<>();
+        Set<Link> link = new HashSet<>();
 
-        Set<MetaTag> metaTags = new HashSet<>();
-        Set<Link> links = new HashSet<>();
-
-        public Set<MetaTag> getMetaTags() {
-            return metaTags;
+        public String getTitle() {
+            return title;
         }
 
-        public void setMetaTags(Set<MetaTag> metaTags) {
-            this.metaTags = metaTags;
+        public void setTitle(String title) {
+            this.title = title;
         }
 
-        public Set<Link> getLinks() {
-            return links;
+        public HtmlAttrs getHtmlAttrs() {
+            return htmlAttrs;
         }
 
-        public void setLinks(Set<Link> links) {
-            this.links = links;
+        public void setHtmlAttrs(HtmlAttrs htmlAttrs) {
+            this.htmlAttrs = htmlAttrs;
+        }
+
+        public BodyAttrs getBodyAttrs() {
+            return bodyAttrs;
+        }
+
+        public void setBodyAttrs(BodyAttrs bodyAttrs) {
+            this.bodyAttrs = bodyAttrs;
+        }
+
+        public Set<Meta> getMeta() {
+            return meta;
+        }
+
+        public void setMeta(Set<Meta> meta) {
+            this.meta = meta;
+        }
+
+        public Set<Link> getLink() {
+            return link;
+        }
+
+        public void setLink(Set<Link> link) {
+            this.link = link;
         }
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static class MetaTag {
+    public static class HtmlAttrs {
+
+        String lang;
+
+        public String getLang() {
+            return lang;
+        }
+
+        public void setLang(String lang) {
+            this.lang = lang;
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class BodyAttrs {
+
+        @JsonProperty("class")
+        String cssClass;
+
+        @JsonProperty("class")
+        public String getCssClass() {
+            return cssClass;
+        }
+
+        @JsonProperty("class")
+        public void setCssClass(String cssClass) {
+            this.cssClass = cssClass;
+        }
+    }
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public static class Meta {
 
         String name;
+        String charset;
         String content;
 
         public String getName() {
@@ -53,6 +108,14 @@ public class PageData {
 
         public void setName(String name) {
             this.name = name;
+        }
+
+        public String getCharset() {
+            return charset;
+        }
+
+        public void setCharset(String charset) {
+            this.charset = charset;
         }
 
         public String getContent() {
@@ -151,45 +214,6 @@ public class PageData {
         }
     }
 
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getLang() {
-        return lang;
-    }
-
-    public void setLang(String lang) {
-        this.lang = lang;
-    }
-
-    public String getCharset() {
-        return charset;
-    }
-
-    public void setCharset(String charset) {
-        this.charset = charset;
-    }
-
-    public Integer getHttpStatus() {
-        return httpStatus;
-    }
-
-    public void setPageHttpStatus(Integer httpStatus) {
-        this.httpStatus = httpStatus;
-    }
-
-    public MetaData getMetaData() {
-        return metaData;
-    }
-
-    public void setMetaData(MetaData metaData) {
-        this.metaData = metaData;
-    }
 
     public String getLayout() {
         return layout;
@@ -207,8 +231,12 @@ public class PageData {
         this.areas = areas;
     }
 
-    public void setHttpStatus(Integer httpStatus) {
-        this.httpStatus = httpStatus;
+    public MetaInfo getMetaInfo() {
+        return metaInfo;
+    }
+
+    public void setMetaInfo(MetaInfo metaInfo) {
+        this.metaInfo = metaInfo;
     }
 
     @Override

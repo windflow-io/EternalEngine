@@ -34,7 +34,7 @@ public class InitialData {
         if ((resetDataOnStartup.equals("undefined") && pageRepository.count() == 0) || resetDataOnStartup.equals("true")) {
             logger.warn("Truncating pages and adding default data. Usually happens once. See prop io.windflow.resetDataOnStartup");
             pageRepository.truncate();
-            savePage("localhost", "/", Page.PageType.PageNormal, "/data/localhost/pages/index.json");
+            savePage("localhost", "/", Page.PageType.PageNormal, "/data/localhost/pages/index.json"); /* New Format */
             savePage("localhost", "/about", Page.PageType.PageNormal, "/data/localhost/pages/about.json");
             savePage("localhost", "/contact", Page.PageType.PageNormal, "/data/localhost/pages/contact.json");
             savePage("localhost", null, Page.PageType.Page404, "/data/localhost/pages/404.json");

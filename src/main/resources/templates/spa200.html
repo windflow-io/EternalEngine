@@ -1,12 +1,12 @@
 <!doctype html>
-<html xmlns:th="http://www.thymeleaf.org" th:lang="${pageData.getLang()}">
-    <!-- SPA Page Template HTML -->
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${pageData?.getMetaInfo()?.getHtmlAttrs()?.getLang()}">
     <head>
-        <meta th:if="${pageData.getCharset() != null}" th:charset="${pageData.getCharset()}">
-        <title th:text="${pageData.getTitle()}"></title>
-        <meta th:each="metaTag : ${pageData.getMetaData().getMetaTags()}" th:name="${metaTag.getName()}" th:content="${metaTag.getContent()}"/>
-        <link th:each="link : ${pageData.getMetaData().getLinks()}" th:rel="${link.getRel()}" th:type="${link.getType()}" th:href="${link.getHref()}"  th:sizes="${link.getSizes()}"/></head>
-    <body>
+        <title th:text="${pageData?.getMetaInfo()?.getTitle()}"></title>
+        <meta th:each="tag : ${pageData?.getMetaInfo().getMeta()}" th:charset="${tag?.getCharset()}" th:if="${tag.getCharset()}"/>
+        <meta th:each="tag : ${pageData?.getMetaInfo().getMeta()}" th:name="${tag?.getName()}" th:content="${tag?.getContent()}" th:if="!${tag.getCharset()}"/>
+        <link th:each="tag : ${pageData?.getMetaInfo().getLink()}" th:rel="${tag?.getRel()}" th:href="${tag?.getHref()}" th:sizes="${tag?.getSizes()}" />
+    </head>
+    <body th:class="${pageData?.getMetaInfo()?.getBodyAttrs()?.getCssClass()}">
         <div id="app"></div>
         <script type="module" src="/app/app.mjs"></script>
     </body>

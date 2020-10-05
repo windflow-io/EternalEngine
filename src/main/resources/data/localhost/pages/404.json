@@ -1,12 +1,17 @@
 {
-    "title": "404 - Custom 404 Page",
-    "httpStatus": "404",
-    "metaData": {
-        "metaTags": [
+    "metaInfo": {
+        "title": "404 - Custom 404 Page",
+        "htmlAttrs" : {
+            "lang" : "en"
+        },
+        "bodyAttrs" : {
+            "class" : "dark mode"
+        },
+        "meta": [
             {"name": "robots", "content": "noindex, follow"},
             {"name": "description", "content": "This is the custom 404 page"}
         ],
-        "links": [
+        "link": [
             {"rel":"icon" ,"type": "img/png", "href": "https://cdn.windflow.io/app/img/favicon-32x32.png", "sizes": "32x32"},
             {"rel":"icon" ,"type": "img/png", "href": "https://cdn.windflow.io/app/img/favicon-16x16.png", "sizes": "16x16"},
             {"rel":"stylesheet" ,"type": "text/css", "href": "https://cdn.windflow.io/app/vendor/tailwindcss/tailwind.min.css"}

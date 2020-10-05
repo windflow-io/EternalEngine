@@ -43,6 +43,7 @@ public class WebController {
         Optional<Page> optPage = pageRepository.findByDomainAndPath(request.getServerName(), request.getServletPath());
         if (optPage.isPresent()) {
             PageData pageData = prepareModel(optPage.get());
+            System.out.println(pageData);
             model.addAttribute("pageData", pageData);
             response.setStatus(HttpServletResponse.SC_OK);
             return "spa200";
