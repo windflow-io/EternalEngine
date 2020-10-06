@@ -9,6 +9,9 @@ export default {
             <flow-link class="text-blue-500" to="/">Home Page</flow-link>
             <flow-link class="text-blue-500" to="/about">About</flow-link>
             <flow-link class="text-blue-500" to="/contact">Contact</flow-link>
+            <flow-link class="text-blue-500" to="/auth">Auth</flow-link>
+            <flow-link class="text-blue-500" to="/upload">Upload</flow-link>
+            <flow-link class="text-blue-500" to="/gallery">Gallery</flow-link>
             <flow-link class="text-blue-500" to="/poo">404</flow-link>
         </nav>
     `

@@ -2,9 +2,9 @@
 <html xmlns:th="http://www.thymeleaf.org" th:lang="${pageData?.getMetaInfo()?.getHtmlAttrs()?.getLang()}">
     <head>
         <title th:text="${pageData?.getMetaInfo()?.getTitle()}"></title>
-        <meta th:each="tag : ${pageData?.getMetaInfo().getMeta()}" th:charset="${tag?.getCharset()}" th:if="${tag.getCharset()}"/>
-        <meta th:each="tag : ${pageData?.getMetaInfo().getMeta()}" th:name="${tag?.getName()}" th:content="${tag?.getContent()}" th:if="!${tag.getCharset()}"/>
-        <link th:each="tag : ${pageData?.getMetaInfo().getLink()}" th:rel="${tag?.getRel()}" th:href="${tag?.getHref()}" th:sizes="${tag?.getSizes()}" />
+        <meta th:each="tag : ${pageData?.getMetaInfo()?.getMeta()}" th:charset="${tag?.getCharset()}" th:if="${tag.getCharset()}"/>
+        <meta th:each="tag : ${pageData?.getMetaInfo()?.getMeta()}" th:name="${tag?.getName()}" th:content="${tag?.getContent()}" th:if="!${tag.getCharset()}"/>
+        <link th:each="tag : ${pageData?.getMetaInfo()?.getLink()}" th:rel="${tag?.getRel()}" th:href="${tag?.getHref()}" th:sizes="${tag?.getSizes()}" />
     </head>
     <body th:class="${pageData?.getMetaInfo()?.getBodyAttrs()?.getCssClass()}">
         <div id="app"></div>

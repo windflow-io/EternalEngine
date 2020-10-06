@@ -34,9 +34,17 @@ public class InitialData {
         if ((resetDataOnStartup.equals("undefined") && pageRepository.count() == 0) || resetDataOnStartup.equals("true")) {
             logger.warn("Truncating pages and adding default data. Usually happens once. See prop io.windflow.resetDataOnStartup");
             pageRepository.truncate();
+
+            /** Auth.windflow.local **/
+            savePage("auth.windflow.local", "/", Page.PageType.PageNormal, "/data/auth.windflow.local/pages/index.json");
+
+            /** Localhost */
             savePage("localhost", "/", Page.PageType.PageNormal, "/data/localhost/pages/index.json");
             savePage("localhost", "/about", Page.PageType.PageNormal, "/data/localhost/pages/about.json");
             savePage("localhost", "/contact", Page.PageType.PageNormal, "/data/localhost/pages/contact.json");
+            savePage("localhost", "/auth", Page.PageType.PageNormal, "/data/localhost/pages/auth.json");
+            savePage("localhost", "/upload", Page.PageType.PageNormal, "/data/localhost/pages/upload.json");
+            savePage("localhost", "/gallery", Page.PageType.PageNormal, "/data/localhost/pages/gallery.json");
             savePage("localhost", null, Page.PageType.Page404, "/data/localhost/pages/404.json");
         }
     }
@@ -49,12 +57,21 @@ public class InitialData {
 
             // Layouts
 
+            /* auth.windflow.local */
+            saveComponent("auth.windflow.local", "CenteredLayout", io.windflow.eternalengine.entities.Component.ComponentType.LAYOUT, "/data/auth.windflow.local/layouts/CenteredLayout.mjs");
+            saveComponent("auth.windflow.local", "SingleColumnLayout", io.windflow.eternalengine.entities.Component.ComponentType.LAYOUT, "/data/auth.windflow.local/layouts/SingleColumnLayout.mjs");
+
+            /* localhost */
             saveComponent("localhost", "CenteredLayout", io.windflow.eternalengine.entities.Component.ComponentType.LAYOUT, "/data/localhost/layouts/CenteredLayout.mjs");
             saveComponent("localhost", "LeftMenuLayout", io.windflow.eternalengine.entities.Component.ComponentType.LAYOUT, "/data/localhost/layouts/LeftMenuLayout.mjs");
             saveComponent("localhost", "SingleColumnLayout", io.windflow.eternalengine.entities.Component.ComponentType.LAYOUT, "/data/localhost/layouts/SingleColumnLayout.mjs");
 
             // Components
 
+            /* auth.windflow.local */
+            saveComponent("auth.windflow.local", "GitHubAuth", io.windflow.eternalengine.entities.Component.ComponentType.COMPONENT, "/data/auth.windflow.local/components/GitHubAuth.mjs");
+
+            /* localhost */
             saveComponent("localhost", "ContactForm", io.windflow.eternalengine.entities.Component.ComponentType.COMPONENT, "/data/localhost/components/ContactForm.mjs");
             saveComponent("localhost", "HeaderAbout", io.windflow.eternalengine.entities.Component.ComponentType.COMPONENT, "/data/localhost/components/HeaderAbout.mjs");
             saveComponent("localhost", "HeaderContact", io.windflow.eternalengine.entities.Component.ComponentType.COMPONENT, "/data/localhost/components/HeaderContact.mjs");

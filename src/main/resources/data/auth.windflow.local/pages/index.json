@@ -1,0 +1,24 @@
+{
+    "metaInfo": {
+        "title": "Login Page",
+        "htmlAttrs" : {
+            "lang" : "en"
+        },
+        "meta": [
+            {"charset" :  "utf-8"}
+        ],
+        "link": [
+            {"rel":"icon" ,"type": "img/png", "href": "https://cdn.windflow.io/app/img/favicon-32x32.png", "sizes": "32x32"},
+            {"rel":"icon" ,"type": "img/png", "href": "https://cdn.windflow.io/app/img/favicon-16x16.png", "sizes": "16x16"},
+            {"rel":"stylesheet" ,"type": "text/css", "href": "https://cdn.windflow.io/app/vendor/tailwindcss/tailwind.min.css"}
+        ]
+    },
+    "layout": "auth.windflow.local.CenteredLayout",
+    "areas": [
+        {
+            "area": "center",
+            "components": [{"name":"auth.windflow.local.GitHubAuth", "id": "1"}]
+        }
+    ],
+    "data": {}
+}
