@@ -35,10 +35,10 @@ public class InitialData {
             logger.warn("Truncating pages and adding default data. Usually happens once. See prop io.windflow.resetDataOnStartup");
             pageRepository.truncate();
 
-            /** Auth.windflow.local **/
+            /* Auth.windflow.local */
             savePage("auth.windflow.local", "/", Page.PageType.PageNormal, "/data/auth.windflow.local/pages/index.json");
 
-            /** Localhost */
+            /* Localhost */
             savePage("localhost", "/", Page.PageType.PageNormal, "/data/localhost/pages/index.json");
             savePage("localhost", "/about", Page.PageType.PageNormal, "/data/localhost/pages/about.json");
             savePage("localhost", "/contact", Page.PageType.PageNormal, "/data/localhost/pages/contact.json");
