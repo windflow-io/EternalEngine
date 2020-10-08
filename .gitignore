@@ -35,4 +35,7 @@ out/
 ### Node ###
 /node_modules/
 
+### Custom
 .DS_Store
+secret.properties
+

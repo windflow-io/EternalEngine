@@ -1,7 +1,9 @@
 package io.windflow.eternalengine.configuration;
 
+import io.windflow.eternalengine.entities.ExtensionData;
 import io.windflow.eternalengine.entities.Page;
 import io.windflow.eternalengine.persistence.ComponentRepository;
+import io.windflow.eternalengine.persistence.ExtensionDataRepository;
 import io.windflow.eternalengine.persistence.PageRepository;
 import io.windflow.eternalengine.utils.TextFileReader;
 import org.slf4j.Logger;
@@ -19,14 +21,17 @@ public class InitialData {
 
     PageRepository pageRepository;
     ComponentRepository componentRepository;
+    ExtensionDataRepository extensionDataRepository;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Value(value = "${io.windflow.eternalengine.resetDataOnStartup:undefined}")
     String resetDataOnStartup;
 
-    InitialData(@Autowired  PageRepository pageRepository, @Autowired ComponentRepository componentRepository) {
+    InitialData(@Autowired  PageRepository pageRepository, @Autowired ComponentRepository componentRepository, @Autowired ExtensionDataRepository extensionDataRepository) {
         this.pageRepository = pageRepository;
         this.componentRepository = componentRepository;
+        this.extensionDataRepository = extensionDataRepository;
     }
 
     @PostConstruct
@@ -88,6 +93,36 @@ public class InitialData {
         }
     }
 
+    @PostConstruct
+    public void initialExtensionData() {
+        if ((resetDataOnStartup.equals("undefined") && pageRepository.count() == 0) || resetDataOnStartup.equals("true")) {
+            logger.warn("Truncating extension data and adding default data. Usually happens once. See prop io.windflow.resetDataOnStartup");
+            extensionDataRepository.truncate();
+
+            /*
+            IMPORTANT NOTE:
+                You need to replace the  client_id and client_secret encrypted values herein with your own values.
+                Create a secret.properties file on the classpath and add a property io.windflow.encryption.password=
+                Uses JASYPT to encode / decode
+                JASYPT online tool: https://www.devglan.com/online-tools/jasypt-online-encryption-decryption
+                GitHub Docs: https://docs.github.com/en/free-pro-team@latest/developers/apps/authorizing-oauth-apps
+                @TODO: Explain this all in the readme. Preferably read the contents from disk than from the code.
+            */
+
+            final String ENC_GITHUB_ENCRYPTED_CALLBACK_URL = "RhObDCN6z2FkCd5fyl8nE8hRmbuKvZPZrJP10+DCDQ8tBFg9WxfWElIRt2+GlvAkr4btwh359ub8743jEwfQzMbc5sEqymZomFCv23FOysBdA8YDsF9RbFYCCjX7jDgLI+U4psj8mNXSRD0xg46133SovUweKMyw6bvFcJ3dtIkKGljP3jHsYA==";
+            final String ENC_GITHUB_CLIENT_ID = "JjC94/ugG2T8R7r2tu2FPwi7YdtYhKH1FTzawmw6JOg=";
+            final String ENC_GITHUB_CLIENT_SECRET = "Nj5+TFUacQRBnQ+rajVGdGT5ZYEUeySXiE0pGRh6xXJ9iMywRsa71ynyuo980Ym1Mv53OE9ndjo=";
+
+            saveExtensionData("io.windflow.eternalengine.extensions.api.WindflowOpenIdExtension", "providers",          "github",                                  false);
+            saveExtensionData("io.windflow.eternalengine.extensions.api.WindflowOpenIdExtension", "github_base_url",    "https://github.com/login/oauth/authorize",false);
+            saveExtensionData("io.windflow.eternalengine.extensions.api.WindflowOpenIdExtension", "github_callback_url",      ENC_GITHUB_ENCRYPTED_CALLBACK_URL,         true);
+            saveExtensionData("io.windflow.eternalengine.extensions.api.WindflowOpenIdExtension", "github_client_id",         ENC_GITHUB_CLIENT_ID,                      true);
+            saveExtensionData("io.windflow.eternalengine.extensions.api.WindflowOpenIdExtension", "github_client_secret",     ENC_GITHUB_CLIENT_SECRET,                  true);
+            saveExtensionData("io.windflow.eternalengine.extensions.api.WindflowOpenIdExtension", "github_allow_signup","true",                                    false);
+            saveExtensionData("io.windflow.eternalengine.extensions.api.WindflowOpenIdExtension", "github_scope",       "read:user+user:email",                    false);
+        }
+    }
+
     private void savePage(String domain, String path, Page.PageType type, String filePath) {
         try {
             pageRepository.save(new Page(domain, path, type, TextFileReader.getText(filePath)));
@@ -102,6 +137,11 @@ public class InitialData {
         } catch (IOException ex) {
             logger.warn("Could not load file: " + ex.getMessage() + ". Ignoring, but be prepared for an error page on first visit!");
         }
+    }
+
+    private void saveExtensionData(String className, String key, String value, Boolean encrypted) {
+
+        extensionDataRepository.save(new ExtensionData(className, key, value, encrypted));
     }
 
 }
