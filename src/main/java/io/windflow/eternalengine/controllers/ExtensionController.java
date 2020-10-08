@@ -58,10 +58,8 @@ public class ExtensionController {
                         String encrypted = extensionData.getValue();
                         String decrypted = textEncryptor.decrypt(encrypted);
                         keyValuePairs.put(extensionData.getKey(), decrypted);
-                        System.out.println(extensionData.getKey() + ":" + decrypted);
                     } else {
                         keyValuePairs.put(extensionData.getKey(), extensionData.getValue());
-                        System.out.println(extensionData.getKey() + ":" + extensionData.getValue());
                     }
                 }
                 ((Datafiable) plugin).injectData(keyValuePairs);

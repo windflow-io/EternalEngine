@@ -35,5 +35,7 @@ To run the application:
 * **Note 3**: Default database credentials are `postgres:postgres@windflow`   
 
 ### Undocumented.
-* One needs to create /src/main/java/resources/secret.properties (ignored by .gitignore)
-* In this file, add: io.windflow.encryption.password=your-secret-password-here
+1. One needs to create /src/main/java/resources/secret.properties (ignored by .gitignore)
+2. In this file, add: io.windflow.encryption.password=your-secret-password-here
+3. Go and encrypt the client_id, callback_url and client_secret and put it in InitialData.java
+4. Add auth.windflow.local to the /etc/hosts file

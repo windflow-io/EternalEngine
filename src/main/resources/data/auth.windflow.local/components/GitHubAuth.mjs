@@ -7,11 +7,7 @@ export default {
     data() {
         return {
             github: {
-                base_url: 'https://github.com/login/oauth/authorize',
-                client_id: '30bd3b79eb4c2e226e13',
-                state: '3b696208e11d645d023ee541f3def35e',
-                allow_signup: 'true',
-                scope: 'read:user+user:email'
+                base_url: 'http://auth.windflow.local',
             }
         }
     },
