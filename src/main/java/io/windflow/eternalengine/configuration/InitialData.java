@@ -1,5 +1,6 @@
 package io.windflow.eternalengine.configuration;
 
+import io.windflow.eternalengine.services.CryptoService;
 import io.windflow.eternalengine.entities.ExtensionData;
 import io.windflow.eternalengine.entities.Page;
 import io.windflow.eternalengine.persistence.ComponentRepository;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -17,21 +19,32 @@ import java.io.IOException;
 
 
 @Component
+@PropertySource("classpath:secret.properties")
 public class InitialData {
 
-    PageRepository pageRepository;
-    ComponentRepository componentRepository;
-    ExtensionDataRepository extensionDataRepository;
-
+    private final CryptoService cryptoService;
+    private final PageRepository pageRepository;
+    private final ComponentRepository componentRepository;
+    private final ExtensionDataRepository extensionDataRepository;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Value("${io.windflow.auth.github_client_id}")
+    String GITHUB_CLIENT_ID;
+
+    @Value("${io.windflow.auth.github_client_secret}")
+    String GITHUB_CLIENT_SECRET;
+
+    @Value("${io.windflow.auth.github_callback_url}")
+    String GITHUB_CALLBACK_URL;
 
     @Value(value = "${io.windflow.eternalengine.resetDataOnStartup:undefined}")
     String resetDataOnStartup;
 
-    InitialData(@Autowired  PageRepository pageRepository, @Autowired ComponentRepository componentRepository, @Autowired ExtensionDataRepository extensionDataRepository) {
+    InitialData(@Autowired PageRepository pageRepository, @Autowired ComponentRepository componentRepository, @Autowired ExtensionDataRepository extensionDataRepository, @Autowired CryptoService cryptoService) {
         this.pageRepository = pageRepository;
         this.componentRepository = componentRepository;
         this.extensionDataRepository = extensionDataRepository;
+        this.cryptoService = cryptoService;
     }
 
     @PostConstruct
@@ -109,17 +122,14 @@ public class InitialData {
                 @TODO: Explain this all in the readme. Preferably read the contents from disk than from the code.
             */
 
-            final String ENC_GITHUB_ENCRYPTED_CALLBACK_URL = "RhObDCN6z2FkCd5fyl8nE8hRmbuKvZPZrJP10+DCDQ8tBFg9WxfWElIRt2+GlvAkr4btwh359ub8743jEwfQzMbc5sEqymZomFCv23FOysBdA8YDsF9RbFYCCjX7jDgLI+U4psj8mNXSRD0xg46133SovUweKMyw6bvFcJ3dtIkKGljP3jHsYA==";
-            final String ENC_GITHUB_CLIENT_ID = "JjC94/ugG2T8R7r2tu2FPwi7YdtYhKH1FTzawmw6JOg=";
-            final String ENC_GITHUB_CLIENT_SECRET = "Nj5+TFUacQRBnQ+rajVGdGT5ZYEUeySXiE0pGRh6xXJ9iMywRsa71ynyuo980Ym1Mv53OE9ndjo=";
-
-            saveExtensionData("io.windflow.eternalengine.extensions.api.WindflowOpenIdExtension", "providers",          "github",                                  false);
-            saveExtensionData("io.windflow.eternalengine.extensions.api.WindflowOpenIdExtension", "github_base_url",    "https://github.com/login/oauth/authorize",false);
-            saveExtensionData("io.windflow.eternalengine.extensions.api.WindflowOpenIdExtension", "github_callback_url",      ENC_GITHUB_ENCRYPTED_CALLBACK_URL,         true);
-            saveExtensionData("io.windflow.eternalengine.extensions.api.WindflowOpenIdExtension", "github_client_id",         ENC_GITHUB_CLIENT_ID,                      true);
-            saveExtensionData("io.windflow.eternalengine.extensions.api.WindflowOpenIdExtension", "github_client_secret",     ENC_GITHUB_CLIENT_SECRET,                  true);
-            saveExtensionData("io.windflow.eternalengine.extensions.api.WindflowOpenIdExtension", "github_allow_signup","true",                                    false);
-            saveExtensionData("io.windflow.eternalengine.extensions.api.WindflowOpenIdExtension", "github_scope",       "read:user+user:email",                    false);
+            saveExtensionData("io.windflow.eternalengine.extensions.api.OpenIdExtension", "providers","github",false);
+            saveExtensionData("io.windflow.eternalengine.extensions.api.OpenIdExtension", "github_base_url_auth","https://github.com/login/oauth/authorize",false);
+            saveExtensionData("io.windflow.eternalengine.extensions.api.OpenIdExtension", "github_base_url_token","https://github.com/login/oauth/access_token",false);
+            saveExtensionData("io.windflow.eternalengine.extensions.api.OpenIdExtension", "github_callback_url", cryptoService.encrypt(GITHUB_CALLBACK_URL),true);
+            saveExtensionData("io.windflow.eternalengine.extensions.api.OpenIdExtension", "github_client_id", cryptoService.encrypt(GITHUB_CLIENT_ID),true);
+            saveExtensionData("io.windflow.eternalengine.extensions.api.OpenIdExtension", "github_client_secret", cryptoService.encrypt(GITHUB_CLIENT_SECRET),true);
+            saveExtensionData("io.windflow.eternalengine.extensions.api.OpenIdExtension", "github_allow_signup","true",false);
+            saveExtensionData("io.windflow.eternalengine.extensions.api.OpenIdExtension", "github_scope","read:user+user:email",false);
         }
     }
 

@@ -6,16 +6,14 @@ export default {
     components: {FlowIcon},
     data() {
         return {
-            github: {
-                base_url: 'http://auth.windflow.local',
-            }
+            github_extension_url: 'http://auth.windflow.local:8080/api/extensions/io.windflow.eternalengine.extensions.api.OpenIdExtension/github_redirect',
         }
     },
     template: `
         <h1 class="text-4xl text-white mb-5">GitHub Authentication</h1>
-        <a @click="redirect(urlBuilder())" class="cursor-pointer">
+        <a @click="sendUserToGithub" class="cursor-pointer">
             <div class=" flex border border-white p-1 w-40 rounded-lg text-white bg-blue-700 justify-center hover:bg-blue-600 items-center text-sm">
-                <flow-icon icon="brands github" class="pr-2 w-6" /> Login with Github
+                <flow-icon icon="brands github" class="pr-2 w-6 h-6" /> Login with Github
             </div>
         </a>
         <div class="mt-8 text-gray-500 text-sm">
@@ -26,26 +24,26 @@ export default {
         </div>
     `,
     mounted() {
-        let url = window.location.href;
-        if (url.indexOf("code") > -1) {
-            let code = this.getCodeFromUrl(url);
-            let url2 = 'https://github.com/login/oauth/access_token?client_id=30bd3b79eb4c2e226e13&client_secret=43f827284f61d22e982cf0600d1bb4de30e8c580&code=' + code + '&redirect_uri=http://auth.windflow.io:8080&state=12345'
-            fetch(url2).then(response => response.json()).then(data => console.log(data));
-            /* @TODO: This baby needs to talk with the server */
+        let gitHubToken = this.getCookieValue("github_token");
+        if (gitHubToken) {
+
+        } else {
+
         }
     },
     methods: {
-        getCodeFromUrl(url) {
-            let codePos = url.indexOf("code=");
-            let codePrefix = url.substring(codePos + 5);
-            let codeEndPos = codePrefix.indexOf("&");
-            return codeEndPos > -1 ? codePrefix.substring(0, codeEndPos) : codePrefix;
+        sendUserToGithub() {
+            window.location.href = this.github_extension_url;
         },
-        urlBuilder: function () {
-            return this.github.base_url + '?client_id=' + this.github.client_id + '&scope=' + this.github.scope + '&state=' + this.github.state + '&allow_signup=' + this.github.allow_signup
-        },
-        redirect(url) {
-            window.location = url
+        getCookieValue(cookieName) {
+            try {
+            return document.cookie
+                .split('; ')
+                .find(row => row.startsWith(cookieName))
+                .split('=')[1];
+            } catch (error) {
+                return null;
+            }
         }
     }
 }

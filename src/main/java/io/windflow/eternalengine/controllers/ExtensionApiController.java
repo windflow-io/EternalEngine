@@ -1,16 +1,11 @@
 package io.windflow.eternalengine.controllers;
 
 
+import io.windflow.eternalengine.extensions.framework.*;
+import io.windflow.eternalengine.services.CryptoService;
 import io.windflow.eternalengine.entities.ExtensionData;
-import io.windflow.eternalengine.extensions.framework.Actionable;
-import io.windflow.eternalengine.extensions.framework.Datafiable;
-import io.windflow.eternalengine.extensions.framework.Requestable;
-import io.windflow.eternalengine.extensions.framework.Respondable;
 import io.windflow.eternalengine.persistence.ExtensionDataRepository;
-import org.jasypt.util.text.BasicTextEncryptor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -18,20 +13,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 
 @RestController
-@PropertySource("classpath:secret.properties")
-public class ExtensionController {
-
-    @Value("${io.windflow.encryption.password}")
-    String encryptionPassword;
+public class ExtensionApiController {
 
     ExtensionDataRepository extensionDataRepository;
+    CryptoService cryptoService;
 
-    public ExtensionController(@Autowired ExtensionDataRepository extensionDataRepository) {
+    public ExtensionApiController(@Autowired ExtensionDataRepository extensionDataRepository, @Autowired CryptoService cryptoService) {
         this.extensionDataRepository = extensionDataRepository;
+        this.cryptoService = cryptoService;
     }
 
     @RequestMapping("/api/extensions/{fullyQualifiedClassName}/{actionName}")
@@ -43,20 +37,25 @@ public class ExtensionController {
             /** @TODO: Use a classloader that protects the system from malicious classes. **/
             /** @TODO: Cache the object in an extension singleton **/
 
-            Class<?> pluginClass = Class.forName(fullyQualifiedClassName);
-            Object plugin = pluginClass.getConstructor().newInstance();
+            Object plugin = null;
+            try {
+                Class<?> pluginClass = Class.forName(fullyQualifiedClassName);
+                plugin = pluginClass.getConstructor().newInstance();
+            } catch (ClassNotFoundException ex) {
+                throw new ExtensionException("Error loading extension. Is " + fullyQualifiedClassName + " on the classpath and spelled correctly?" , ex);
+            } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException ex) {
+                throw new ExtensionException("Error instantiating extension.", ex);
+            }
 
             if (plugin instanceof Datafiable) {
 
                 HashMap<String, String> keyValuePairs = new HashMap<>();
-                BasicTextEncryptor textEncryptor = new BasicTextEncryptor();
-                textEncryptor.setPassword(encryptionPassword);
 
                 List<ExtensionData> extensionDataList = extensionDataRepository.findByFullyQualifiedClassName(fullyQualifiedClassName);
                 for (ExtensionData extensionData : extensionDataList) {
                     if (extensionData.isKeyEncrypted()) {
                         String encrypted = extensionData.getValue();
-                        String decrypted = textEncryptor.decrypt(encrypted);
+                        String decrypted = cryptoService.decrypt(encrypted);
                         keyValuePairs.put(extensionData.getKey(), decrypted);
                     } else {
                         keyValuePairs.put(extensionData.getKey(), extensionData.getValue());
@@ -77,15 +76,12 @@ public class ExtensionController {
                 return ((Actionable) plugin).performAction(actionName, "");
             }
 
-        } catch (Exception ex) {
-            /*@TODO Proper error handling here please */
+            return "{\"status\":\"error\",\"message\":\"Could not execute plugin as it does not implement Actionable\"}";
+
+        } catch (ExtensionException ex) {
             ex.printStackTrace();
-            return "{\"status\":\"An error occurred\"}";
-
-
+            return "{\"status\":\"error\",\"message\":\"" + ex.getMessage() + "\"}";
         }
-
-        return "{\"status\":\"No action performed\"}";
 
     }
 
