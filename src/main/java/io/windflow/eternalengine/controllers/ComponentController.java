@@ -24,7 +24,6 @@ public class ComponentController {
         this.componentRepository = componentRepository;
     }
 
-
     /***
      * Get component from server
      * @param namespace component namespace (domain) eg: com.mysite.components
@@ -55,7 +54,7 @@ public class ComponentController {
      */
     @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST}, value = "/api/{componentType}/{namespace}/{filename:^.+\\.mjs$}", produces = "text/javascript")
     @ResponseBody
-    public String putComponent(@PathVariable("namespace") String componentType, @PathVariable("namespace") String namespace, @PathVariable("filename") String componentFilename, @RequestBody String javaScript) {
+    public String saveComponent(@PathVariable("namespace") String componentType, @PathVariable("namespace") String namespace, @PathVariable("filename") String componentFilename, @RequestBody String javaScript) {
 
         String componentName = componentFilename.replace(".mjs", "");
         Component component;
