@@ -14,6 +14,14 @@ public class GithubTokenResponse {
 
     private String scope;
 
+    private String error;
+
+    @JsonProperty("error_description")
+    private String errorDescription;
+
+    @JsonProperty("error_uri")
+    private String errorUri;
+
     public String getAccessToken() {
         return accessToken;
     }
@@ -36,5 +44,21 @@ public class GithubTokenResponse {
 
     public void setScope(String scope) {
         this.scope = scope;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
+    }
+
+    public String getErrorDescription() {
+        return errorDescription;
+    }
+
+    public void setErrorDescription(String errorDescription) {
+        this.errorDescription = errorDescription;
     }
 }

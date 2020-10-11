@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Optional;
 
@@ -41,10 +40,10 @@ public class ComponentController {
 
         /*** @TODO: WARNING - THIS IS A HACK ***/
 
-        if (componentName.equals("GitHubAuth")) {
+        if (componentName.equals("GithubAuth")) {
             try {
                 logger.warn("Mark van Wyk's KAK CODE (that must be removed) is fudging in a component straight from the file system - BAD");
-                return TextFileReader.getText("data/auth.windflow.local/components/GitHubAuth.mjs");
+                return TextFileReader.getText("data/auth.windflow.local/components/GithubAuth.mjs");
             } catch (IOException ex) {
                 logger.error("FUDGING THE COMPONENT FAILED " + ex.getMessage());
             }

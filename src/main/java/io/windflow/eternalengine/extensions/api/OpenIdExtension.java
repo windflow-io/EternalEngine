@@ -2,6 +2,10 @@ package io.windflow.eternalengine.extensions.api;
 
 import io.windflow.eternalengine.beans.GithubTokenResponse;
 import io.windflow.eternalengine.extensions.framework.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.Cookie;
@@ -69,8 +73,7 @@ public class OpenIdExtension<T extends Plugin> extends Plugin implements Request
 
                 if (token == null) throw new ExtensionException("Github returned no token");
 
-                /**
-                 *
+
                 HttpHeaders headers = new HttpHeaders();
                 headers.set("Authorization", "token " + token);
 
@@ -81,12 +84,11 @@ public class OpenIdExtension<T extends Plugin> extends Plugin implements Request
                 System.out.println("USER DATA");
                 System.out.println(userInfoEntity.getBody());
 
-                **/
-
                 Cookie githubCookie = new Cookie("github_token", token);
                 githubCookie.setPath("/");
                 githubCookie.setMaxAge(604800); // 1 week
                 response.addCookie(githubCookie);
+
                 try {
                     response.sendRedirect(returnedState);
                 } catch (IOException ex) {

@@ -2,11 +2,11 @@ import {FlowIcon} from "/modules/coreComponents.mjs";
 
 /*@TODO:Get a state (nonce) from the server and compare it later. At the moment it's a MD5 hash of 'windflow.io'*/
 export default {
-    name: 'GitHubAuth',
+    name: 'GithubAuth',
     components: {FlowIcon},
     data() {
         return {
-            github_extension_url: 'http://auth.windflow.local:8080/api/extensions/io.windflow.eternalengine.extensions.api.OpenIdExtension/github_redirect',
+            github_extension_url: 'http://auth.windflow.local:8080/api/auth/github',
         }
     },
     template: `
