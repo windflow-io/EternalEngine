@@ -1,12 +1,20 @@
-import { app } from '/app/app.mjs';
 import {
-    addUrlListener,
-    removeNamespace,
-    mapQueryString,
-    pushUrl,
+    computed,
+    getCurrentInstance,
+    inject,
+    ref,
+} from '../vendor/vue3/vue.esm-browser.js';
+import {
+    CONTEXT_CACHE_COMPONENT,
+    CONTEXT_CACHE_PAGE,
+    CONTEXT_COMPONENT_REGISTRY,
+    CONTEXT_EDIT_MODE,
+    CONTEXT_ROUTER,
+} from '../app/app.mjs';
+import {
     loadEditor,
-    componentService,
-} from '/modules/windflowUtils.mjs'
+    useDrag,
+} from './windflowUtils.mjs';
 
 export const FlowIcon = {
     name: 'FlowIcon',
@@ -39,6 +47,8 @@ export const FlowIcon = {
 export const CodeEditor = {
   name: 'CodeEditor',
   model: {
+    // REFACTOR
+    // - Model value.
     prop: 'value',
     event: 'update',
   },
@@ -92,6 +102,14 @@ export const CodeEditor = {
                 ref="editor"
                 @input="$emit('update', this.editor.getValue())"
             />
+            <div class="px-4 py-2">
+                <button
+                    class="px-4 py-1 border border-transparent text-base leading-6 font-medium rounded-md transition duration-150 ease-in-out text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo"
+                    @click="$emit('save', this.editor.getValue())"
+                >
+                    Save
+                </button>
+            </div>
         </div>
     </div>
   `,
@@ -109,16 +127,21 @@ export const FlowFormGroup = {
             type: String,
         },
     },
+    setup(props) {
+        const id = computed(() => `${props.name}-${getCurrentInstance().uid}`);
+
+        return { id };
+    },
     template: `
         <div>
             <label
-                :for="name"
+                :for="id"
                 class="block text-sm leading-5 font-medium text-gray-700"
             >
                 {{ label }}
             </label>
             <div class="mt-1">
-                <slot/>
+                <slot :id="id"/>
             </div>
         </div>
     `,
@@ -134,26 +157,27 @@ export const FlowFormFieldText = {
             required: true,
             type: String,
         },
+        modelValue: {
+            default: '',
+            type: [Number, String],
+        },
         name: {
             required: true,
             type: String,
-        },
-        value: {
-            default: '',
-            type: [Number, String],
         },
     },
     template: `
         <flow-form-group
             :label="label"
             :name="name"
+            #default="{ id }"
         >
             <input
-                :id="name"
-                :value="value"
+                :id="id"
+                :value="modelValue"
                 :name="name"
                 class="border border-gray-400 block w-full p-2 sm:text-sm sm:leading-5 rounded-md shadow-sm"
-                @input.stop="$emit('input', $event.target.value)"
+                @input.stop="$emit('update:modelValue', $event.target.value)"
             >
         </flow-form-group>
     `,
@@ -169,12 +193,12 @@ export const FlowFormFieldTextarea = {
             required: true,
             type: String,
         },
-        name: {
-            required: true,
+        modelValue: {
+            default: '',
             type: String,
         },
-        value: {
-            default: '',
+        name: {
+            required: true,
             type: String,
         },
     },
@@ -182,13 +206,14 @@ export const FlowFormFieldTextarea = {
         <flow-form-group
             :label="label"
             :name="name"
+            #default="{ id }"
         >
             <textarea
-                :id="name"
-                :value="value"
+                :id="id"
+                :value="modelValue"
                 :name="name"
                 class="border border-gray-400 block w-full p-2 h-24 sm:text-sm sm:leading-5 rounded-md shadow-sm"
-                @input.stop="$emit('input', $event.target.value)"
+                @input.stop="$emit('update:modelValue', $event.target.value)"
             />
         </flow-form-group>
     `,
@@ -204,13 +229,13 @@ export const FlowFormFieldSelect = {
             required: true,
             type: String,
         },
+        modelValue: {
+            default: '',
+            type: [Number, String],
+        },
         name: {
             required: true,
             type: String,
-        },
-        value: {
-            default: '',
-            type: [Number, String],
         },
         options: {
             required: true,
@@ -221,13 +246,14 @@ export const FlowFormFieldSelect = {
         <flow-form-group
             :label="label"
             :name="name"
+            #default="{ id }"
         >
             <select
-                :id="name"
-                :value="value"
+                :id="id"
+                :value="modelValue"
                 :name="name"
                 class="border border-gray-400 block w-full p-2 sm:text-sm sm:leading-5 rounded-md shadow-sm"
-                @input.stop="$emit('input', $event.target.value)"
+                @input.stop="$emit('update:modelValue', $event.target.value)"
             >
                 <option
                     v-for="option in options"
@@ -254,8 +280,8 @@ export const FlowFormFields = {
             required: true,
             type: Object,
         },
-        value: {
-            required: true,
+        modelValue: {
+            default: () => ({}),
             type: Object,
         },
     },
@@ -270,10 +296,10 @@ export const FlowFormFields = {
     methods: {
         update(fieldName, fieldValue) {
             const newValue = {
-                ...this.value,
+                ...this.modelValue,
                 [fieldName]: fieldValue,
             };
-            this.$emit('input', newValue);
+            this.$emit('update:modelValue', newValue);
         },
     },
     template: `
@@ -284,8 +310,8 @@ export const FlowFormFields = {
                 :is="fieldMap[fields[fieldName].type]"
                 v-bind="fields[fieldName]"
                 :name="fieldName"
-                :value="value[fieldName]"
-                @input="update(fieldName, $event)"
+                :model-value="modelValue[fieldName]"
+                @update:model-value="update(fieldName, $event)"
             />
         </div>
     `,
@@ -305,8 +331,8 @@ export const FlowFormFieldFieldset = {
             required: true,
             type: String,
         },
-        value: {
-            required: true,
+        modelValue: {
+            default: () => ({}),
             type: Object,
         },
     },
@@ -316,8 +342,8 @@ export const FlowFormFieldFieldset = {
             <div class="mt-1 p-4 border border-gray-300">
                 <flow-form-fields
                     :fields="fields"
-                    :value="value"
-                    @input="$emit('input', $event)"
+                    :model-value="modelValue"
+                    @update:model-value="$emit('update:modelValue', $event)"
                 />
             </div>
         </div>
@@ -332,20 +358,19 @@ export const FlowToolbarForm = {
         FlowFormFields,
     },
     props: {
-        schema: {
-            required: true,
+        modelValue: {
+            default: () => ({}),
             type: Object,
         },
-        value: {
-            default: () => ({}),
+        schema: {
+            required: true,
             type: Object,
         },
     },
     template: `
         <flow-form-fields
             :fields="schema"
-            :value="value"
-            @input="$emit('input', $event)"
+            :model-value="modelValue"
         />
     `,
 };
@@ -357,102 +382,75 @@ export const FlowToolbar = {
         FlowIcon,
         FlowToolbarForm,
     },
-    data() {
+    setup() {
+        const {
+            activeAreaComponent,
+            disableEditMode,
+            editAreaComponent,
+        } = inject(CONTEXT_EDIT_MODE);
+        const isInEditComponentMode = computed(() => !!activeAreaComponent.value);
+
+        const areaComponentId = computed(() => activeAreaComponent.value && activeAreaComponent.value.id);
+        const areaComponentName = computed(() => activeAreaComponent.value && activeAreaComponent.value.name);
+
+        const { components } = inject(CONTEXT_COMPONENT_REGISTRY);
+        const component = computed(() => components[areaComponentName.value]);
+
+        const {
+            loadComponent,
+            updateComponent,
+        } = inject(CONTEXT_CACHE_COMPONENT);
+        const { data: componentCode } = loadComponent(() => ({
+            name: areaComponentName.value,
+        }));
+        const saveCode = data => updateComponent({
+            data,
+            name: areaComponentName.value,
+        });
+
+        const {
+            commitComponentData,
+            loadComponentData,
+            updateComponentData,
+        } = inject(CONTEXT_CACHE_PAGE);
+        const { currentPath } = inject(CONTEXT_ROUTER);
+        const { data: componentData } = loadComponentData(() => ({
+            id: areaComponentId.value,
+            path: currentPath.value,
+        }));
+        const commitData = data => commitComponentData({
+            data,
+            id: areaComponentId.value,
+        });
+        const savePage = () => updateComponentData({
+            path: currentPath.value,
+        });
+
+        const tab = ref(null);
+        const $root = ref(null);
+        const { startDrag } = useDrag({ $el: $root });
+
         return {
-            code: '',
-            mode: null,
-            dragging: false,
-            offsetX: 0,
-            offsetY: 0,
-            mouseMoveListener: null,
-            mouseUpListener: null,
-        }
-    },
-    computed: {
-        componentId() {
-            return this.$store.state.editComponent;
-        },
-        namespacedComponentName() {
-            if (!this.componentId) return null;
-
-            const allComponents = [];
-            this.$store.state.pageAreas.forEach(section => section.components.forEach(component => allComponents.push(component)));
-
-            return allComponents.find(component => component.id === this.componentId).name;
-        },
-        componentName() {
-            if (!this.componentId) return null;
-
-            return removeNamespace(this.namespacedComponentName);
-        },
-        component() {
-            return app.component(this.componentName);
-        },
-        content: {
-            get() {
-                if (!this.$store.state.pageData.components) return '';
-
-                return this.$store.state.pageData.components[this.componentId];
-            },
-            set(content) {
-                this.$store.commit('setPageData', {
-                    ...this.$store.state.pageData,
-                    components: {
-                        ...this.$store.state.pageData.components,
-                        [this.componentId]: content,
-                    },
-                });
-            },
-        },
-    },
-    watch: {
-        namespacedComponentName(name) {
-            this.loadCode();
-        },
-    },
-    methods: {
-        doDrag(mouse) {
-            if (!this.dragging) return;
-
-            this.$el.style.top = (mouse.clientY - this.offsetY) + 'px';
-            this.$el.style.left = (mouse.clientX - this.offsetX) + 'px';
-        },
-        startDrag(mouse) {
-            if (this.dragging) return;
-
-            this.offsetY = mouse.clientY - this.$el.getBoundingClientRect().top;
-            this.offsetX = mouse.clientX - this.$el.getBoundingClientRect().left;
-            this.dragging = true;
-            this.mouseMoveListener = window.addEventListener('mousemove', this.doDrag);
-            this.mouseUpListener = window.addEventListener('mouseup', this.endDrag);
-        },
-        endDrag() {
-            this.dragging = false;
-            window.removeEventListener('mousemove', this.doDrag);
-            window.removeEventListener('mouseup', this.endDrag);
-        },
-        exitEditMode() {
-            pushUrl(`${window.location.pathname}${window.location.search}`);
-        },
-        exitComponentEditMode() {
-            this.$store.commit('setEditComponent', null);
-        },
-        async loadCode() {
-            const code = await componentService.load(this.namespacedComponentName);
-            this.code = code;
-        },
-        update() {
-            this.$store.dispatch('updateComponent', {
-                code: this.code,
-                content: this.content,
-                id: this.componentId,
-            });
-        },
+            $root,
+            activeAreaComponent,
+            commitData,
+            component,
+            componentCode,
+            componentData,
+            disableEditMode,
+            editAreaComponent,
+            isInEditComponentMode,
+            saveCode,
+            savePage,
+            startDrag,
+            tab,
+        };
     },
     template: `
         <div
             class="fixed z-30 bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all text-gray-700 max-w-xl"
             style="left:calc(100% - 380px);top:50px;"
+            ref="$root"
         >
             <div class="flex h-16">
                 <button
@@ -464,7 +462,7 @@ export const FlowToolbar = {
                     <flow-icon icon="grip-vertical" class="text-md" />
                 </button>
                 <button
-                    v-if="!componentId"
+                    v-if="!isInEditComponentMode"
                     class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-300 hover:text-gray-800"
                     title="add component"
                     aria-label="add component"
@@ -472,20 +470,20 @@ export const FlowToolbar = {
                     <flow-icon icon="plus" class="text-md" />
                 </button>
                 <button
-                    v-if="componentId"
+                    v-if="isInEditComponentMode"
                     class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-300 hover:text-gray-800"
-                    title="edit content"
-                    aria-label="edit content"
-                    @click="mode = 'edit-content'"
+                    title="edit component data"
+                    aria-label="edit component data"
+                    @click="tab = 'edit-component-data'"
                 >
                     <flow-icon icon="edit" class="text-md" />
                 </button>
                 <button
-                    v-if="componentId"
+                    v-if="isInEditComponentMode"
                     class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-300 hover:text-gray-800"
                     title="edit code"
                     aria-label="edit code"
-                    @click="mode = 'edit-code'"
+                    @click="tab = 'edit-code'"
                 >
                     <flow-icon icon="code" class="text-md" />
                 </button>
@@ -500,16 +498,16 @@ export const FlowToolbar = {
                     class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-300 hover:text-gray-800"
                     title="save"
                     aria-label="save"
-                    @click="update"
+                    @click="savePage"
                 >
                     <flow-icon icon="save" class="text-md"/>
                 </button>
                 <button
-                    v-if="componentId"
+                    v-if="isInEditComponentMode"
                     class="flex items-center pl-5 pr-5 mt-3 mb-3 border-gray-300 hover:text-gray-800"
                     title="exit component edit mode"
                     aria-label="exit component edit mode"
-                    @click="exitComponentEditMode"
+                    @click="editAreaComponent(null)"
                 >
                     <flow-icon icon="times" class="text-md" />
                 </button>
@@ -518,129 +516,139 @@ export const FlowToolbar = {
                     class="flex items-center pl-5 pr-5 mt-3 mb-3 border-gray-300 hover:text-gray-800"
                     title="exit edit mode"
                     aria-label="exit edit mode"
-                    @click="exitEditMode"
+                    @click="disableEditMode"
                 >
                     <flow-icon icon="times" class="text-md" />
                 </button>
             </div>
             <div
-                v-if="componentName"
+                v-if="activeAreaComponent"
                 class="bg-gray-100 px-4 py-3 text-xs"
             >
-                {{ componentName }}
+                {{ activeAreaComponent.name }}
             </div>
             <div
-                v-if="mode"
+                v-if="tab"
                 class="w-full"
             >
                 <div
-                    v-if="mode === 'edit-content' && component.schema"
+                    v-if="tab === 'edit-component-data' && component.schema"
                     class="p-6 bg-white"
                     style="max-height: 42rem;overflow: auto;"
                 >
                     <flow-toolbar-form
                         :schema="component.schema"
-                        :value="content"
+                        :model-value="componentData"
                         class="w-full h-full"
-                        @input="content = $event"
+                        @update:model-value="commitData"
                     />
                 </div>
                 <code-editor
-                    v-if="mode === 'edit-code'"
-                    :value="code"
+                    v-if="tab === 'edit-code'"
+                    :value="componentCode"
                     class="w-full h-full"
-                    @update="code = $event"
+                    @save="saveCode"
                 />
             </div>
         </div>
     `,
 }
 
-export const FlowApplication = {
-    name: 'FlowApplication',
-    components: {
-        FlowToolbar,
+export const FlowAreaComponent = {
+    name: 'FlowAreaComponent',
+    props: {
+        areaComponent: {
+            required: true,
+            type: Object,
+        },
+    },
+    setup(props) {
+        const { components } = inject(CONTEXT_COMPONENT_REGISTRY);
+        const component = computed(() => components[props.areaComponent.name]);
+
+        const { loadComponentData } = inject(CONTEXT_CACHE_PAGE);
+        const { currentPath } = inject(CONTEXT_ROUTER);
+        const { data } = loadComponentData(() => ({
+            id: props.areaComponent.id,
+            path: currentPath.value,
+        }));
+
+        const {
+            editAreaComponent,
+            isInEditMode,
+        } = inject(CONTEXT_EDIT_MODE);
+
+        return {
+            component,
+            data,
+            editAreaComponent,
+            isInEditMode,
+        };
     },
     template: `
-        <div>
-            <flow-toolbar v-if="$store.state.editMode"/>
-            <component :is="removeNamespace(layoutComponent)" :key="currentPath"/>
-        </div>
+        <component
+            :key="areaComponent.id"
+            :is="component"
+            v-bind="data"
+            :style="isInEditMode && 'outline: rgba(0, 0, 0, 0.3) dashed 1px;'"
+            @click="isInEditMode && editAreaComponent(areaComponent)"
+        />
     `,
-    data() {
-        return {
-            host:  mapQueryString(window.location.href).host || location.host,
-            path: location.pathname,
-            currentPath: location.pathname
-        }
-    },
-    computed: {
-        layoutComponent() {
-            return this.$store.state.pageLayout;
-        },
-    },
-    created() {
-        addUrlListener(this.urlChanged);
-    },
-    beforeMount() {
-        this.pageLoad(this.host, this.path);
-    },
-    methods: {
-        urlChanged(current) {
-            this.currentPath = current;
-            this.pageLoad(this.host, current);
-        },
-        pageLoad(host, path) {
-            this.$store.dispatch('fetchPageData', {host:host, path:path});
-        },
-        removeNamespace: removeNamespace
-    },
 }
 
 export const FlowArea = {
     name: 'FlowArea',
-    data() {
+    components: {
+        FlowAreaComponent,
+    },
+    props: {
+        areaComponents: {
+            required: true,
+            type: Array,
+        },
+        name: {
+            required: true,
+            type: String,
+        },
+    },
+    setup(props) {
+        const { addDefaultComponent } = inject(CONTEXT_CACHE_COMPONENT);
+        const { addAreaComponent } = inject(CONTEXT_CACHE_PAGE);
+        const { isInEditMode } = inject(CONTEXT_EDIT_MODE);
+        const { currentPath } = inject(CONTEXT_ROUTER);
+
+        const addComponent = async () => {
+            // REFACTOR
+            // - Should not have to deal with host here.
+            const urlParams = new URLSearchParams(window.location.search);
+            const host = urlParams.get('host') || location.host;
+            const id = Date.now();
+            const name = `NewComponent${id}`;
+            await addDefaultComponent({ name });
+
+            const areaComponent = { id, name: `${host}.${name}` };
+
+            return addAreaComponent({
+                areaComponent,
+                areaName: props.name,
+                path: currentPath.value,
+            });
+        };
+
         return {
-            host:window.location.host,
-            path:window.location.pathname
-        }
-    },
-    props: ['name'],
-    computed: {
-        areaComponents() {
-            const area = this.$store.state.pageAreas.find(({ area }) => area === this.name);
-            return area ? area.components : [];
-        }
-    },
-    methods: {
-        async addComponent() {
-            const componentId = await this.$store.dispatch('addComponent', { area: this.name });
-            this.editComponent(componentId);
-        },
-        editComponent(id) {
-            if (!this.$store.state.editMode) return;
-
-            this.$store.commit('setEditComponent', id);
-        },
-        getComponentData(id) {
-            if (!this.$store.state.pageData.components) return null;
-
-            return this.$store.state.pageData.components[id];
-        },
-        removeNamespace: removeNamespace
+            addComponent,
+            isInEditMode,
+        };
     },
     template: `
         <div>
-            <component
-                v-for="component in areaComponents"
-                :key="component.id"
-                :is="removeNamespace(component.name)"
-                v-bind="getComponentData(component.id)"
-                :style="$store.state.editMode && 'outline: rgba(0, 0, 0, 0.3) dashed 1px;'"
-                @click="editComponent(component.id)"
+            <flow-area-component
+                v-for="areaComponent in areaComponents"
+                :key="areaComponent.id"
+                :area-component="areaComponent"
             />
             <div
-                v-if="$store.state.editMode"
+                v-if="isInEditMode"
                 style="outline: rgba(0, 0, 0, 0.3) dashed 1px;"
                 class="flex p-8 justify-center items-center"
             >
@@ -654,30 +662,55 @@ export const FlowArea = {
 
 export const FlowLink = {
     name: 'FlowLink',
-    props: ['to'],
-    template: '<a :href="to" @click="click($event)"><slot/></a>',
-    methods: {
-        click(event) {
-            pushUrl(this.to)
+    props: {
+        to: {
+            required: true,
+            type: String,
+        },
+    },
+    setup(props) {
+        const { push } = inject(CONTEXT_ROUTER);
+
+        const handleClick = (event) => {
             event.preventDefault();
-        }
-    }
+            push(props.to);
+        };
+
+        return {
+            handleClick,
+        };
+    },
+    template: `
+        <a
+            :href="to"
+            @click="handleClick"
+        >
+            <slot/>
+        </a>
+    `,
 }
 
 export const ErrorLayout = {
     name: 'ErrorLayout',
+    setup() {
+        const { page } = inject(CONTEXT_ROUTER);
+
+        return {
+            page,
+        };
+    },
     template:
         `<div class="flex flex-row h-screen items-center justify-center p-10 bg-gray-900">
             <div class="relative z-10 max-w-4xl opacity-100">
                 <section class="flex flex-col">
                     <h1 class="flex text-6xl justify-center font-semibold text-gray-300">
-                        {{ $store.state.pageData.errorTitle }}
+                        {{ page.data.errorTitle }}
                     </h1>
                     <h2 class="flex text-3xl justify-center text-gray-600">
-                        {{ $store.state.pageData.errorDescription }}
+                        {{ page.data.errorDescription }}
                     </h2>
                     <h2 class="flex text-xl justify-center text-gray-700 mt-4">
-                        {{ $store.state.pageData.errorDetail }}
+                        {{ page.data.errorDetail }}
                     </h2>
                 </section>
             </div>
