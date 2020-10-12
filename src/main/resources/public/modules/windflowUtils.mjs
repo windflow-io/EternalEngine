@@ -533,6 +533,10 @@ export function makeContextEditMode({ loadStylesheet }) {
     const isInEditModeInitially = window.location.hash === `#${editModeHash}`;
     if (isInEditModeInitially) enableEditMode();
 
+    window.addEventListener('hashchange', () => {
+        if (window.location.hash === `#${editModeHash}`) enableEditMode();
+    }, true);
+
     return {
         ...toRefs(state),
         disableEditMode,
