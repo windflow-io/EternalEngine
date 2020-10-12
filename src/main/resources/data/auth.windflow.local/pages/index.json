@@ -17,7 +17,7 @@
     "areas": [
         {
             "area": "center",
-            "components": [{"name":"auth.windflow.local.GitHubAuth", "id": "1"}]
+            "components": [{"name":"auth.windflow.local.GithubAuth", "id": "1"}]
         }
     ],
     "data": {}

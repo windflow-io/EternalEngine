@@ -5,12 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import io.windflow.eternalengine.utils.JsonStringifiable;
 
 import java.util.HashSet;
 import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class PageData {
+public class PageData extends JsonStringifiable {
 
     MetaInfo metaInfo;
     String layout;
@@ -239,14 +240,5 @@ public class PageData {
         this.metaInfo = metaInfo;
     }
 
-    @Override
-    public String toString() {
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.enable(SerializationFeature.INDENT_OUTPUT);
-            return mapper.writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            return "Could not express object as JSON";
-        }
-    }
+
 }

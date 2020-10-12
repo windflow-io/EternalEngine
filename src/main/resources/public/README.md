@@ -11,7 +11,7 @@ Tasks
  * Create server component example
  * Create websocket thing (VueX)
  * Database implementation
- * Monoco editor
+ * Monaco editor
  * Actual UI with bubble up, etc.
 
 

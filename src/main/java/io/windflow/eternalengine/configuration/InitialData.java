@@ -1,7 +1,10 @@
 package io.windflow.eternalengine.configuration;
 
+import io.windflow.eternalengine.services.CryptoService;
+import io.windflow.eternalengine.entities.ExtensionData;
 import io.windflow.eternalengine.entities.Page;
 import io.windflow.eternalengine.persistence.ComponentRepository;
+import io.windflow.eternalengine.persistence.ExtensionDataRepository;
 import io.windflow.eternalengine.persistence.PageRepository;
 import io.windflow.eternalengine.utils.TextFileReader;
 import org.slf4j.Logger;
@@ -17,16 +20,20 @@ import java.io.IOException;
 @Component
 public class InitialData {
 
-    PageRepository pageRepository;
-    ComponentRepository componentRepository;
+    private final CryptoService cryptoService;
+    private final PageRepository pageRepository;
+    private final ComponentRepository componentRepository;
+    private final ExtensionDataRepository extensionDataRepository;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Value(value = "${io.windflow.eternalengine.resetDataOnStartup:undefined}")
     String resetDataOnStartup;
 
-    InitialData(@Autowired  PageRepository pageRepository, @Autowired ComponentRepository componentRepository) {
+    InitialData(@Autowired PageRepository pageRepository, @Autowired ComponentRepository componentRepository, @Autowired ExtensionDataRepository extensionDataRepository, @Autowired CryptoService cryptoService) {
         this.pageRepository = pageRepository;
         this.componentRepository = componentRepository;
+        this.extensionDataRepository = extensionDataRepository;
+        this.cryptoService = cryptoService;
     }
 
     @PostConstruct
@@ -35,10 +42,10 @@ public class InitialData {
             logger.warn("Truncating pages and adding default data. Usually happens once. See prop io.windflow.resetDataOnStartup");
             pageRepository.truncate();
 
-            /** Auth.windflow.local **/
+            /* Auth.windflow.local */
             savePage("auth.windflow.local", "/", Page.PageType.PageNormal, "/data/auth.windflow.local/pages/index.json");
 
-            /** Localhost */
+            /* Localhost */
             savePage("localhost", "/", Page.PageType.PageNormal, "/data/localhost/pages/index.json");
             savePage("localhost", "/about", Page.PageType.PageNormal, "/data/localhost/pages/about.json");
             savePage("localhost", "/contact", Page.PageType.PageNormal, "/data/localhost/pages/contact.json");
@@ -69,7 +76,7 @@ public class InitialData {
             // Components
 
             /* auth.windflow.local */
-            saveComponent("auth.windflow.local", "GitHubAuth", io.windflow.eternalengine.entities.Component.ComponentType.COMPONENT, "/data/auth.windflow.local/components/GitHubAuth.mjs");
+            saveComponent("auth.windflow.local", "GithubAuth", io.windflow.eternalengine.entities.Component.ComponentType.COMPONENT, "/data/auth.windflow.local/components/GithubAuth.mjs");
 
             /* localhost */
             saveComponent("localhost", "ContactForm", io.windflow.eternalengine.entities.Component.ComponentType.COMPONENT, "/data/localhost/components/ContactForm.mjs");
@@ -102,6 +109,11 @@ public class InitialData {
         } catch (IOException ex) {
             logger.warn("Could not load file: " + ex.getMessage() + ". Ignoring, but be prepared for an error page on first visit!");
         }
+    }
+
+    private void saveExtensionData(String className, String key, String value, Boolean encrypted) {
+
+        extensionDataRepository.save(new ExtensionData(className, key, value, encrypted));
     }
 
 }

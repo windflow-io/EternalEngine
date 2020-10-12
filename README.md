@@ -33,3 +33,9 @@ To run the application:
 * **Note 1**: As above, there is a gradlew.bat for windows users.
 * **Note 2**: The application checks `window.location.host` to decide which site to serve. This doesn't help much when running locally as http://localhost so we added a feature that allows you to fudge hosts. To fudge a host, just add a querystring parameter `?host=www.windflow.io` for example to any url.
 * **Note 3**: Default database credentials are `postgres:postgres@windflow`   
+
+### Undocumented.
+1. One needs to create /src/main/java/resources/secret.properties (ignored by .gitignore)
+2. In this file, add: io.windflow.encryption.password=your-secret-password-here
+3. Go and encrypt the client_id, callback_url and client_secret and put it in InitialData.java
+4. Add auth.windflow.local to the /etc/hosts file

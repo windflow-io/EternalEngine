@@ -37,7 +37,7 @@ public class WebController {
     @GetMapping(value = {"/**/{regex:[-a-zA-Z0-9]*}", "/"})
     public String spa(HttpServletRequest request, HttpServletResponse response, Model model) throws JsonProcessingException {
 
-        /** @TODO: Send PageData down with Index **/
+        /** @TODO: Send content down with Index **/
 
         /** Look for the page **/
         Optional<Page> optPage = pageRepository.findByDomainAndPath(request.getServerName(), request.getServletPath());

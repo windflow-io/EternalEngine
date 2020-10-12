@@ -30,11 +30,20 @@ export const FlowIcon = {
             :viewBox="viewBox"
             ref="svgTag"
             fill="currentColor"
-            style="width:auto;height:1em;"
         />
     `,
     mounted() {
-        fetch('/icons/solid/' + this.icon + '.svg').then(r => r.text()).then(d => {
+
+        let typeAndIcon = this.icon.split(" ");
+        let type = 'solid'
+        let name = ''
+        if ((typeAndIcon.length) > 1) {
+            type = typeAndIcon[0];
+            name = typeAndIcon[1];
+        } else {
+            name = typeAndIcon[0];
+        }
+        fetch('/icons/' + type + '/' + name + '.svg').then(r => r.text()).then(d => {
             let svg = new DOMParser().parseFromString(d, "image/svg+xml").firstChild;
             this.viewBox = svg.getAttribute('viewBox');
             svg.childNodes.forEach(n => {
@@ -459,7 +468,7 @@ export const FlowToolbar = {
                     aria-label="drag"
                     @mousedown="startDrag"
                 >
-                    <flow-icon icon="grip-vertical" class="text-md" />
+                    √
                 </button>
                 <button
                     v-if="!isInEditComponentMode"

@@ -6,8 +6,10 @@ public enum WindflowError {
     ERROR_003("404 Domain Not Found", "No matching domain in the database"),
     ERROR_004("No Sites Configured", "No Windflow Eternal Engine sites are configured in this database"),
     ERROR_005("Database is Empty", "The Windflow Eternal Engine database contains no data"),
-    ERROR_006("Invalid Page Data", "Cannot Parse JSON page data"),
-    ERROR_007("Component Not Found", "Missing component");
+    ERROR_006("Corrupt Page Data", "Cannot Parse JSON page data"),
+    ERROR_007("Component Not Found", "Missing component"),
+    ERROR_008("Authentication Error", "Redirects to an authentication provider must have a referer"),
+    ERROR_009("GitHub Authentication Failed", "GitHub returned an error");
 
     String title;
     String description;

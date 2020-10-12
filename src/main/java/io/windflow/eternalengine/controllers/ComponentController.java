@@ -5,13 +5,14 @@ import io.windflow.eternalengine.error.WindflowError;
 import io.windflow.eternalengine.error.WindflowNotFoundException;
 import io.windflow.eternalengine.persistence.ComponentRepository;
 import io.windflow.eternalengine.utils.HttpError;
+import io.windflow.eternalengine.utils.TextFileReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.Optional;
 
 @RestController
@@ -35,6 +36,17 @@ public class ComponentController {
     public String getComponent(@PathVariable("namespace") String namespace, @PathVariable("filename") String componentFilename) {
 
         String componentName = componentFilename.replace(".mjs", "");
+
+        /*** @TODO: WARNING - THIS IS A HACK ***/
+
+        if (componentName.equals("GithubAuth")) {
+            try {
+                logger.warn("Mark van Wyk's KAK CODE (that must be removed) is fudging in a component straight from the file system - BAD");
+                return TextFileReader.getText("data/auth.windflow.local/components/GithubAuth.mjs");
+            } catch (IOException ex) {
+                logger.error("FUDGING THE COMPONENT FAILED " + ex.getMessage());
+            }
+        }
 
         Optional<Component> optComponent = componentRepository.findByNamespaceAndComponentName(namespace, componentName);
         if (optComponent.isPresent()) {
