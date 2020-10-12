@@ -533,6 +533,10 @@ export function makeContextEditMode({ loadStylesheet }) {
     const isInEditModeInitially = window.location.hash === `#${editModeHash}`;
     if (isInEditModeInitially) enableEditMode();
 
+    window.addEventListener('hashchange', () => {
+        if (window.location.hash === `#${editModeHash}`) enableEditMode();
+    }, true);
+
     return {
         ...toRefs(state),
         disableEditMode,
@@ -548,15 +552,19 @@ export function makeContextRouter({ loadPage, registerComponent }) {
     let previousPath = null;
     const currentPath = ref(window.location.pathname);
 
-    const push = (path) => {
+    const goTo = (path) => {
         previousPath = window.location.pathname;
-        window.history.pushState(null, null, path);
         currentPath.value = path;
         listeners.forEach(listener => listener(path, previousPath));
     };
 
+    const push = (path) => {
+        window.history.pushState(null, null, path);
+        goTo(path);
+    };
+
     window.addEventListener('popstate', () => {
-        listeners.forEach(listener => listener(window.location.pathname, previousPath))
+        goTo(window.location.pathname);
     });
 
     const getComponentDescriptionsForPage = (page) => {

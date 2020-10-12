@@ -1,4 +1,4 @@
-![Windflow logo](https://i.imgur.com/zgUXAF6.png)
+![Windflow logo](https://i.imgur.com/Yt2FfIY.png)
 # Windflow.io's Eternal Engine
 Windflow Eternal Engine is an open-source, web-component-based platform for building apps and web sites in Vue.js and TailwindCSS. It serves web sites and apps as an assortment of web components dynamically constructed from a database.
 The components, order, layout, styles and content are all dynamic.
@@ -19,9 +19,9 @@ Client code is written in highly-readable plain-old ES6 modular JavaScript with 
 The process is as follows:
 
 1. On the first visit, index.html is served to the client on a clean slate with no html.
-2. The client-side app then requests a layout and list of components to be displayed on the page.
-3. The client-side app then requests the individual components and displays them.
-4. Components are hydrated with data from vuex (that came with the list of components).
+2. The client-side Vue3 app then requests a layout and list of components to be displayed on the page.
+3. The client-side Vue3 app then requests the individual components and displays them.
+4. Components are hydrated with data page data from the server (that came with the list of components).
 
 ### running the application
 To run the application:
@@ -31,7 +31,7 @@ To run the application:
   4. Start the application using the Gradle Wrapper `./gradlew bootRun` 
 
 * **Note 1**: As above, there is a gradlew.bat for windows users.
-* **Note 2**: The application checks `window.location.host` to decide which site to serve. This doesn't help much when running locally as http://localhost so we added a feature that allows you to fudge hosts. To fudge a host, just add a querystring parameter `?host=www.windflow.io` for example to any url.
+* **Note 2**: The application checks `window.location.host` to decide which site to serve. This doesn't help much when running locally as http://localhost so we added a feature that allows you to fudge hosts. To fudge a host, just add a querystring parameter `?host=www.example.com` (for example) to any url.
 * **Note 3**: Default database credentials are `postgres:postgres@windflow`   
 
 ### Undocumented.
