@@ -16,6 +16,25 @@ import {
     useDrag,
 } from './windflowUtils.mjs';
 
+export const FlowButton = {
+    name: 'FlowButton',
+    props: {
+        tag: {
+            default: 'button',
+            type: String,
+        },
+    },
+    template: `
+        <component
+            :is="tag"
+            type="button"
+            class="px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md transition duration-150 ease-in-out text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo"
+        >
+            <slot/>
+        </component>
+    `,
+}
+
 export const FlowIcon = {
     name: 'FlowIcon',
     props: ['icon'],
@@ -600,6 +619,7 @@ export const FlowArea = {
     name: 'FlowArea',
     components: {
         FlowAreaComponent,
+        FlowButton,
     },
     props: {
         areaComponents: {
@@ -652,9 +672,9 @@ export const FlowArea = {
                 style="outline: rgba(0, 0, 0, 0.3) dashed 1px;"
                 class="flex p-8 justify-center items-center"
             >
-                <button @click="addComponent">
+                <flow-button @click="addComponent">
                     Add new component
-                </button>
+                </flow-button>
             </div>
         </div>
     `,
