@@ -1,7 +1,21 @@
-import {FlowArea} from '/modules/coreComponents.mjs'
+import { FlowArea } from '/modules/coreComponents.mjs';
 
 export default {
     name: 'SingleColumnLayout',
-    components: {FlowArea},
-    template: `<flow-area class="antialiased font-sans bg-gray-200" name="content"/>`,
+    components: {
+        FlowArea,
+    },
+    props: {
+        areas: {
+            required: true,
+            type: Object,
+        },
+    },
+    template: `
+        <flow-area
+            name="content"
+            :area-components="areas.content.components"
+            class="antialiased font-sans bg-gray-200"
+        />
+    `,
 }
