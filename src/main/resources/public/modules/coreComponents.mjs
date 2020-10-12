@@ -195,7 +195,7 @@ export const FlowFormFieldText = {
                 :id="id"
                 :value="modelValue"
                 :name="name"
-                class="border border-gray-400 block w-full p-2 sm:text-sm sm:leading-5 rounded-md shadow-sm"
+                class="border border-gray-400 block w-full p-3 leading-6 rounded-md shadow-sm"
                 @input.stop="$emit('update:modelValue', $event.target.value)"
             >
         </flow-form-group>
@@ -231,7 +231,7 @@ export const FlowFormFieldTextarea = {
                 :id="id"
                 :value="modelValue"
                 :name="name"
-                class="border border-gray-400 block w-full p-2 h-24 sm:text-sm sm:leading-5 rounded-md shadow-sm"
+                class="border border-gray-400 block w-full p-3 h-24 sm:text-sm sm:leading-5 rounded-md shadow-sm"
                 @input.stop="$emit('update:modelValue', $event.target.value)"
             />
         </flow-form-group>
@@ -271,7 +271,7 @@ export const FlowFormFieldSelect = {
                 :id="id"
                 :value="modelValue"
                 :name="name"
-                class="border border-gray-400 block w-full p-2 sm:text-sm sm:leading-5 rounded-md shadow-sm"
+                class="border border-gray-400 block w-full p-3 sm:text-sm sm:leading-5 rounded-md shadow-sm"
                 @input.stop="$emit('update:modelValue', $event.target.value)"
             >
                 <option
@@ -620,6 +620,7 @@ export const FlowArea = {
     components: {
         FlowAreaComponent,
         FlowButton,
+        FlowFormFieldText,
     },
     props: {
         areaComponents: {
@@ -637,13 +638,15 @@ export const FlowArea = {
         const { isInEditMode } = inject(CONTEXT_EDIT_MODE);
         const { currentPath } = inject(CONTEXT_ROUTER);
 
+        const newComponentName = ref(null);
+
         const addComponent = async () => {
             // REFACTOR
             // - Should not have to deal with host here.
             const urlParams = new URLSearchParams(window.location.search);
             const host = urlParams.get('host') || location.host;
             const id = Date.now();
-            const name = `NewComponent${id}`;
+            const name = newComponentName.value;
             await addDefaultComponent({ name });
 
             const areaComponent = { id, name: `${host}.${name}` };
@@ -658,6 +661,7 @@ export const FlowArea = {
         return {
             addComponent,
             isInEditMode,
+            newComponentName,
         };
     },
     template: `
@@ -670,8 +674,14 @@ export const FlowArea = {
             <div
                 v-if="isInEditMode"
                 style="outline: rgba(0, 0, 0, 0.3) dashed 1px;"
-                class="flex p-8 justify-center items-center"
+                class="flex p-8 justify-center items-end"
             >
+                <flow-form-field-text
+                    v-model="newComponentName"
+                    label="Component name"
+                    name="new-component-name"
+                    class="mr-2"
+                />
                 <flow-button @click="addComponent">
                     Add new component
                 </flow-button>
