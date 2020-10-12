@@ -7,8 +7,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import java.util.UUID;
 
-@Entity(name = "`user`")
-public class User {
+@Entity
+public class EternalEngineUser {
 
     @Id
     @GeneratedValue
@@ -22,7 +22,7 @@ public class User {
     AuthenticationProvider authenticationProvider = AuthenticationProvider.GITHUB;
     String githubUsername;
     String githubHomepage;
-    String githubUserData;
+    String githubUserDataUrl;
 
     public UUID getId() {
         return id;
@@ -96,26 +96,27 @@ public class User {
         this.githubHomepage = githubHomepage;
     }
 
-    public String getGithubUserData() {
-        return githubUserData;
+    public String getGithubUserDataUrl() {
+        return githubUserDataUrl;
     }
 
-    public void setGithubUserData(String githubUserData) {
-        this.githubUserData = githubUserData;
+    public void setGithubUserDataUrl(String githubUserData) {
+        this.githubUserDataUrl = githubUserData;
     }
 
     public enum AuthenticationProvider {
         GITHUB
     }
 
-    public static User createFromGithubUser(GithubUser githubUser) {
-        User user = new User();
+    public static EternalEngineUser createFromGithubUser(GithubUser githubUser) {
+        EternalEngineUser user = new EternalEngineUser();
         user.setName(githubUser.getName());
         user.setEmail(githubUser.getEmail());
         user.setCompany(githubUser.getCompany());
         user.setLocation(githubUser.getLocation());
         user.setAvatarUrl(githubUser.getAvatarUrl());
         user.setGithubHomepage(githubUser.getGithubHomepage());
+        user.setGithubUserDataUrl(githubUser.getGithubUserDataUrl());
         user.setGithubUsername(githubUser.getGithubUsername());
         user.setAuthenticationProvider(AuthenticationProvider.GITHUB);
         return user;

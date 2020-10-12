@@ -2,7 +2,7 @@ package io.windflow.eternalengine.controllers.api;
 
 import io.windflow.eternalengine.beans.GithubTokenResponse;
 import io.windflow.eternalengine.beans.GithubUser;
-import io.windflow.eternalengine.entities.User;
+import io.windflow.eternalengine.entities.EternalEngineUser;
 import io.windflow.eternalengine.error.WindflowError;
 import io.windflow.eternalengine.error.WindflowWebException;
 
@@ -41,7 +41,6 @@ public class AuthApi {
 
     private final String GITHUB_LOGIN_URL = "https://github.com/login/oauth/authorize";
     private final String GITHUB_TOKEN_URL = "https://github.com/login/oauth/access_token";
-    private final String GITHUB_CALLBACK_URL = GITHUB_CALLBACK_DOMAIN + "/api/auth/github/callback";
 
     private UserRepository userRepository;
 
@@ -52,11 +51,14 @@ public class AuthApi {
     @GetMapping("/api/auth/github")
     public void redirectUserToGitHub(HttpServletRequest request, HttpServletResponse response) throws WindflowWebException {
 
+        final String GITHUB_CALLBACK_URL = GITHUB_CALLBACK_DOMAIN + "/api/auth/github/callback";
+
         String referer = request.getHeader("referer");
 
         if (referer == null) throw new WindflowWebException(WindflowError.ERROR_008, "Auth refused to redirect use to github without referer header");
 
         String state = URLEncoder.encode(referer, StandardCharsets.UTF_8);
+
         final String authRedirectUrl = GITHUB_LOGIN_URL + "?client_id=" + GITHUB_CLIENT_ID + "&scope=" + SCOPE + "&state=" + state + "&allow_signup=" + GITHUB_ALLOW_SIGNUP + "&redirect_uri=" + GITHUB_CALLBACK_URL;
 
         try {
@@ -79,6 +81,7 @@ public class AuthApi {
             throw new WindflowWebException(WindflowError.ERROR_009, errorString);
         }
 
+        final String GITHUB_CALLBACK_URL = GITHUB_CALLBACK_DOMAIN + "/api/auth/github/callback";
         final String code = request.getParameter("code");
         final String tokenUrl = GITHUB_TOKEN_URL + "?client_id=" + GITHUB_CLIENT_ID + "&client_secret=" + GITHUB_CLIENT_SECRET + "&code=" + code + "&redirect_uri=" + GITHUB_CALLBACK_URL;
 
@@ -91,13 +94,14 @@ public class AuthApi {
 
 
         GithubUser githubUser = fetchUserData(token.getAccessToken());
-        Optional<User> optUser = userRepository.findByEmail(githubUser.getEmail());
-        User windflowUser;
+        Optional<EternalEngineUser> optUser = userRepository.findByEmail(githubUser.getEmail());
+        EternalEngineUser user;
+
         if (optUser.isPresent()) {
-            windflowUser = optUser.get();
+            user = optUser.get();
         } else {
-            windflowUser = User.createFromGithubUser(githubUser);
-            userRepository.save(windflowUser);
+            user = EternalEngineUser.createFromGithubUser(githubUser);
+            userRepository.save(user);
         }
 
         /* @TODO: CREATE A SESSION HERE AND RETURN A SESSION ID - THAT SESSION SHOULD INCLUDE IP, EXPIRY, ETC */
