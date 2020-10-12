@@ -1,5 +1,8 @@
 package io.windflow.eternalengine.error;
 
+/**
+ * @TODO: Refactor to "EternalEngine" as opposed to "Windflow"
+ */
 public enum WindflowError {
     ERROR_001("500 Internal Server Error", "An unexpected server error occurred"),
     ERROR_002("404 Not Found","Page was not found"),

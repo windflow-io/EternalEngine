@@ -1,11 +1,14 @@
 package io.windflow.eternalengine.controllers.api;
 
 import io.windflow.eternalengine.beans.GithubTokenResponse;
-import io.windflow.eternalengine.beans.GithubUserResponse;
+import io.windflow.eternalengine.beans.GithubUser;
+import io.windflow.eternalengine.entities.User;
 import io.windflow.eternalengine.error.WindflowError;
 import io.windflow.eternalengine.error.WindflowWebException;
 
+import io.windflow.eternalengine.persistence.UserRepository;
 import io.windflow.eternalengine.utils.HttpError;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.*;
@@ -18,9 +21,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 @RestController
-@PropertySource("classpath:secret.properties")
+@PropertySource({"classpath:secret.properties","classpath:openid.properties"})
 public class AuthApi {
 
     @Value("${io.windflow.auth.github_client_id}")
@@ -29,12 +33,21 @@ public class AuthApi {
     @Value("${io.windflow.auth.github_client_secret}")
     String GITHUB_CLIENT_SECRET;
 
+    @Value("${io.windflow.auth.github_auth_domain}")
+    String GITHUB_CALLBACK_DOMAIN;
+
     final String GITHUB_ALLOW_SIGNUP = "true";
     final String SCOPE = "read:user+user:email";
 
     private final String GITHUB_LOGIN_URL = "https://github.com/login/oauth/authorize";
     private final String GITHUB_TOKEN_URL = "https://github.com/login/oauth/access_token";
-    private final String GITHUB_CALLBACK_PATH = "/api/auth/github/callback"; /*@TODO: UNHARDCODE THIS */
+    private final String GITHUB_CALLBACK_URL = GITHUB_CALLBACK_DOMAIN + "/api/auth/github/callback";
+
+    private UserRepository userRepository;
+
+    public AuthApi(@Autowired UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @GetMapping("/api/auth/github")
     public void redirectUserToGitHub(HttpServletRequest request, HttpServletResponse response) throws WindflowWebException {
@@ -43,9 +56,8 @@ public class AuthApi {
 
         if (referer == null) throw new WindflowWebException(WindflowError.ERROR_008, "Auth refused to redirect use to github without referer header");
 
-        String githubCallbackUrl = getDomain() + referer.GITHUB_CALLBACK_PATH;
         String state = URLEncoder.encode(referer, StandardCharsets.UTF_8);
-        final String authRedirectUrl = GITHUB_LOGIN_URL + "?client_id=" + GITHUB_CLIENT_ID + "&scope=" + SCOPE + "&state=" + state + "&allow_signup=" + GITHUB_ALLOW_SIGNUP + "&redirect_uri=" + githubCallbackUrl;
+        final String authRedirectUrl = GITHUB_LOGIN_URL + "?client_id=" + GITHUB_CLIENT_ID + "&scope=" + SCOPE + "&state=" + state + "&allow_signup=" + GITHUB_ALLOW_SIGNUP + "&redirect_uri=" + GITHUB_CALLBACK_URL;
 
         try {
             response.sendRedirect(authRedirectUrl);
@@ -77,7 +89,18 @@ public class AuthApi {
             throw new WindflowWebException(WindflowError.ERROR_009, token.getError() + ": " + token.getErrorDescription());
         }
 
-        System.out.println(fetchUserData(token.getAccessToken()));
+
+        GithubUser githubUser = fetchUserData(token.getAccessToken());
+        Optional<User> optUser = userRepository.findByEmail(githubUser.getEmail());
+        User windflowUser;
+        if (optUser.isPresent()) {
+            windflowUser = optUser.get();
+        } else {
+            windflowUser = User.createFromGithubUser(githubUser);
+            userRepository.save(windflowUser);
+        }
+
+        /* @TODO: CREATE A SESSION HERE AND RETURN A SESSION ID - THAT SESSION SHOULD INCLUDE IP, EXPIRY, ETC */
 
         try {
             response.sendRedirect(request.getParameter("state"));
@@ -87,18 +110,13 @@ public class AuthApi {
 
     }
 
-    private GithubUserResponse fetchUserData(String token) {
+    private GithubUser fetchUserData(String token) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "token " + token);
         HttpEntity entity = new HttpEntity(headers);
         String userInfoUrl = "https://api.github.com/user";
-        ResponseEntity<GithubUserResponse> userInfoEntity = new RestTemplate().exchange(userInfoUrl, HttpMethod.GET, entity, GithubUserResponse.class);
+        ResponseEntity<GithubUser> userInfoEntity = new RestTemplate().exchange(userInfoUrl, HttpMethod.GET, entity, GithubUser.class);
         return userInfoEntity.getBody();
-    }
-
-    private getDomain(String url ) {
-        String[] parts = url.split("/");
-        return parts[0] + parts[1]
     }
 
     @ExceptionHandler(WindflowWebException.class)

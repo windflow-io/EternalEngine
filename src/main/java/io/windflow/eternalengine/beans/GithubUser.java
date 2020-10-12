@@ -5,11 +5,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.windflow.eternalengine.utils.JsonStringifiable;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class GithubUserResponse extends JsonStringifiable {
+public class GithubUser extends JsonStringifiable {
 
     String name;
     String email;
-    String avatar_url;
+
+    @JsonProperty("avatar_url")
+    String avatarUrl;
     String location;
     String company;
 
@@ -20,7 +22,7 @@ public class GithubUserResponse extends JsonStringifiable {
     String githubHomepage;
 
     @JsonProperty("url")
-    String githubUserData;
+    String githubUserDataUrl;
 
     public String getName() {
         return name;
@@ -38,12 +40,12 @@ public class GithubUserResponse extends JsonStringifiable {
         this.email = email;
     }
 
-    public String getAvatar_url() {
-        return avatar_url;
+    public String getAvatarUrl() {
+        return avatarUrl;
     }
 
-    public void setAvatar_url(String avatar_url) {
-        this.avatar_url = avatar_url;
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
     public String getLocation() {
@@ -78,11 +80,11 @@ public class GithubUserResponse extends JsonStringifiable {
         this.githubHomepage = githubHomepage;
     }
 
-    public String getGithubUserData() {
-        return githubUserData;
+    public String getGithubUserDataUrl() {
+        return githubUserDataUrl;
     }
 
-    public void setGithubUserData(String githubUserData) {
-        this.githubUserData = githubUserData;
+    public void setGithubUserDataUrl(String githubUserDataUrl) {
+        this.githubUserDataUrl = githubUserDataUrl;
     }
 }

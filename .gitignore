@@ -39,4 +39,5 @@ out/
 ### Custom
 .DS_Store
 secret.properties
+openid.properties
 
