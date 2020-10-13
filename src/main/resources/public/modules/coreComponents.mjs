@@ -49,6 +49,7 @@ export const FlowIcon = {
             :viewBox="viewBox"
             ref="svgTag"
             fill="currentColor"
+            style="width:auto;height:1em;"
         />
     `,
     mounted() {
@@ -487,7 +488,7 @@ export const FlowToolbar = {
                     aria-label="drag"
                     @mousedown="startDrag"
                 >
-                    √
+                    <flow-icon icon="grip-vertical" class="text-md" />
                 </button>
                 <button
                     v-if="!isInEditComponentMode"
