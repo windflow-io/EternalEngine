@@ -16,13 +16,13 @@ export default {
             <div class="w-64 bg-purple-500 bg-opacity-25 p-1 text-white">
                 <flow-area
                     name="left"
-                    :area-components="areas.left.components"
+                    :chapters="areas.left.chapters"
                 />
             </div>
             <div class="flex-grow bg-blue-500 bg-opacity-25 p-1 text-white">
                 <flow-area
                     name="right"
-                    :area-components="areas.right.components"
+                    :chapters="areas.right.chapters"
                 />
             </div>
         </section>

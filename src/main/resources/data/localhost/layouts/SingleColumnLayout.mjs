@@ -14,7 +14,7 @@ export default {
     template: `
         <flow-area
             name="content"
-            :area-components="areas.content.components"
+            :chapters="areas.content.chapters"
             class="antialiased font-sans bg-gray-200"
         />
     `,

@@ -5,8 +5,6 @@ import {
     ref,
 } from '../vendor/vue3/vue.esm-browser.js';
 import {
-    CONTEXT_CACHE_COMPONENT,
-    CONTEXT_CACHE_PAGE,
     CONTEXT_COMPONENT_REGISTRY,
     CONTEXT_EDIT_MODE,
     CONTEXT_ROUTER,
@@ -339,7 +337,7 @@ export const FlowFormFields = {
                 :is="fieldMap[fields[fieldName].type]"
                 v-bind="fields[fieldName]"
                 :name="fieldName"
-                :model-value="modelValue[fieldName]"
+                :model-value="modelValue && modelValue[fieldName]"
                 @update:model-value="update(fieldName, $event)"
             />
         </div>
@@ -392,15 +390,19 @@ export const FlowToolbarForm = {
             type: Object,
         },
         schema: {
-            required: true,
+            default: null,
             type: Object,
         },
     },
     template: `
         <flow-form-fields
+            v-if="schema"
             :fields="schema"
             :model-value="modelValue"
         />
+        <p v-else>
+            This component has no schema.
+        </p>
     `,
 };
 
@@ -411,49 +413,15 @@ export const FlowToolbar = {
         FlowIcon,
         FlowToolbarForm,
     },
-    setup() {
-        const {
-            activeAreaComponent,
-            disableEditMode,
-            editAreaComponent,
-        } = inject(CONTEXT_EDIT_MODE);
-        const isInEditComponentMode = computed(() => !!activeAreaComponent.value);
-
-        const areaComponentId = computed(() => activeAreaComponent.value && activeAreaComponent.value.id);
-        const areaComponentName = computed(() => activeAreaComponent.value && activeAreaComponent.value.name);
-
+    props: {
+        chapter: {
+            default: null,
+            type: Object,
+        },
+    },
+    setup(props) {
         const { components } = inject(CONTEXT_COMPONENT_REGISTRY);
-        const component = computed(() => components[areaComponentName.value]);
-
-        const {
-            loadComponent,
-            updateComponent,
-        } = inject(CONTEXT_CACHE_COMPONENT);
-        const { data: componentCode } = loadComponent(() => ({
-            name: areaComponentName.value,
-        }));
-        const saveCode = data => updateComponent({
-            data,
-            name: areaComponentName.value,
-        });
-
-        const {
-            commitComponentData,
-            loadComponentData,
-            updateComponentData,
-        } = inject(CONTEXT_CACHE_PAGE);
-        const { currentPath } = inject(CONTEXT_ROUTER);
-        const { data: componentData } = loadComponentData(() => ({
-            id: areaComponentId.value,
-            path: currentPath.value,
-        }));
-        const commitData = data => commitComponentData({
-            data,
-            id: areaComponentId.value,
-        });
-        const savePage = () => updateComponentData({
-            path: currentPath.value,
-        });
+        const component = computed(() => props.chapter && components[props.chapter.component.id]);
 
         const tab = ref(null);
         const $root = ref(null);
@@ -461,16 +429,7 @@ export const FlowToolbar = {
 
         return {
             $root,
-            activeAreaComponent,
-            commitData,
             component,
-            componentCode,
-            componentData,
-            disableEditMode,
-            editAreaComponent,
-            isInEditComponentMode,
-            saveCode,
-            savePage,
             startDrag,
             tab,
         };
@@ -491,7 +450,7 @@ export const FlowToolbar = {
                     <flow-icon icon="grip-vertical" class="text-md" />
                 </button>
                 <button
-                    v-if="!isInEditComponentMode"
+                    v-if="!chapter"
                     class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-300 hover:text-gray-800"
                     title="add component"
                     aria-label="add component"
@@ -499,20 +458,20 @@ export const FlowToolbar = {
                     <flow-icon icon="plus" class="text-md" />
                 </button>
                 <button
-                    v-if="isInEditComponentMode"
+                    v-if="chapter"
                     class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-300 hover:text-gray-800"
-                    title="edit component data"
-                    aria-label="edit component data"
-                    @click="tab = 'edit-component-data'"
+                    title="edit chapter data"
+                    aria-label="edit chapter data"
+                    @click="tab = 'edit-chapter-data'"
                 >
                     <flow-icon icon="edit" class="text-md" />
                 </button>
                 <button
-                    v-if="isInEditComponentMode"
+                    v-if="chapter"
                     class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-300 hover:text-gray-800"
-                    title="edit code"
-                    aria-label="edit code"
-                    @click="tab = 'edit-code'"
+                    title="edit chapter component"
+                    aria-label="edit chapter component"
+                    @click="tab = 'edit-chapter-component'"
                 >
                     <flow-icon icon="code" class="text-md" />
                 </button>
@@ -527,16 +486,16 @@ export const FlowToolbar = {
                     class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-300 hover:text-gray-800"
                     title="save"
                     aria-label="save"
-                    @click="savePage"
+                    @click="$emit('save-page')"
                 >
                     <flow-icon icon="save" class="text-md"/>
                 </button>
                 <button
-                    v-if="isInEditComponentMode"
+                    v-if="chapter"
                     class="flex items-center pl-5 pr-5 mt-3 mb-3 border-gray-300 hover:text-gray-800"
-                    title="exit component edit mode"
-                    aria-label="exit component edit mode"
-                    @click="editAreaComponent(null)"
+                    title="exit chapter edit mode"
+                    aria-label="exit chapter edit mode"
+                    @click="$emit('disable-chapter-edit-mode')"
                 >
                     <flow-icon icon="times" class="text-md" />
                 </button>
@@ -545,82 +504,66 @@ export const FlowToolbar = {
                     class="flex items-center pl-5 pr-5 mt-3 mb-3 border-gray-300 hover:text-gray-800"
                     title="exit edit mode"
                     aria-label="exit edit mode"
-                    @click="disableEditMode"
+                    @click="$emit('disable-edit-mode')"
                 >
                     <flow-icon icon="times" class="text-md" />
                 </button>
             </div>
             <div
-                v-if="activeAreaComponent"
+                v-if="chapter"
                 class="bg-gray-100 px-4 py-3 text-xs"
             >
-                {{ activeAreaComponent.name }}
+                {{ chapter.component.name }}
             </div>
             <div
                 v-if="tab"
                 class="w-full"
             >
                 <div
-                    v-if="tab === 'edit-component-data' && component.schema"
+                    v-if="tab === 'edit-chapter-data' && component"
                     class="p-6 bg-white"
                     style="max-height: 42rem;overflow: auto;"
                 >
                     <flow-toolbar-form
                         :schema="component.schema"
-                        :model-value="componentData"
+                        :model-value="chapter.data"
                         class="w-full h-full"
-                        @update:model-value="commitData"
+                        @update:model-value="$emit('update-chapter', { ...chapter, data: $event })"
                     />
                 </div>
                 <code-editor
-                    v-if="tab === 'edit-code'"
-                    :value="componentCode"
+                    v-if="tab === 'edit-chapter-component' && chapter"
+                    :value="chapter.component.sfc"
                     class="w-full h-full"
-                    @save="saveCode"
+                    @save="$emit('save-component', { ...chapter.component, sfc: $event })"
                 />
             </div>
         </div>
     `,
 }
 
-export const FlowAreaComponent = {
-    name: 'FlowAreaComponent',
+export const FlowAreaChapter = {
+    name: 'FlowAreaChapter',
     props: {
-        areaComponent: {
+        component: {
             required: true,
+            type: Object,
+        },
+        data: {
+            default: null,
             type: Object,
         },
     },
     setup(props) {
         const { components } = inject(CONTEXT_COMPONENT_REGISTRY);
-        const component = computed(() => components[props.areaComponent.name]);
+        const renderComponent = computed(() => components[props.component.id]);
 
-        const { loadComponentData } = inject(CONTEXT_CACHE_PAGE);
-        const { currentPath } = inject(CONTEXT_ROUTER);
-        const { data } = loadComponentData(() => ({
-            id: props.areaComponent.id,
-            path: currentPath.value,
-        }));
-
-        const {
-            editAreaComponent,
-            isInEditMode,
-        } = inject(CONTEXT_EDIT_MODE);
-
-        return {
-            component,
-            data,
-            editAreaComponent,
-            isInEditMode,
-        };
+        return { renderComponent };
     },
     template: `
         <component
-            :key="areaComponent.id"
-            :is="component"
+            :is="renderComponent"
             v-bind="data"
-            :style="isInEditMode && 'outline: rgba(0, 0, 0, 0.3) dashed 1px;'"
-            @click="isInEditMode && editAreaComponent(areaComponent)"
         />
     `,
 }
@@ -628,12 +571,12 @@ export const FlowAreaComponent = {
 export const FlowArea = {
     name: 'FlowArea',
     components: {
-        FlowAreaComponent,
+        FlowAreaChapter,
         FlowButton,
         FlowFormFieldText,
     },
     props: {
-        areaComponents: {
+        chapters: {
             required: true,
             type: Array,
         },
@@ -642,44 +585,30 @@ export const FlowArea = {
             type: String,
         },
     },
-    setup(props) {
-        const { addDefaultComponent } = inject(CONTEXT_CACHE_COMPONENT);
-        const { addAreaComponent } = inject(CONTEXT_CACHE_PAGE);
+    setup() {
         const { isInEditMode } = inject(CONTEXT_EDIT_MODE);
-        const { currentPath } = inject(CONTEXT_ROUTER);
-
         const newComponentName = ref(null);
-
-        const addComponent = async () => {
-            // REFACTOR
-            // - Should not have to deal with host here.
-            const urlParams = new URLSearchParams(window.location.search);
-            const host = urlParams.get('host') || location.host;
-            const id = Date.now();
-            const name = newComponentName.value;
-            await addDefaultComponent({ name });
-
-            const areaComponent = { id, name: `${host}.${name}` };
-
-            return addAreaComponent({
-                areaComponent,
-                areaName: props.name,
-                path: currentPath.value,
-            });
-        };
+        const newChapter = computed(() => ({
+            component: {
+                name: newComponentName.value,
+            },
+        }));
 
         return {
-            addComponent,
             isInEditMode,
+            newChapter,
             newComponentName,
         };
     },
     template: `
         <div>
-            <flow-area-component
-                v-for="areaComponent in areaComponents"
-                :key="areaComponent.id"
-                :area-component="areaComponent"
+            <flow-area-chapter
+                v-for="chapter in chapters"
+                :key="chapter.id"
+                :component="chapter.component"
+                :data="chapter.data"
+                :style="isInEditMode && 'outline: rgba(0, 0, 0, 0.3) dashed 1px;'"
+                @click="isInEditMode && $parent.$emit('enable-chapter-edit-mode', chapter)"
             />
             <div
                 v-if="isInEditMode"
@@ -692,7 +621,13 @@ export const FlowArea = {
                     name="new-component-name"
                     class="mr-2"
                 />
-                <flow-button @click="addComponent">
+                <!--
+                  Emitting event directly on the parent component (layout) so
+                  layouts don't have to pass through the event which makes it
+                  easier for our users to create their own layouts without
+                  knowing about this implementation detail.
+                -->
+                <flow-button @click="$parent.$emit('add-chapter', name, newChapter)">
                     Add new component
                 </flow-button>
             </div>

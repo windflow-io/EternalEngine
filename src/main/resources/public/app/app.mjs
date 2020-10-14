@@ -10,13 +10,12 @@ import {
     http,
     loadStylesheet,
     makeApi,
-    makeComponentService,
-    makeContextCacheComponent,
     makeContextCachePage,
     makeContextComponentRegistry,
     makeContextEditMode,
     makeContextRouter,
-    makePageService,
+    makeServiceComponent,
+    makeServicePage,
 } from '../modules/windflowUtils.mjs';
 
 export const CONTEXT_COMPONENT_REGISTRY = Symbol();
@@ -35,69 +34,81 @@ export const FlowApplication = {
         const host = urlParams.get('host') || location.host;
 
         const api = makeApi({ http });
-        const componentService = makeComponentService({ api, host });
-        const pageService = makePageService({ api, host });
+        const serviceComponent = makeServiceComponent({ api, host });
+        const servicePage = makeServicePage({ api, host, serviceComponent });
 
         const contextComponentRegistry = makeContextComponentRegistry();
         app.provide(CONTEXT_COMPONENT_REGISTRY, contextComponentRegistry);
 
-        const { registerUpdatedComponent } = contextComponentRegistry;
-        const contextCacheComponent = makeContextCacheComponent({
-            componentService,
-            registerUpdatedComponent,
-        });
-        app.provide(CONTEXT_CACHE_COMPONENT, contextCacheComponent);
-
-        const contextCachePage = makeContextCachePage({ pageService });
+        const contextCachePage = makeContextCachePage({ servicePage });
         app.provide(CONTEXT_CACHE_PAGE, contextCachePage);
 
-        const contextEditMode = makeContextEditMode({ loadStylesheet });
-        app.provide(CONTEXT_EDIT_MODE, contextEditMode);
-
-        const { loadPage } = contextCachePage;
-        const { registerComponent } = contextComponentRegistry;
         const contextRouter = makeContextRouter({
-            loadPage,
-            registerComponent,
+            contextCachePage,
+            contextComponentRegistry,
         });
         app.provide(CONTEXT_ROUTER, contextRouter);
 
-        const { currentPath, page } = contextRouter;
-        const { isInEditMode } = contextEditMode;
+        const contextEditMode = makeContextEditMode({
+            contextCachePage,
+            contextComponentRegistry,
+            contextRouter,
+            loadStylesheet,
+            serviceComponent,
+            servicePage,
+        });
+        app.provide(CONTEXT_EDIT_MODE, contextEditMode);
 
+        const { currentPath, page: currentPage } = contextRouter;
+        const {
+            activateChapter,
+            addChapter,
+            disableEditMode,
+            editedChapter,
+            editedPage,
+            isInEditMode,
+            saveComponent,
+            savePage,
+            setEditedChapter,
+            updateChapter,
+        } = contextEditMode;
+        const page = computed(() => isInEditMode.value ? editedPage.value : currentPage.value);
         const { components } = contextComponentRegistry;
-        const layoutComponent = computed(() => {
-            return page.value ? components[page.value.layout] : null;
-        });
-
-        const areas = computed(() => {
-            if (!page.value) return null;
-
-            const areas = {};
-
-            for (const area of page.value.areas) {
-                areas[area.area] = {
-                    components: area.components,
-                };
-            }
-
-            return areas;
-        });
+        const layoutComponent = computed(() => components[page.value.layout.id]);
 
         return {
-            areas,
+            activateChapter,
+            addChapter,
             currentPath,
+            disableEditMode,
+            editedChapter,
             isInEditMode,
             layoutComponent,
+            page,
+            saveComponent,
+            savePage,
+            setEditedChapter,
+            updateChapter,
         }
     },
     template: `
         <div>
-            <flow-toolbar v-if="isInEditMode"/>
+            <flow-toolbar
+                v-if="isInEditMode"
+                :chapter="editedChapter"
+                @disable-chapter-edit-mode="setEditedChapter(null)"
+                @disable-edit-mode="disableEditMode"
+                @save-component="saveComponent"
+                @save-page="savePage(page)"
+                @update-chapter="updateChapter"
+            />
             <component
+                v-if="page"
                 :is="layoutComponent"
                 :key="currentPath"
-                :areas="areas"
+                :areas="page.areas"
+                @add-chapter="addChapter"
+                @enable-chapter-edit-mode="setEditedChapter"
             />
         </div>
     `,

@@ -18,7 +18,7 @@ export default {
                 <div>
                     <flow-area
                         name="center"
-                        :area-components="areas.center.components"
+                        :chapters="areas.center.chapters"
                     />
                 </div>
             </div>
