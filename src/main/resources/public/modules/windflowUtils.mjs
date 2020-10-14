@@ -132,9 +132,9 @@ export const withRetryHandling = (callback, {
 
 /** Assemble component URL **/
 
-function assembleComponentUrl({ namespacedName, type }) {
+function assembleComponentUrl({ id, type }) {
     const endpoint = COMPONENT_ENDPOINTS[type];
-    const parts = [endpoint, namespaceOnly(namespacedName), `${removeNamespace(namespacedName)}.mjs`];
+    const parts = [endpoint, namespaceOnly(id), `${removeNamespace(id)}.mjs`];
 
     return parts.join('/');
 }
@@ -239,22 +239,56 @@ export function makeApi({ http }) {
 
 /** Service: Component */
 
-// REFACTOR
-// - Rename "makeServiceComponent" so make functions are grouped by type.
-export function makeComponentService({ api, host }) {
+const componentServiceAdapter = {
+    adaptForApi({ data }) {
+        return data.sfc;
+    },
+    adaptForApp({ data, id, type }) {
+        return {
+            code: data,
+            id,
+            name: removeNamespace(id),
+            sfc: data,
+            type,
+        };
+    },
+};
+
+export function makeServiceComponent({ api, host }) {
     return {
-        create({ data, name, type = COMPONENT_TYPES.default }) {
-            const namespacedName = `${host}.${name}`;
-            const url = assembleComponentUrl({ namespacedName, type });
-            return api.create(url, data);
+        async create(data) {
+            // REFACTOR
+            // Generic validator.
+            if (!data.name) throw new Error(`"name" is required!`);
+
+            const id = `${host}.${data.name}`;
+            const type = data.type || COMPONENT_TYPES.default;
+            const url = assembleComponentUrl({ id, type });
+            const newApiData = componentServiceAdapter.adaptForApi({ data });
+            const apiData = await api.create(url, newApiData);
+
+            return componentServiceAdapter.adaptForApp({ data: apiData, id, type });
         },
-        load: withRetryHandling(({ name: namespacedName, type = COMPONENT_TYPES.default }) => {
-            const url = assembleComponentUrl({ namespacedName, type });
-            return api.get(url);
+        // REFACTOR
+        // API endpoint for loading multiple components.
+        async find(ids, { type = COMPONENT_TYPES.default } = {}) {
+            return Promise.all(ids.map(id => this.findOne(id, type)));
+        },
+        findOne: withRetryHandling(async (id, { type = COMPONENT_TYPES.default } = {}) => {
+            const url = assembleComponentUrl({ id, type });
+            const apiData = await api.get(url);
+
+            return componentServiceAdapter.adaptForApp({ data: apiData, id, type });
         }),
-        update({ data, name: namespacedName, type = COMPONENT_TYPES.default }) {
-            const url = assembleComponentUrl({ namespacedName, type });
-            return api.update(url, data);
+        async update(id, data) {
+            if (!data.name) throw new Error(`"name" is required!`);
+
+            const type = data.type || COMPONENT_TYPES.default;
+            const url = assembleComponentUrl({ id, type });
+            const newApiData = componentServiceAdapter.adaptForApi({ data });
+            const apiData = await api.update(url, newApiData);
+
+            return componentServiceAdapter.adaptForApp({ data: apiData, id, type });
         },
     };
 }
@@ -262,216 +296,134 @@ export function makeComponentService({ api, host }) {
 /** Service: Page */
 
 const PAGE_SERVICE_ENDPOINT = '/api/pages';
+const pageServiceAdapter = {
+    adaptForApi({ data }) {
+        const areas = [];
+        const componentsData = {};
 
-export function makePageService({ api, host }) {
+        for (const [areaName, area] of Object.entries(data.areas)) {
+            const apiArea = {
+                area: areaName,
+                components: [],
+            };
+
+            for (const chapter of area.chapters) {
+                componentsData[chapter.id] = chapter.data;
+                apiArea.components.push({
+                    id: chapter.id,
+                    name: chapter.component.id,
+                });
+            }
+
+            areas.push(apiArea);
+        }
+
+        return {
+            areas,
+            data: {
+                components: componentsData,
+            },
+            layout: data.layout.id,
+            metaInfo: data.metaInfo,
+        };
+    },
+    adaptForApp({ data, id, included }) {
+        const areas = {};
+
+        for (const { area: areaName, components } of data.areas) {
+            areas[areaName] = {
+                chapters: components.map(areaComponent => ({
+                    component: {
+                        id: areaComponent.name,
+                        type: COMPONENT_TYPES.default,
+                        ...(included && included.components && included.components[areaComponent.name]),
+                    },
+                    data: data.data && data.data.components && data.data.components[areaComponent.id],
+                    id: areaComponent.id,
+                })),
+                id: areaName,
+            };
+        }
+
+        return {
+            areas,
+            id,
+            layout: {
+                id: data.layout,
+            },
+            metaInfo: data.metaInfo,
+        };
+    },
+};
+
+export function makeServicePage({ api, host, serviceComponent }) {
+    const resolveIncludes = async ({ data, include }) => {
+        const included = {};
+
+        if (include.includes('components')) {
+            const componentIds = [];
+            for (const area of data.areas) {
+                for (const component of area.components) {
+                    componentIds.push(component.name);
+                }
+            }
+
+            included.components = {};
+            for (const component of await serviceComponent.find(componentIds)) {
+                included.components[component.id] = component;
+            }
+        }
+
+        return included;
+    }
+
     return {
-        load: withRetryHandling(({ path }) => {
-            return api.get(`${PAGE_SERVICE_ENDPOINT}/${host}${path}`);
+        findOne: withRetryHandling(async (id, { include = [] } = {}) => {
+            const apiData = await api.get(`${PAGE_SERVICE_ENDPOINT}/${host}${id}`);
+
+            return pageServiceAdapter.adaptForApp({
+                data: apiData,
+                id,
+                included: await resolveIncludes({ data: apiData, include }),
+            });
         }),
-        update({ data, path }) {
-            return api.update(`${PAGE_SERVICE_ENDPOINT}/${host}${path}`, data);
+        findCurrent(options) {
+            const id = window.location.pathname;
+
+            return this.findOne(id, options);
         },
-    };
-}
+        async update(id, data, { include = [] }) {
+            const newApiData = pageServiceAdapter.adaptForApi({ data });
+            const apiData = await api.update(`${PAGE_SERVICE_ENDPOINT}/${host}${id}`, newApiData);
 
-/** Context: Component Cache **/
-
-export function makeContextCacheComponent({ componentService, registerUpdatedComponent }) {
-    // REFACTOR
-    // - Make this bullet proof.
-    const createComponentFromCode = (code) => {
-        const component = eval(`${code.replace('export default ', '(() => (')}))()`);
-        return component;
-    }
-
-    const makeNewComponent = ({ name }) => {
-        return `export default {
-    name: '${name}',
-    props: {
-        heading: {
-            default: 'Hello World',
-            type: String,
+            return pageServiceAdapter.adaptForApp({
+                data: apiData,
+                id,
+                included: await resolveIncludes({ data: apiData, include }),
+            });
         },
-        paragraph: {
-            default: 'Lorem Ipsum',
-            type: String,
-        },
-    },
-    schema: {
-        heading: {
-            type: 'text',
-            label: 'Heading',
-        },
-        paragraph: {
-            type: 'textarea',
-            label: 'Paragraph',
-        },
-    },
-    template: \`
-        <div class="max-w-screen-xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
-            <h2 class="leading-9 font-extrabold tracking-tight text-gray-900 sm:leading-10 text-3xl">
-                {{ heading }}
-            </h2>
-            <p class="mt-2 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                {{ paragraph }}
-            </p>
-        </div>
-    \`,
-}`;
-    }
-
-    const addComponent = ({ data, name }) => {
-        mutateComponent({ data, name });
-        const component = createComponentFromCode(data)
-        registerUpdatedComponent({ component, name });
-
-        return componentService.create({ data, name });
-    };
-
-    const addDefaultComponent = ({ name }) => {
-        const data = makeNewComponent({ name });
-        return addComponent({ data, name });
-    };
-
-    const loadComponent = (options) => {
-        // REFACTOR
-        // - Make this generic and add an ID for each service.
-        const params = isRef(options) ? options : computed(typeof options === 'function' ? options : () => options);
-        return useSwr(() => params.value.name && JSON.stringify({ name: params.value.name }), paramString => componentService.load(JSON.parse(paramString)));
-    };
-
-    const mutateComponent = ({ data, name }) => {
-        // REFACTOR
-        // - Make this generic and add an ID for each service.
-        mutate(JSON.stringify({ name }), data);
-    };
-
-    const updateComponent = ({ data, name }) => {
-        mutateComponent({ data, name });
-        const component = createComponentFromCode(data)
-        registerUpdatedComponent({ component, name });
-
-        return componentService.update({ data, name });
-    };
-
-    return {
-        addDefaultComponent,
-        loadComponent,
-        mutateComponent,
-        updateComponent,
     };
 }
 
 /** Context: Page Cache **/
 
-export function makeContextCachePage({ pageService }) {
-    const stagedComponentData = reactive({});
-
+export function makeContextCachePage({ servicePage }) {
     const loadPage = (options) => {
         // REFACTOR
         // - Make this generic and add an ID for each service.
         const params = isRef(options) ? options : computed(typeof options === 'function' ? options : () => options);
-        const cache = useSwr(() => params.value.path && JSON.stringify({ path: params.value.path }), paramString => pageService.load(JSON.parse(paramString)));
-
-        return {
-            ...cache,
-            data: computed(() => {
-                if (!cache.data.value) return cache.data.value;
-
-                return {
-                    ...cache.data.value,
-                    data: {
-                        ...cache.data.value.data,
-                        components: {
-                            ...cache.data.value.data.components,
-                            ...stagedComponentData,
-                        },
-                    },
-                };
-            }),
-        };
+        return useSwr(() => params.value && JSON.stringify(params.value), paramString => servicePage.findOne(JSON.parse(paramString)));
     };
 
-    const mutatePage = ({ data, path }) => {
+    const mutatePage = (id, data) => {
         // REFACTOR
         // - Make this generic and add an ID for each service.
-        mutate(JSON.stringify({ path }), data);
-    };
-
-    const updatePage = ({ data, path }) => {
-        mutatePage({ data, path });
-        return pageService.update({ data, path });
-    };
-
-    const loadComponentData = (options) => {
-        // REFACTOR
-        // - Make this generic and add an ID for each service.
-        const params = isRef(options) ? options : computed(typeof options === 'function' ? options : () => options);
-        const cache = loadPage(params);
-        const componentData = computed(() => {
-            return cache.data.value && cache.data.value.data && cache.data.value.data.components;
-        });
-        const data = computed(() => componentData.value && componentData.value[params.value.id]);
-
-        return {
-            ...cache,
-            data,
-        };
-    };
-
-    const updateComponentData = async ({ path }) => {
-        const oldData = await pageService.load({ path });
-        const data = {
-            ...oldData,
-            data: {
-                ...oldData.data,
-                components: {
-                    ...oldData.data.components,
-                    ...stagedComponentData,
-                },
-            },
-        };
-        const result = await updatePage({ data, path });
-
-        for (const componentDataId of Object.keys(data.data.components)) {
-            delete stagedComponentData[componentDataId];
-        }
-
-        return result;
-    };
-
-    const commitComponentData = ({ data, id }) => {
-        stagedComponentData[id] = data;
-    };
-
-    const addAreaComponent = async ({ areaComponent, areaName, path }) => {
-        const oldData = await pageService.load({ path });
-        const areasWithNew = oldData.areas.map((area) => {
-            if (area.area !== areaName) return area;
-
-            return {
-                ...area,
-                components: [
-                    ...area.components,
-                    areaComponent,
-                ]
-            }
-        });
-        const data = {
-            ...oldData,
-            areas: areasWithNew,
-        };
-
-        return updatePage({ data, path });
+        mutate(JSON.stringify({ id }), data);
     };
 
     return {
-        addAreaComponent,
-        commitComponentData,
-        loadComponentData,
         loadPage,
         mutatePage,
-        updateComponentData,
     };
 }
 
@@ -484,26 +436,77 @@ export function makeContextComponentRegistry() {
 
     return {
         components: readonly(components),
-        async registerComponent({ name, type }) {
-            const url = assembleComponentUrl({
-                namespacedName: name,
-                type,
-            });
-
-            components[name] = markRaw((await import(url)).default);
-        },
-        registerUpdatedComponent({ component, name }) {
-            components[name] = markRaw(component);
+        async registerComponent(id, { type = COMPONENT_TYPES.default, bustCache = false } = {}) {
+            const cacheBustSuffix = bustCache ? `?cache-buster=${Date.now()}` : '';
+            const url = `${assembleComponentUrl({ id, type })}${cacheBustSuffix}`;
+            components[id] = markRaw((await import(url)).default);
         },
     };
 }
 
 /** Context: Edit Mode **/
 
-export function makeContextEditMode({ loadStylesheet }) {
+const makeNewSfc = (name) => {
+    return `export default {
+name: '${name}',
+props: {
+    heading: {
+        default: 'Hello World',
+        type: String,
+    },
+    paragraph: {
+        default: 'Lorem Ipsum',
+        type: String,
+    },
+},
+schema: {
+    heading: {
+        type: 'text',
+        label: 'Heading',
+    },
+    paragraph: {
+        type: 'textarea',
+        label: 'Paragraph',
+    },
+},
+template: \`
+    <div class="max-w-screen-xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
+        <h2 class="leading-9 font-extrabold tracking-tight text-gray-900 sm:leading-10 text-3xl">
+            {{ heading }}
+        </h2>
+        <p class="mt-2 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
+            {{ paragraph }}
+        </p>
+    </div>
+\`,
+}`;
+}
+
+export function makeContextEditMode({
+    contextCachePage,
+    contextComponentRegistry,
+    contextRouter,
+    loadStylesheet,
+    serviceComponent,
+    servicePage,
+}) {
     const state = reactive({
-        activeAreaComponent: null,
+        editedChapterId: null,
+        editedPage: null,
         isInEditMode: null,
+    });
+    const editedChapter = computed(() => {
+        if (!state.editedChapterId) return null;
+
+        // REFACTOR
+        // Abstraction for such for of loops everywhere.
+        for (const { chapters } of Object.values(state.editedPage.areas)) {
+            for (const chapter of chapters) {
+                if (chapter.id === state.editedChapterId) return chapter;
+            }
+        }
+
+        throw new Error(`Chapter with ID "${state.editedChapterId}" not found!`);
     });
 
     const loadEditModeAssets = async () => {
@@ -513,19 +516,89 @@ export function makeContextEditMode({ loadStylesheet }) {
         ]);
     }
 
-    const editAreaComponent = (areaComponent) => {
-        state.activeAreaComponent = areaComponent;
+    const setEditedChapter = (chapter) => {
+        state.editedChapterId = chapter && chapter.id;
+    };
+
+    const updateChapter = (chapter) => {
+        for (const area of Object.values(state.editedPage.areas)) {
+            const originalChapter = area.chapters.find(({ id }) => id === chapter.id);
+            if (!originalChapter) continue;
+
+            Object.assign(originalChapter, chapter);
+            return;
+        }
+    };
+
+    const addComponent = async (componentPartial) => {
+        const component = await serviceComponent.create(componentPartial);
+        await contextComponentRegistry.registerComponent(component.id, { type: component.type });
+
+        return component;
+    };
+
+    const addChapter = async (areaName, chapterPartial) => {
+        const chapter = {
+            data: null,
+            id: `NEW_CHAPTER_${Date.now()}`,
+            ...chapterPartial,
+        };
+
+        if (!chapterPartial.component.id) {
+            const component = await addComponent({
+                sfc: makeNewSfc(chapterPartial.component.name),
+                type: COMPONENT_TYPES.default,
+                ...chapterPartial.component,
+            });
+            chapter.component = component;
+        }
+
+        state.editedPage.areas[areaName].chapters.push(chapter);
+    };
+
+    const saveComponent = async (data) => {
+        const component = await serviceComponent.update(data.id, data);
+
+        for (const { chapters } of Object.values(state.editedPage.areas)) {
+            for (const chapter of chapters) {
+                if (chapter.component.id !== component.id) continue;
+                Object.assign(chapter.component, component);
+            }
+        }
+
+        await contextComponentRegistry.registerComponent(component.id, {
+            type: component.type,
+            bustCache: true,
+        });
+    };
+
+    const savePage = async (data) => {
+        contextCachePage.mutatePage(data.id, data);
+        state.editedPage = await servicePage.update(data.id, data, { include: ['components'] });
+    };
+
+    const loadEditedPage = async () => {
+        state.editedPage = await servicePage.findCurrent({ include: ['components'] });
+        state.editedChapterId = null;
     };
 
     const enableEditMode = async () => {
-        if (state.isInEditMode === null) await loadEditModeAssets();
+        const isEnabledForTheFirstTime = state.isInEditMode === null;
+        if (isEnabledForTheFirstTime) {
+            contextRouter.beforeEach(loadEditedPage);
+            await loadEditModeAssets();
+        }
 
         window.location.hash = editModeHash;
+        await loadEditedPage();
         state.isInEditMode = true;
     };
 
     const disableEditMode = async () => {
         history.replaceState(null, null, ' ');
+        // REFACTOR
+        // Show wraning before dismissing unsaved changes.
+        state.editedPage = null;
         state.isInEditMode = false;
     };
 
@@ -539,15 +612,23 @@ export function makeContextEditMode({ loadStylesheet }) {
 
     return {
         ...toRefs(state),
+        addChapter,
         disableEditMode,
-        editAreaComponent,
+        editedChapter,
         enableEditMode,
+        saveComponent,
+        savePage,
+        setEditedChapter,
+        updateChapter,
     };
 }
 
 /** Context: Router **/
 
-export function makeContextRouter({ loadPage, registerComponent }) {
+export function makeContextRouter({
+    contextCachePage,
+    contextComponentRegistry,
+}) {
     const listeners = [];
     let previousPath = null;
     const currentPath = ref(window.location.pathname);
@@ -563,20 +644,22 @@ export function makeContextRouter({ loadPage, registerComponent }) {
         goTo(path);
     };
 
+    const beforeEach = callback => listeners.push(callback);
+
     window.addEventListener('popstate', () => {
         goTo(window.location.pathname);
     });
 
-    const getComponentDescriptionsForPage = (page) => {
+    const getAllComponentsForPage = (page) => {
         const componentDescriptions = [{
-            name: page.layout,
+            id: page.layout.id,
             type: COMPONENT_TYPES.layout,
         }];
 
-        for (const area of page.areas) {
-            for (const component of area.components) {
+        for (const area of Object.values(page.areas)) {
+            for (const chapter of area.chapters) {
                 componentDescriptions.push({
-                    name: component.name,
+                    id: chapter.component.id,
                     type: COMPONENT_TYPES.default,
                 });
             }
@@ -613,7 +696,7 @@ export function makeContextRouter({ loadPage, registerComponent }) {
 
     // REFACTOR
     // - Make use of promises and wait until resolved and registered before returning data.
-    const { data, error } = loadPage(() => ({ path: currentPath.value }));
+    const { data, error } = contextCachePage.loadPage(() => currentPath.value);
     const registerError = ref(null);
 
     watch(data, () => {
@@ -627,8 +710,10 @@ export function makeContextRouter({ loadPage, registerComponent }) {
             document.documentElement.lang = data.value.metaInfo.htmlAttrs.lang;
 
             registerError.value = null;
-            const componentDescriptions = getComponentDescriptionsForPage(data.value);
-            componentDescriptions.forEach(registerComponent);
+            const components = getAllComponentsForPage(data.value);
+            components.forEach(({ id, type }) => contextComponentRegistry.registerComponent(id, {
+                type,
+            }));
         } catch (error) {
             console.error(error);
             registerError.value = markRaw(error);
@@ -642,6 +727,7 @@ export function makeContextRouter({ loadPage, registerComponent }) {
     })
 
     return {
+        beforeEach,
         currentPath,
         page,
         push,
