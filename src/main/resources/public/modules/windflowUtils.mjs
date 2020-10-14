@@ -525,7 +525,7 @@ export function makeContextEditMode({ loadStylesheet }) {
     };
 
     const disableEditMode = async () => {
-        window.location.hash = '';
+        history.replaceState(null, null, ' ');
         state.isInEditMode = false;
     };
 
