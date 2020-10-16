@@ -2,7 +2,10 @@ import {
     computed,
     getCurrentInstance,
     inject,
+    onUnmounted,
+    onUpdated,
     ref,
+    watchEffect,
 } from '../vendor/vue3/vue.esm-browser.js';
 import {
     CONTEXT_COMPONENT_REGISTRY,
@@ -10,9 +13,13 @@ import {
     CONTEXT_ROUTER,
 } from '../app/app.mjs';
 import {
+    arrayMoveIndex,
     loadEditor,
     useDrag,
 } from './windflowUtils.mjs';
+
+// REFACTOR
+import '../vendor/popperjs/popperjs-2.5.3.js';
 
 export const FlowButton = {
     name: 'FlowButton',
@@ -436,7 +443,7 @@ export const FlowToolbar = {
     },
     template: `
         <div
-            class="fixed z-30 bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all text-gray-700 max-w-xl"
+            class="fixed z-50 bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all text-gray-700 max-w-xl"
             style="left:calc(100% - 380px);top:50px;"
             ref="$root"
         >
@@ -553,18 +560,109 @@ export const FlowAreaChapter = {
             default: null,
             type: Object,
         },
+        hasOverlay: {
+            default: false,
+            type: Boolean,
+        },
+        isFirst: {
+            default: false,
+            type: Boolean,
+        },
+        isLast: {
+            default: false,
+            type: Boolean,
+        },
     },
     setup(props) {
         const { components } = inject(CONTEXT_COMPONENT_REGISTRY);
         const renderComponent = computed(() => components[props.component.id]);
 
-        return { renderComponent };
+        const $overlay = ref(null);
+        const $root = ref(null);
+
+        // REFACTOR
+        // Only load and initialize popper when in edit mode.
+        const overlay = {
+            name: 'overlay',
+            enabled: true,
+            phase: 'beforeWrite',
+            requires: ['computeStyles'],
+            fn: ({ state }) => {
+              state.styles.popper.width = `${state.rects.reference.width}px`;
+              state.styles.popper.height = `${state.rects.reference.height}px`;
+              state.styles.popper.marginTop = `-${state.rects.reference.height}px`;
+            },
+            effect: ({ state }) => {
+              state.elements.popper.style.width = `${state.elements.reference.offsetWidth}px`;
+              state.elements.popper.style.height = `${state.elements.reference.offsetHeight}px`;
+              state.elements.popper.style.marginTop = `-${state.elements.reference.offsetHeight}px`;
+            }
+        };
+
+        let popperInstance = null;
+        watchEffect(() => {
+            if (!$overlay.value) return;
+
+            popperInstance = Popper.createPopper($root.value, $overlay.value, {
+                modifiers: [
+                    {
+                        name: 'flip',
+                        enabled: false,
+                    },
+                    overlay,
+                ],
+                placement: 'bottom-end',
+            });
+        });
+
+        onUnmounted(() => {
+            if (!popperInstance) return;
+            popperInstance.destroy();
+        });
+
+        onUpdated(() => {
+            if (!popperInstance) return;
+            popperInstance.forceUpdate();
+        });
+
+        return {
+            $overlay,
+            $root,
+            renderComponent,
+        };
     },
     template: `
-        <component
-            :is="renderComponent"
-            v-bind="data"
-        />
+        <div ref="$root">
+            <div
+                v-if="hasOverlay"
+                ref="$overlay"
+                class="opacity-0 hover:opacity-100 hover:bg-blue-700 hover:bg-opacity-50 transition duration-200 z-40"
+            >
+                <div class="inline-flex bg-blue-700 text-white leading-none text-xs">
+                    <div class="p-2 border-r border-white">
+                        {{ renderComponent && renderComponent.name }}
+                    </div>
+                    <button
+                        v-if="!isFirst"
+                        class="p-2 border-r border-white"
+                        @click="$emit('move-up')"
+                    >
+                        Up
+                    </button>
+                    <button
+                        v-if="!isLast"
+                        class="p-2"
+                        @click="$emit('move-down')"
+                    >
+                        Down
+                    </button>
+                </div>
+            </div>
+            <component
+                :is="renderComponent"
+                v-bind="data"
+            />
+        </div>
     `,
 }
 
@@ -585,7 +683,7 @@ export const FlowArea = {
             type: String,
         },
     },
-    setup() {
+    setup(props) {
         const { isInEditMode } = inject(CONTEXT_EDIT_MODE);
         const newComponentName = ref(null);
         const newChapter = computed(() => ({
@@ -593,22 +691,35 @@ export const FlowArea = {
                 name: newComponentName.value,
             },
         }));
+        const chapterIds = computed(() => props.chapters.map(chapter => chapter.id));
 
         return {
+            arrayMoveIndex,
+            chapterIds,
             isInEditMode,
             newChapter,
             newComponentName,
         };
     },
     template: `
+        <!--
+          Emitting events directly on the parent component (layout) so layouts
+          don't have to pass through the event which makes it easier for our
+          users to create their own layouts without knowing about this
+          implementation detail.
+        -->
         <div>
             <flow-area-chapter
-                v-for="chapter in chapters"
+                v-for="(chapter, index) in chapters"
                 :key="chapter.id"
                 :component="chapter.component"
                 :data="chapter.data"
-                :style="isInEditMode && 'outline: rgba(0, 0, 0, 0.3) dashed 1px;'"
+                :has-overlay="isInEditMode"
+                :is-first="index === 0"
+                :is-last="index === chapters.length - 1"
                 @click="isInEditMode && $parent.$emit('enable-chapter-edit-mode', chapter)"
+                @move-down="$parent.$emit('reorder-chapters', name, arrayMoveIndex(chapterIds, index, index + 1))"
+                @move-up="$parent.$emit('reorder-chapters', name, arrayMoveIndex(chapterIds, index, index - 1))"
             />
             <div
                 v-if="isInEditMode"
@@ -621,12 +732,6 @@ export const FlowArea = {
                     name="new-component-name"
                     class="mr-2"
                 />
-                <!--
-                  Emitting event directly on the parent component (layout) so
-                  layouts don't have to pass through the event which makes it
-                  easier for our users to create their own layouts without
-                  knowing about this implementation detail.
-                -->
                 <flow-button @click="$parent.$emit('add-chapter', name, newChapter)">
                     Add new component
                 </flow-button>

@@ -65,6 +65,22 @@ export const loadScript = (url, globalName = null) => {
     });
 }
 
+export function arrayMoveIndex(array, fromIndex, toIndex) {
+    const result = [];
+    const shift = toIndex - fromIndex > 0 ? 1 : -1;
+    const start = toIndex < fromIndex ? toIndex : fromIndex;
+    const end = start < toIndex ? toIndex : fromIndex;
+
+    for (let index = 0; index < array.length; index++) {
+      const offset = index >= start && index <= end ? shift : 0;
+      result[index] = array[index + offset];
+    }
+
+    result[toIndex] = array[fromIndex];
+
+    return result;
+}
+
 /** Load Stylesheet **/
 
 export const loadStylesheet = (url) => {
@@ -556,6 +572,11 @@ export function makeContextEditMode({
         state.editedPage.areas[areaName].chapters.push(chapter);
     };
 
+    const reorderChapters = (areaName, chapterIds) => {
+        const area = state.editedPage.areas[areaName];
+        area.chapters = chapterIds.map(chapterId => area.chapters.find(chapter => chapter.id === chapterId));
+    };
+
     const saveComponent = async (data) => {
         const component = await serviceComponent.update(data.id, data);
 
@@ -616,6 +637,7 @@ export function makeContextEditMode({
         disableEditMode,
         editedChapter,
         enableEditMode,
+        reorderChapters,
         saveComponent,
         savePage,
         setEditedChapter,
