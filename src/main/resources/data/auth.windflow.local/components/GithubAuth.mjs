@@ -7,6 +7,7 @@ export default {
     data() {
         return {
             github_extension_url: 'http://auth.windflow.local:8080/api/auth/github',
+            github_token_exchange_url: 'http://auth.windflow.local:8080/api/auth/github/exchange'
         }
     },
     template: `
@@ -24,9 +25,11 @@ export default {
         </div>
     `,
     mounted() {
-        let gitHubToken = this.getCookieValue("github_token");
+        let gitHubToken = this.getCookieValue("token_exchange");
         if (gitHubToken) {
-
+            fetch(this.github_token_exchange_url)
+                .then(r => r.json())
+                .then(data => console.log(data));
         } else {
 
         }

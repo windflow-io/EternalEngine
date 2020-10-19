@@ -87,6 +87,7 @@ public class OpenIdExtension<T extends Plugin> extends Plugin implements Request
                 Cookie githubCookie = new Cookie("github_token", token);
                 githubCookie.setPath("/");
                 githubCookie.setMaxAge(604800); // 1 week
+                githubCookie.setDomain("");
                 response.addCookie(githubCookie);
 
                 try {

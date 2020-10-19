@@ -1,4 +1,4 @@
-package io.windflow.eternalengine.utils;
+package io.windflow.eternalengine.beans.dto;
 
 import io.windflow.eternalengine.error.WindflowError;
 

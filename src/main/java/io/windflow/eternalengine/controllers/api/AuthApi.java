@@ -2,12 +2,15 @@ package io.windflow.eternalengine.controllers.api;
 
 import io.windflow.eternalengine.beans.GithubTokenResponse;
 import io.windflow.eternalengine.beans.GithubUser;
+import io.windflow.eternalengine.beans.dto.Token;
 import io.windflow.eternalengine.entities.EternalEngineUser;
+import io.windflow.eternalengine.entities.Session;
 import io.windflow.eternalengine.error.WindflowError;
 import io.windflow.eternalengine.error.WindflowWebException;
 
+import io.windflow.eternalengine.persistence.SessionRepository;
 import io.windflow.eternalengine.persistence.UserRepository;
-import io.windflow.eternalengine.utils.HttpError;
+import io.windflow.eternalengine.beans.dto.HttpError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -16,12 +19,16 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @PropertySource({"classpath:secret.properties","classpath:openid.properties"})
@@ -36,6 +43,9 @@ public class AuthApi {
     @Value("${io.windflow.auth.github_auth_domain}")
     String GITHUB_CALLBACK_DOMAIN;
 
+    @Value("${io.windflow.auth.cookiedomain}")
+    String GITHUB_COOKIE_DOMAIN;
+
     final String GITHUB_ALLOW_SIGNUP = "true";
     final String SCOPE = "read:user+user:email";
 
@@ -43,9 +53,11 @@ public class AuthApi {
     private final String GITHUB_TOKEN_URL = "https://github.com/login/oauth/access_token";
 
     private UserRepository userRepository;
+    private SessionRepository sessionRepository;
 
-    public AuthApi(@Autowired UserRepository userRepository) {
+    public AuthApi(@Autowired UserRepository userRepository, @Autowired SessionRepository sessionRepository) {
         this.userRepository = userRepository;
+        this.sessionRepository = sessionRepository;
     }
 
     @GetMapping("/api/auth/github")
@@ -76,42 +88,81 @@ public class AuthApi {
     @GetMapping("/api/auth/github/callback")
     public void receiveUserFromGitHub(HttpServletRequest request, HttpServletResponse response) throws WindflowWebException {
 
-        if (request.getParameter("error") != null) {
-            String errorString = request.getParameter("error") + ": " + request.getParameter("error_description");
-            throw new WindflowWebException(WindflowError.ERROR_009, errorString);
-        }
-
         final String GITHUB_CALLBACK_URL = GITHUB_CALLBACK_DOMAIN + "/api/auth/github/callback";
         final String code = request.getParameter("code");
         final String tokenUrl = GITHUB_TOKEN_URL + "?client_id=" + GITHUB_CLIENT_ID + "&client_secret=" + GITHUB_CLIENT_SECRET + "&code=" + code + "&redirect_uri=" + GITHUB_CALLBACK_URL;
 
-        RestTemplate template = new RestTemplate();
-        GithubTokenResponse token = template.getForObject(tokenUrl, GithubTokenResponse.class);
-        if (token == null) throw new WindflowWebException(WindflowError.ERROR_009, "No response to token request");
-        if (token.getError() != null) {
-            throw new WindflowWebException(WindflowError.ERROR_009, token.getError() + ": " + token.getErrorDescription());
-        }
-
-
+        checkForErrors(request);
+        GithubTokenResponse token = fetchToken(tokenUrl);
         GithubUser githubUser = fetchUserData(token.getAccessToken());
-        Optional<EternalEngineUser> optUser = userRepository.findByEmail(githubUser.getEmail());
-        EternalEngineUser user;
-
-        if (optUser.isPresent()) {
-            user = optUser.get();
-        } else {
-            user = EternalEngineUser.createFromGithubUser(githubUser);
-            userRepository.save(user);
-        }
-
-        /* @TODO: CREATE A SESSION HERE AND RETURN A SESSION ID - THAT SESSION SHOULD INCLUDE IP, EXPIRY, ETC */
+        EternalEngineUser user = createOrFetchUser(githubUser);
+        Session session = sessionRepository.save(new Session(user.getId(), request.getRemoteAddr()));
 
         try {
+            response.addCookie(createCookie(session.getId()));
             response.sendRedirect(request.getParameter("state"));
         } catch (IOException ex) {
             throw new WindflowWebException(WindflowError.ERROR_001, "Could not send redirect", ex);
         }
 
+    }
+
+    @GetMapping("/api/auth/github/exchange")
+    private EternalEngineUser tokenExchange(HttpServletRequest request, HttpServletResponse response) {
+        Cookie cookie = Arrays.stream(request.getCookies()).filter(t -> "token_exchange".equals(t.getName())).findFirst().get();
+        String value = cookie.getValue();
+        String decoded = new String (Base64.getDecoder().decode(value));
+        Optional<Session> optSession = sessionRepository.findById(UUID.fromString(decoded));
+        if (optSession.isPresent()) {
+            String sessionIp = optSession.get().getClientIp();
+            UUID userId = optSession.get().getUserId();
+            System.out.println("Looking for " + userId);
+            String userIp = request.getRemoteAddr();
+            if (sessionIp != null && sessionIp.equals(userIp)) {
+                Optional<EternalEngineUser> user = userRepository.findById(userId);
+
+                if (user.isPresent()) {
+                    return (user.get());
+                } else {
+                    throw new WindflowWebException(WindflowError.ERROR_009, "No such user");
+                }
+            } else {
+                throw new WindflowWebException(WindflowError.ERROR_009, "Authorization Failed");
+            }
+        } else {
+            throw new WindflowWebException(WindflowError.ERROR_009, "Session not found");
+        }
+    }
+
+    private EternalEngineUser createOrFetchUser(GithubUser githubUser) {
+        Optional<EternalEngineUser> optUser = userRepository.findByEmail(githubUser.getEmail());
+
+        if (optUser.isPresent()) {
+            return optUser.get();
+        } else {
+            return userRepository.save(EternalEngineUser.createFromGithubUser(githubUser));
+        }
+    }
+
+    private GithubTokenResponse fetchToken(String tokenUrl) {
+
+        RestTemplate template = new RestTemplate();
+        GithubTokenResponse token = template.getForObject(tokenUrl, GithubTokenResponse.class);
+        if (token == null) throw new WindflowWebException(WindflowError.ERROR_010, "No response to token request");
+        if (token.getError() != null) {
+            throw new WindflowWebException(WindflowError.ERROR_010, token.getError() + ": " + token.getErrorDescription());
+        }
+        return token;
+
+    }
+
+    /* private methods */
+
+    private void checkForErrors(HttpServletRequest request) {
+        if (request.getParameter("error") != null) {
+            String errorString = request.getParameter("error") + ": " + request.getParameter("error_description");
+            throw new WindflowWebException(WindflowError.ERROR_010, errorString);
+        }
     }
 
     private GithubUser fetchUserData(String token) {
@@ -122,6 +173,16 @@ public class AuthApi {
         ResponseEntity<GithubUser> userInfoEntity = new RestTemplate().exchange(userInfoUrl, HttpMethod.GET, entity, GithubUser.class);
         return userInfoEntity.getBody();
     }
+
+    private Cookie createCookie(UUID uuid) {
+        Cookie cookie = new Cookie("token_exchange", Base64.getEncoder().encodeToString(uuid.toString().getBytes()));
+        cookie.setDomain(GITHUB_COOKIE_DOMAIN);
+        cookie.setPath("/");
+        cookie.setMaxAge(30);
+        return cookie;
+    }
+
+    /* Error handling */
 
     @ExceptionHandler(WindflowWebException.class)
     @ResponseBody

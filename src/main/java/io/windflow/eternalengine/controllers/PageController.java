@@ -4,7 +4,7 @@ import io.windflow.eternalengine.entities.Page;
 import io.windflow.eternalengine.error.WindflowError;
 import io.windflow.eternalengine.error.WindflowNotFoundException;
 import io.windflow.eternalengine.persistence.PageRepository;
-import io.windflow.eternalengine.utils.HttpError;
+import io.windflow.eternalengine.beans.dto.HttpError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

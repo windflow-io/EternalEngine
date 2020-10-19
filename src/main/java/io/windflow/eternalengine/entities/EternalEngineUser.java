@@ -1,6 +1,7 @@
 package io.windflow.eternalengine.entities;
 
 import io.windflow.eternalengine.beans.GithubUser;
+import io.windflow.eternalengine.utils.JsonStringifiable;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -8,7 +9,7 @@ import javax.persistence.Id;
 import java.util.UUID;
 
 @Entity
-public class EternalEngineUser {
+public class EternalEngineUser extends JsonStringifiable {
 
     @Id
     @GeneratedValue

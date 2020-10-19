@@ -12,7 +12,8 @@ public enum WindflowError {
     ERROR_006("Corrupt Page Data", "Cannot Parse JSON page data"),
     ERROR_007("Component Not Found", "Missing component"),
     ERROR_008("Authentication Error", "Redirects to an authentication provider must have a referer"),
-    ERROR_009("GitHub Authentication Failed", "GitHub returned an error");
+    ERROR_009("Authorization Error", "Token verification failed"),
+    ERROR_010("GitHub Authentication Failed", "GitHub returned an error");
 
     String title;
     String description;
