@@ -51,7 +51,6 @@ public class AuthService {
         if (optSession.isPresent()) {
             String sessionIp = optSession.get().getClientIp();
             UUID userId = optSession.get().getUserId();
-            System.out.println("Looking for " + userId);
             if (sessionIp != null && sessionIp.equals(userIp)) {
                 Optional<EternalEngineUser> optUser = userRepository.findById(userId);
                 if (optUser.isPresent()) {

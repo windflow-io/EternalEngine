@@ -16,6 +16,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
+@Deprecated
 public class OpenIdExtension<T extends Plugin> extends Plugin implements Requestable, Respondable, Actionable, Datafiable {
 
     HttpServletRequest request;
@@ -81,8 +82,6 @@ public class OpenIdExtension<T extends Plugin> extends Plugin implements Request
 
                 String userInfoUrl = "https://api.github.com/user";
                 ResponseEntity<String> userInfoEntity = template.exchange(userInfoUrl, HttpMethod.GET, entity, String.class);
-                System.out.println("USER DATA");
-                System.out.println(userInfoEntity.getBody());
 
                 Cookie githubCookie = new Cookie("github_token", token);
                 githubCookie.setPath("/");

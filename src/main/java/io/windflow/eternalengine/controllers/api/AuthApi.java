@@ -1,8 +1,5 @@
 package io.windflow.eternalengine.controllers.api;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import io.windflow.eternalengine.EternalEngine;
 import io.windflow.eternalengine.beans.GithubTokenResponse;
 import io.windflow.eternalengine.beans.GithubUser;
 import io.windflow.eternalengine.beans.dto.Token;
@@ -21,7 +18,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -121,12 +117,7 @@ public class AuthApi {
 
     private EternalEngineUser createOrFetchUser(GithubUser githubUser) {
         Optional<EternalEngineUser> optUser = userRepository.findByEmail(githubUser.getEmail());
-
-        if (optUser.isPresent()) {
-            return optUser.get();
-        } else {
-            return userRepository.save(EternalEngineUser.createFromGithubUser(githubUser));
-        }
+        return optUser.orElseGet(() -> userRepository.save(EternalEngineUser.createFromGithubUser(githubUser)));
     }
 
     private GithubTokenResponse fetchToken(String tokenUrl) {
@@ -153,7 +144,7 @@ public class AuthApi {
     private GithubUser fetchUserData(String token) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "token " + token);
-        HttpEntity entity = new HttpEntity(headers);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
         String userInfoUrl = "https://api.github.com/user";
         ResponseEntity<GithubUser> userInfoEntity = new RestTemplate().exchange(userInfoUrl, HttpMethod.GET, entity, GithubUser.class);
         return userInfoEntity.getBody();

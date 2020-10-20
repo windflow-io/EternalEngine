@@ -37,17 +37,6 @@ public class ComponentController {
 
         String componentName = componentFilename.replace(".mjs", "");
 
-        /*** @TODO: WARNING - THIS IS A HACK ***/
-
-        if (componentName.equals("GithubAuth")) {
-            try {
-                logger.warn("Mark van Wyk's KAK CODE (that must be removed) is fudging in a component straight from the file system - BAD");
-                return TextFileReader.getText("data/auth.windflow.local/components/GithubAuth.mjs");
-            } catch (IOException ex) {
-                logger.error("FUDGING THE COMPONENT FAILED " + ex.getMessage());
-            }
-        }
-
         Optional<Component> optComponent = componentRepository.findByNamespaceAndComponentName(namespace, componentName);
         if (optComponent.isPresent()) {
             return optComponent.get().getJavaScript();

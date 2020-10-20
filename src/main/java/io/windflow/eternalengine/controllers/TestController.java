@@ -3,6 +3,8 @@ package io.windflow.eternalengine.controllers;
 import io.windflow.eternalengine.utils.TextFileReader;
 import io.windflow.eternalengine.entities.Page;
 import io.windflow.eternalengine.persistence.PageRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +19,8 @@ import java.util.stream.Collectors;
 @Controller
 public class TestController {
 
+    private final Logger logger = LoggerFactory.getLogger(this.getClass())
+
     PageRepository pageRepository;
 
     public TestController(@Autowired PageRepository pageRepository) {
@@ -27,7 +31,7 @@ public class TestController {
     @ResponseBody
     public String create404(HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-        System.err.println("Simulating an error 404");
+        logger.warn("Simulating an error 404");
         return "{\"error\":\"404\"}";
     }
 
@@ -35,7 +39,7 @@ public class TestController {
     @ResponseBody
     public String create500(HttpServletResponse response) {
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        System.err.println("Simulating an error 500");
+        logger.warn("Simulating an error 500");
         return "{\"error\":\"500\"}";
     }
 

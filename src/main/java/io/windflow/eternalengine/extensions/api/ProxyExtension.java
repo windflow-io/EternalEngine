@@ -24,7 +24,6 @@ public class ProxyExtension<T extends Plugin> extends Plugin implements Requesta
             for (Enumeration<?> e = request.getHeaderNames(); e.hasMoreElements();) {
                 String nextHeaderName = (String) e.nextElement();
                 String headerValue = request.getHeader(nextHeaderName);
-                System.out.println(headerValue);
             }
 
             try {
