@@ -1,4 +1,4 @@
-import { FlowArea } from '/modules/coreComponents.mjs';
+import { FlowArea } from '/modules/coreComponents.js';
 
 export default {
     name: 'LeftMenuLayout',
@@ -19,7 +19,7 @@ export default {
                     :chapters="areas.left.chapters"
                 />
             </div>
-            <div class="flex-grow bg-blue-500 bg-opacity-25 p-1 text-white">
+            <div class="flex-grow bg-blue-500 bg-opacity-25 p-1">
                 <flow-area
                     name="right"
                     :chapters="areas.right.chapters"

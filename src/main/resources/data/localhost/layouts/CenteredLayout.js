@@ -1,4 +1,4 @@
-import { FlowArea } from '/modules/coreComponents.mjs';
+import { FlowArea } from '/modules/coreComponents.js';
 
 export default {
     name: 'CenteredLayout',

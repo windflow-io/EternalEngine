@@ -1,4 +1,4 @@
-import {FlowLink} from '/modules/coreComponents.mjs'
+import {FlowLink} from '/modules/coreComponents.js'
 
 export default {
     name: 'SideMenu',

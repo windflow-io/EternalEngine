@@ -1,4 +1,4 @@
-import {FlowIcon} from "/modules/coreComponents.mjs";
+import {FlowIcon} from "/modules/coreComponents.js";
 
 /*@TODO:Get a state (nonce) from the server and compare it later. At the moment it's a MD5 hash of 'windflow.io'*/
 export default {

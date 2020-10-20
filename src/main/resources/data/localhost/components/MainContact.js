@@ -1,4 +1,4 @@
-import ContactForm from '/api/components/localhost/ContactForm.mjs';
+import ContactForm from '/api/components/localhost/ContactForm.js';
 
 export default {
     name: "MainContact",

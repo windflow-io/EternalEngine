@@ -5,7 +5,7 @@ import {
 
 import {
     FlowToolbar,
-} from '../modules/coreComponents.mjs';
+} from '../modules/coreComponents.js';
 import {
     http,
     loadStylesheet,
@@ -16,7 +16,7 @@ import {
     makeContextRouter,
     makeServiceComponent,
     makeServicePage,
-} from '../modules/windflowUtils.mjs';
+} from '../modules/windflowUtils.js';
 
 export const CONTEXT_COMPONENT_REGISTRY = Symbol();
 export const CONTEXT_CACHE_COMPONENT = Symbol();

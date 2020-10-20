@@ -14,7 +14,7 @@ Windflow Eternal Engine is for you if:
 
 <blockquote>If you would like to try Windflow Eternal Engine without installing it, go create a free developer account on our hosted service at <a href="https://windflow.io">windflow.io</a> and give it a test run.</blockquote>
 
-Client code is written in highly-readable plain-old ES6 modular JavaScript with no client-side build tools. By default index.html and app.mjs are un-opinionated. All the data, layouts, graphics, fonts, etc are/will be requested from the server. The application is then "built" on the client side.
+Client code is written in highly-readable plain-old ES6 modular JavaScript with no client-side build tools. By default index.html and app.js are un-opinionated. All the data, layouts, graphics, fonts, etc are/will be requested from the server. The application is then "built" on the client side.
 
 The process is as follows:
 

@@ -33,7 +33,7 @@ Tasks
    * Cache production
 
 PERFORMANCE OPTIMISATION:
-   * Convert all SVG icons into .mjs functional components
+   * Convert all SVG icons into .js functional components
    * Rollup.js can come later.
    * Implement PurgeCSS
    * Memcache: https://devcenter.heroku.com/articles/spring-boot-memcache

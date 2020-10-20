@@ -11,12 +11,12 @@ import {
     CONTEXT_COMPONENT_REGISTRY,
     CONTEXT_EDIT_MODE,
     CONTEXT_ROUTER,
-} from '../app/app.mjs';
+} from '../app/app.js';
 import {
     arrayMoveIndex,
     loadEditor,
     useDrag,
-} from './windflowUtils.mjs';
+} from './windflowUtils.js';
 
 // REFACTOR
 import '../vendor/popperjs/popperjs-2.5.3.js';
@@ -723,7 +723,7 @@ export const FlowArea = {
             />
             <div
                 v-if="isInEditMode"
-                style="outline: rgba(0, 0, 0, 0.3) dashed 1px;"
+                
                 class="flex p-8 justify-center items-end"
             >
                 <flow-form-field-text

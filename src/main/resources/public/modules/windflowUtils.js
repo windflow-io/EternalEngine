@@ -8,9 +8,9 @@ import {
     toRefs,
     watch,
 } from '../vendor/vue3/vue.esm-browser.js';
-import useSwr, { mutate } from '../vendor/swrv/index.mjs';
+import useSwr, { mutate } from '../vendor/swrv/index.js';
 
-import { ErrorLayout } from './coreComponents.mjs'
+import { ErrorLayout } from './coreComponents.js'
 
 const COMPONENT_TYPES = {
     default: Symbol('Identifier for regular components'),
@@ -150,7 +150,7 @@ export const withRetryHandling = (callback, {
 
 function assembleComponentUrl({ id, type }) {
     const endpoint = COMPONENT_ENDPOINTS[type];
-    const parts = [endpoint, namespaceOnly(id), `${removeNamespace(id)}.mjs`];
+    const parts = [endpoint, namespaceOnly(id), `${removeNamespace(id)}.js`];
 
     return parts.join('/');
 }

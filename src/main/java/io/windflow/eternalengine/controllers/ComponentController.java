@@ -28,14 +28,14 @@ public class ComponentController {
     /***
      * Get component from server
      * @param namespace component namespace (domain) eg: com.mysite.components
-     * @param componentFilename the filename of the component ending in .mjs
+     * @param componentFilename the filename of the component ending in .js
      * @return
      */
-    @RequestMapping(method = RequestMethod.GET, value = {"/api/components/{namespace}/{filename:^.+\\.mjs$}","/api/layouts/{namespace}/{filename:^.+\\.mjs$}"}, produces = "text/javascript")
+    @RequestMapping(method = RequestMethod.GET, value = {"/api/components/{namespace}/{filename:^.+\\.js$}","/api/layouts/{namespace}/{filename:^.+\\.js$}"}, produces = "text/javascript")
     @ResponseBody
     public String getComponent(@PathVariable("namespace") String namespace, @PathVariable("filename") String componentFilename) {
 
-        String componentName = componentFilename.replace(".mjs", "");
+        String componentName = componentFilename.replace(".js", "");
 
         Optional<Component> optComponent = componentRepository.findByNamespaceAndComponentName(namespace, componentName);
         if (optComponent.isPresent()) {
@@ -50,14 +50,14 @@ public class ComponentController {
     /***
      * Put a component on the server
      * @param namespace component namespace (domain) eg: com.mysite.components
-     * @param componentFilename the filename of the component ending in .mjs
+     * @param componentFilename the filename of the component ending in .js
      * @return
      */
-    @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST}, value = "/api/{componentType}/{namespace}/{filename:^.+\\.mjs$}", produces = "text/javascript")
+    @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST}, value = "/api/{componentType}/{namespace}/{filename:^.+\\.js$}", produces = "text/javascript")
     @ResponseBody
     public String saveComponent(@PathVariable("namespace") String componentType, @PathVariable("namespace") String namespace, @PathVariable("filename") String componentFilename, @RequestBody String javaScript) {
 
-        String componentName = componentFilename.replace(".mjs", "");
+        String componentName = componentFilename.replace(".js", "");
         Component component;
 
         Optional<Component> optComponent = componentRepository.findByNamespaceAndComponentName(namespace, componentName);
