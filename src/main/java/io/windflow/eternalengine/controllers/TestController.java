@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Controller
 public class TestController {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass())
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     PageRepository pageRepository;
 
