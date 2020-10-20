@@ -1,5 +1,7 @@
 package io.windflow.eternalengine.controllers.api;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import io.windflow.eternalengine.EternalEngine;
 import io.windflow.eternalengine.beans.GithubTokenResponse;
 import io.windflow.eternalengine.beans.GithubUser;
@@ -28,13 +30,10 @@ import javax.transaction.Transactional;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
-@PropertySource({"classpath:secret.properties","classpath:openid.properties"})
+@PropertySource("classpath:openid.properties")
 public class AuthApi {
 
     @Value("${io.windflow.auth.github_client_id}")
@@ -114,9 +113,10 @@ public class AuthApi {
 
     @GetMapping("/api/auth/github/exchange/{exchangeToken}")
     @Transactional
-    protected EternalEngineUser tokenExchange(HttpServletRequest request, HttpServletResponse response, @PathVariable("exchangeToken") String exchangeToken) {
+    protected Token tokenExchange(HttpServletRequest request, HttpServletResponse response, @PathVariable("exchangeToken") String exchangeToken) {
         String sessionId = new String (Base64.getDecoder().decode(exchangeToken));
-        return authService.exchangeToken(sessionId, request.getRemoteAddr());
+        EternalEngineUser user = authService.exchangeToken(sessionId, request.getRemoteAddr());
+        return authService.createJWT(user);
     }
 
     private EternalEngineUser createOrFetchUser(GithubUser githubUser) {

@@ -20,4 +20,5 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
     implementation 'org.slf4j:log4j-over-slf4j:1.7.30'
     implementation 'org.jasypt:jasypt:1.9.3'
+    implementation 'com.auth0:java-jwt:3.11.0'
 }
