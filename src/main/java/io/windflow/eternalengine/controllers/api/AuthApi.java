@@ -1,5 +1,6 @@
 package io.windflow.eternalengine.controllers.api;
 
+import io.windflow.eternalengine.EternalEngine;
 import io.windflow.eternalengine.beans.GithubTokenResponse;
 import io.windflow.eternalengine.beans.GithubUser;
 import io.windflow.eternalengine.beans.dto.Token;
@@ -11,6 +12,7 @@ import io.windflow.eternalengine.error.WindflowWebException;
 import io.windflow.eternalengine.persistence.SessionRepository;
 import io.windflow.eternalengine.persistence.UserRepository;
 import io.windflow.eternalengine.beans.dto.HttpError;
+import io.windflow.eternalengine.services.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -22,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -54,10 +57,12 @@ public class AuthApi {
 
     private UserRepository userRepository;
     private SessionRepository sessionRepository;
+    private AuthService authService;
 
-    public AuthApi(@Autowired UserRepository userRepository, @Autowired SessionRepository sessionRepository) {
+    public AuthApi(@Autowired UserRepository userRepository, @Autowired SessionRepository sessionRepository, @Autowired AuthService authService) {
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
+        this.authService = authService;
     }
 
     @GetMapping("/api/auth/github")
@@ -107,31 +112,11 @@ public class AuthApi {
 
     }
 
-    @GetMapping("/api/auth/github/exchange")
-    private EternalEngineUser tokenExchange(HttpServletRequest request, HttpServletResponse response) {
-        Cookie cookie = Arrays.stream(request.getCookies()).filter(t -> "token_exchange".equals(t.getName())).findFirst().get();
-        String value = cookie.getValue();
-        String decoded = new String (Base64.getDecoder().decode(value));
-        Optional<Session> optSession = sessionRepository.findById(UUID.fromString(decoded));
-        if (optSession.isPresent()) {
-            String sessionIp = optSession.get().getClientIp();
-            UUID userId = optSession.get().getUserId();
-            System.out.println("Looking for " + userId);
-            String userIp = request.getRemoteAddr();
-            if (sessionIp != null && sessionIp.equals(userIp)) {
-                Optional<EternalEngineUser> user = userRepository.findById(userId);
-
-                if (user.isPresent()) {
-                    return (user.get());
-                } else {
-                    throw new WindflowWebException(WindflowError.ERROR_009, "No such user");
-                }
-            } else {
-                throw new WindflowWebException(WindflowError.ERROR_009, "Authorization Failed");
-            }
-        } else {
-            throw new WindflowWebException(WindflowError.ERROR_009, "Session not found");
-        }
+    @GetMapping("/api/auth/github/exchange/{exchangeToken}")
+    @Transactional
+    protected EternalEngineUser tokenExchange(HttpServletRequest request, HttpServletResponse response, @PathVariable("exchangeToken") String exchangeToken) {
+        String sessionId = new String (Base64.getDecoder().decode(exchangeToken));
+        return authService.exchangeToken(sessionId, request.getRemoteAddr());
     }
 
     private EternalEngineUser createOrFetchUser(GithubUser githubUser) {
@@ -190,6 +175,14 @@ public class AuthApi {
     public HttpError handleWindflowWebException(WindflowWebException windEx) {
         windEx.printStackTrace();
         return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly());
+    }
+
+    @ExceptionHandler(Exception.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public HttpError handleGeneralException(Exception ex) {
+        ex.printStackTrace();
+        return new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), WindflowError.ERROR_009, ex.getMessage());
     }
 
 }

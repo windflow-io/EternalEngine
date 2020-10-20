@@ -27,7 +27,9 @@ export default {
     mounted() {
         let gitHubToken = this.getCookieValue("token_exchange");
         if (gitHubToken) {
-            fetch(this.github_token_exchange_url)
+            let exchangeUrl = this.github_token_exchange_url + "/" + gitHubToken;
+            console.log(exchangeUrl)
+            fetch(exchangeUrl)
                 .then(r => r.json())
                 .then(data => console.log(data));
         } else {
