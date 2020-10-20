@@ -90,6 +90,9 @@ export const CodeEditor = {
     options: {
         default: () => ({
             language: 'javascript',
+            minimap: {
+                enabled: false
+            }
         }),
         type: Object,
     },
