@@ -716,6 +716,60 @@ export function makeContextRouter({
         },
     });
 
+    const updateMetaData = (metaInfo) => {
+        document.title = metaInfo.title;
+
+        for (const [attribute, value] of Object.entries(metaInfo.htmlAttrs)) {
+            document.documentElement.setAttribute(attribute, value);
+        }
+
+        for (const [attribute, value] of Object.entries(metaInfo.bodyAttrs)) {
+            document.body.setAttribute(attribute, value);
+        }
+
+        const $head = document.getElementsByTagName('head')[0];
+        const renderId = `${Date.now()}`;
+
+        // REFACTOR
+        // - Dedupe logic.
+        for (const meta of metaInfo.meta) {
+            const $existing = $head.querySelector(Object.entries(meta).map(([attribute, value]) => `[${attribute}="${value}"]`).join(''));
+            if ($existing) {
+                $existing.dataset.renderId = renderId;
+                continue;
+            }
+
+            const element = document.createElement('meta');
+            element.dataset.renderId = renderId;
+
+            for (const [attribute, value] of Object.entries(meta)) {
+                element.setAttribute(attribute, value);
+            }
+
+            $head.appendChild(element);
+        }
+
+        for (const link of metaInfo.link) {
+            const $existing = $head.querySelector(Object.entries(link).map(([attribute, value]) => `[${attribute}="${value}"]`).join(''));
+            if ($existing) {
+                $existing.dataset.renderId = renderId;
+                continue;
+            }
+
+            const element = document.createElement('link');
+            element.dataset.renderId = renderId;
+
+            for (const [attribute, value] of Object.entries(link)) {
+                element.setAttribute(attribute, value);
+            }
+
+            $head.appendChild(element);
+        }
+
+        const $obsoleteElements = $head.querySelectorAll(`meta:not([data-render-id="${renderId}"]),link:not([data-render-id="${renderId}"])`)
+        $obsoleteElements.forEach($el => $head.removeChild($el));
+    };
+
     // REFACTOR
     // - Make use of promises and wait until resolved and registered before returning data.
     const { data, error } = contextCachePage.loadPage(() => currentPath.value);
@@ -725,17 +779,12 @@ export function makeContextRouter({
         if (!data.value) return;
 
         try {
-            // REFACTOR
-            // - Make this work with all meta tags, like vue-meta.
-            // - Make this work with error layout.
-            document.title = data.value.metaInfo.title;
-            document.documentElement.lang = data.value.metaInfo.htmlAttrs.lang;
-
             registerError.value = null;
             const components = getAllComponentsForPage(data.value);
             components.forEach(({ id, type }) => contextComponentRegistry.registerComponent(id, {
                 type,
             }));
+            updateMetaData(data.value.metaInfo);
         } catch (error) {
             console.error(error);
             registerError.value = markRaw(error);
