@@ -13,8 +13,6 @@ import java.util.UUID;
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class Page {
 
-    /*@TODO: Authorization mechanism please */
-
     @Id
     @GeneratedValue
     UUID id;

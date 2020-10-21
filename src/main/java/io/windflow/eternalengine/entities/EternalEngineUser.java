@@ -3,12 +3,11 @@ package io.windflow.eternalengine.entities;
 import io.windflow.eternalengine.beans.GithubUser;
 import io.windflow.eternalengine.utils.JsonStringifiable;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
+@Table(indexes = {@Index(name="index_columns", columnList="email", unique = true)})
 public class EternalEngineUser extends JsonStringifiable {
 
     @Id
@@ -20,6 +19,8 @@ public class EternalEngineUser extends JsonStringifiable {
     String avatarUrl;
     String location;
     String company;
+
+    @Enumerated(EnumType.STRING)
     AuthenticationProvider authenticationProvider = AuthenticationProvider.GITHUB;
     String githubUsername;
     String githubHomepage;

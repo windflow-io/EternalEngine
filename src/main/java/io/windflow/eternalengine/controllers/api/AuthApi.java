@@ -41,8 +41,8 @@ public class AuthApi {
     @Value("${io.windflow.auth.github_auth_domain}")
     String GITHUB_CALLBACK_DOMAIN;
 
-    @Value("${io.windflow.auth.cookiedomain}")
-    String GITHUB_COOKIE_DOMAIN;
+    //@Value("${io.windflow.auth.cookiedomain}")
+    //String GITHUB_COOKIE_DOMAIN;
 
     final String GITHUB_ALLOW_SIGNUP = "true";
     final String SCOPE = "read:user+user:email";
@@ -152,7 +152,7 @@ public class AuthApi {
 
     private Cookie createCookie(UUID uuid) {
         Cookie cookie = new Cookie("token_exchange", Base64.getEncoder().encodeToString(uuid.toString().getBytes()));
-        cookie.setDomain(GITHUB_COOKIE_DOMAIN);
+        //cookie.setDomain(GITHUB_COOKIE_DOMAIN);
         cookie.setPath("/");
         cookie.setMaxAge(30);
         return cookie;
