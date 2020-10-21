@@ -6,14 +6,15 @@ package io.windflow.eternalengine.error;
 public enum WindflowError {
     ERROR_001("500 Internal Server Error", "An unexpected server error occurred"),
     ERROR_002("404 Not Found","Page was not found"),
-    ERROR_003("404 Domain Not Found", "No matching domain in the database"),
-    ERROR_004("No Sites Configured", "No Windflow Eternal Engine sites are configured in this database"),
-    ERROR_005("Database is Empty", "The Windflow Eternal Engine database contains no data"),
-    ERROR_006("Corrupt Page Data", "Cannot Parse JSON page data"),
-    ERROR_007("Component Not Found", "Missing component"),
-    ERROR_008("Authentication Error", "Redirects to an authentication provider must have a referer"),
-    ERROR_009("Authorization Error", "Token verification failed"),
-    ERROR_010("GitHub Authentication Failed", "GitHub returned an error");
+    ERROR_003("404 Domain Not Configured", "This domain has not been configured"),
+    ERROR_004("404 Unused Domain", "This domain is not in use. You may create a site here."),
+    ERROR_005("No Sites Configured", "No Windflow Eternal Engine sites are configured in this database"),
+    ERROR_006("Database is Empty", "The Windflow Eternal Engine database contains no data"),
+    ERROR_007("Corrupt Page Data", "Cannot Parse JSON page data"),
+    ERROR_008("Component Not Found", "Missing component"),
+    ERROR_009("Authentication Error", "Redirects to an authentication provider must have a referer"),
+    ERROR_010("Authorization Error", "Token verification failed"),
+    ERROR_011("GitHub Authentication Failed", "GitHub returned an error");
 
     String title;
     String description;

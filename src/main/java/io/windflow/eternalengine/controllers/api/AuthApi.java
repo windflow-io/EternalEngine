@@ -29,16 +29,16 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @RestController
-@PropertySource("classpath:openid.properties")
+@PropertySource("classpath:openid.${spring.profiles.active}.properties")
 public class AuthApi {
 
-    @Value("${io.windflow.auth.github_client_id}")
+    @Value("${eternalengine.auth.github_client_id}")
     String GITHUB_CLIENT_ID;
 
-    @Value("${io.windflow.auth.github_client_secret}")
+    @Value("${eternalengine.auth.github_client_secret}")
     String GITHUB_CLIENT_SECRET;
 
-    @Value("${io.windflow.auth.github_auth_domain}")
+    @Value("${eternalengine.auth.github_auth_domain}")
     String GITHUB_CALLBACK_DOMAIN;
 
     //@Value("${io.windflow.auth.cookiedomain}")
@@ -67,7 +67,7 @@ public class AuthApi {
 
         String referer = request.getHeader("referer");
 
-        if (referer == null) throw new WindflowWebException(WindflowError.ERROR_008, "Auth refused to redirect use to github without referer header");
+        if (referer == null) throw new WindflowWebException(WindflowError.ERROR_009, "Auth refused to redirect use to github without referer header");
 
         String state = URLEncoder.encode(referer, StandardCharsets.UTF_8);
 
@@ -124,9 +124,9 @@ public class AuthApi {
 
         RestTemplate template = new RestTemplate();
         GithubTokenResponse token = template.getForObject(tokenUrl, GithubTokenResponse.class);
-        if (token == null) throw new WindflowWebException(WindflowError.ERROR_010, "No response to token request");
+        if (token == null) throw new WindflowWebException(WindflowError.ERROR_011, "No response to token request");
         if (token.getError() != null) {
-            throw new WindflowWebException(WindflowError.ERROR_010, token.getError() + ": " + token.getErrorDescription());
+            throw new WindflowWebException(WindflowError.ERROR_011, token.getError() + ": " + token.getErrorDescription());
         }
         return token;
 
@@ -137,7 +137,7 @@ public class AuthApi {
     private void checkForErrors(HttpServletRequest request) {
         if (request.getParameter("error") != null) {
             String errorString = request.getParameter("error") + ": " + request.getParameter("error_description");
-            throw new WindflowWebException(WindflowError.ERROR_010, errorString);
+            throw new WindflowWebException(WindflowError.ERROR_011, errorString);
         }
     }
 
@@ -173,7 +173,7 @@ public class AuthApi {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public HttpError handleGeneralException(Exception ex) {
         ex.printStackTrace();
-        return new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), WindflowError.ERROR_009, ex.getMessage());
+        return new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), WindflowError.ERROR_010, ex.getMessage());
     }
 
 }

@@ -1,13 +1,17 @@
 package io.windflow.eternalengine.controllers;
 
+import io.windflow.eternalengine.entities.DomainLookup;
 import io.windflow.eternalengine.entities.Page;
+import io.windflow.eternalengine.error.WindflowEditableNotFoundException;
 import io.windflow.eternalengine.error.WindflowError;
 import io.windflow.eternalengine.error.WindflowNotFoundException;
+import io.windflow.eternalengine.persistence.DomainLookupRepository;
 import io.windflow.eternalengine.persistence.PageRepository;
 import io.windflow.eternalengine.beans.dto.HttpError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,15 +25,32 @@ public class PageController {
     private final PageRepository pageRepository;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    public PageController(@Autowired PageRepository pageRepository) {
+    @Value(value = "${eternalengine.appdomain}")
+    String appDomain;
+    final DomainLookupRepository domainLookupRepository;
+
+
+    public PageController(@Autowired PageRepository pageRepository, @Autowired DomainLookupRepository domainLookupRepository) {
         this.pageRepository = pageRepository;
+        this.domainLookupRepository = domainLookupRepository;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = {"/api/pages/**"}, produces = "application/json")
     @ResponseBody
     public String servePage(HttpServletRequest request, HttpServletResponse response) {
 
+        /** See if we can find the domain in DomainLookUp - if not, 404 **/
+
+        String siteId = getSiteId(request);
+        if (siteId == null) {
+            logger.warn("003 Domain does not exist");
+            response.setStatus(HttpStatus.NOT_FOUND.value());
+            throw new WindflowNotFoundException(WindflowError.ERROR_003, "domain: " + request.getServerName());
+        }
+
         UrlHelper url = new UrlHelper(request);
+        url.setDomain(siteId);
+
         Optional<Page> optPage = pageRepository.findByDomainAndPath(url.getDomain(), url.getPath());
         if (optPage.isPresent()) {
             return optPage.get().getJson();
@@ -41,15 +62,34 @@ public class PageController {
             logger.warn("002 Page does not exist");
             throw new WindflowNotFoundException(WindflowError.ERROR_002, "domain: " + url.getDomain() + " and path: " + url.getPath());
         } else if (pageRepository.existsByType(Page.PageType.PageNormal)) {
-            logger.warn("003 Domain does not exist");
+            logger.debug("ERROR THROWN HERE");
+            logger.warn("004 Unused Domain");
             response.setStatus(HttpStatus.NOT_FOUND.value());
-            throw new WindflowNotFoundException(WindflowError.ERROR_003, "domain: " + url.getDomain());
+            throw new WindflowEditableNotFoundException(WindflowError.ERROR_004, "unused domain: " + url.getDomain(), siteId);
         } else if (pageRepository.existsBy()) {
             logger.warn("004 No sites configured");
-            throw new WindflowNotFoundException(WindflowError.ERROR_004);
+            throw new WindflowNotFoundException(WindflowError.ERROR_005);
         } else {
             logger.warn("005 Database is empty");
-            throw new WindflowNotFoundException(WindflowError.ERROR_005);
+            throw new WindflowNotFoundException(WindflowError.ERROR_006);
+        }
+    }
+
+    private String getSiteId(HttpServletRequest request) {
+        String requestDomain = request.getServerName();
+        if (!requestDomain.endsWith(appDomain)) {
+            logger.debug("Domain " + requestDomain + " is not on the app domain " + appDomain);
+            Optional<DomainLookup> domainLookup = domainLookupRepository.findFirstByDomainAlias(requestDomain);
+            if (domainLookup.isPresent()) {
+                logger.debug("Domain " + requestDomain + " maps to " + domainLookup.get().getSiteId());
+                return domainLookup.get().getSiteId();
+            } else {
+                logger.debug("Domain " + requestDomain + " is not configured");
+                return null;
+            }
+        } else {
+            logger.debug("Domain " + requestDomain + " is on wildcard app domain " + appDomain);
+            return requestDomain;
         }
     }
 
@@ -79,12 +119,18 @@ public class PageController {
 
     /**@TODO Common Errors must be moved to a common error handling class **/
 
+
     @ExceptionHandler(WindflowNotFoundException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public HttpError handleWindflowNotFoundException(WindflowNotFoundException windEx) {
+        if (windEx instanceof WindflowEditableNotFoundException) {
+            logger.debug("AND HERE");
+            return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly(), ((WindflowEditableNotFoundException)windEx).getSiteId());
+        }
         return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly());
     }
+
 
     /*** Helper Class ***/
 
@@ -106,6 +152,10 @@ public class PageController {
 
         public String getDomain() {
             return this.domain;
+        }
+
+        public void setDomain(String domain) {
+            this.domain = domain;
         }
 
         public String getPath() {

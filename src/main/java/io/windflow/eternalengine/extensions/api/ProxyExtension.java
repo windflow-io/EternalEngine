@@ -7,10 +7,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Enumeration;
 
-/**
- * Test me: auth.windflow.local:8080/api/extensions/io.windflow.eternalengine.extensions.api.ProxyExtension/forward?url=https://www.google.com
- * @param <T>
- */
+
 public class ProxyExtension<T extends Plugin> extends Plugin implements Requestable, Respondable, Actionable {
 
     HttpServletRequest request;

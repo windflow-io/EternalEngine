@@ -27,8 +27,22 @@ The process is as follows:
 To run the application:
   1. Clone the application to your local machine.
   2. Install PostgreSQL and create an empty database.
-  3. Configure database credentials in `src/main/resources/application.properties`
-  4. Start the application using the Gradle Wrapper `./gradlew bootRun` 
+  3. Configure database credentials in `src/main/resources/application.properties` (example provided)
+  4. Create a `src/main/resources/secret.development.properties` (local machine)
+    <blockquote>
+      `eternalengine.encryption.password=chosen_secret_keyphrase`
+    </blockquote>
+  6. Create an OpenID app on Github. <a href="docs/Github.md">More info</a>
+  5. Create a `src/main/resources/openid.development.properties` and pop the github info in it. See more info link above.
+    <blockquote>
+    ```
+        eternalengine.auth.github_client_id=from_github
+        eternalengine.auth.github_client_secret=from_github
+        eternalengine.auth.github_auth_domain=your_domain_name
+    ```
+    </blockquote>
+  6. Create an environment variable: --spring.profiles.active=development
+  7. Start the application using the Gradle Wrapper `./gradlew bootRun` 
 
 * **Note 1**: As above, there is a gradlew.bat for windows users.
 * **Note 2**: The application checks `window.location.host` to decide which site to serve. This doesn't help much when running locally as http://localhost so we added a feature that allows you to fudge hosts. To fudge a host, just add a querystring parameter `?host=www.example.com` (for example) to any url.
@@ -38,4 +52,4 @@ To run the application:
 1. One needs to create /src/main/java/resources/secret.properties (ignored by .gitignore)
 2. In this file, add: io.windflow.encryption.password=your-secret-password-here
 3. Go and encrypt the client_id, callback_url and client_secret and put it in InitialData.java
-4. Add auth.windflow.local to the /etc/hosts file
+4. Add auth.windflow.io.local to the /etc/hosts file

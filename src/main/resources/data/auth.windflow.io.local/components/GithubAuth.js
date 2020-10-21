@@ -6,8 +6,8 @@ export default {
     components: {FlowIcon},
     data() {
         return {
-            github_extension_url: 'http://auth.windflow.local:8080/api/auth/github',
-            github_token_exchange_url: 'http://auth.windflow.local:8080/api/auth/github/exchange'
+            github_extension_url: 'http://auth.windflow.io.local:8080/api/auth/github',
+            github_token_exchange_url: 'http://auth.windflow.io.local:8080/api/auth/github/exchange'
         }
     },
     template: `

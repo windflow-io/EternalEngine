@@ -11,10 +11,18 @@ public class DomainLookup {
     @GeneratedValue
     UUID id;
 
-    String siteId;
     String domainAlias;
+    String siteId;
     UUID ownerId;
     String herokuCanonicalName;
+
+    public DomainLookup() {}
+
+    public DomainLookup(String domainAlias, String siteId, UUID ownerId) {
+        this.siteId = siteId;
+        this.domainAlias = domainAlias;
+        this.ownerId = ownerId;
+    }
 
     public UUID getId() {
         return id;

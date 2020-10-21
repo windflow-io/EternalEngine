@@ -5,14 +5,12 @@ import io.windflow.eternalengine.error.WindflowError;
 import io.windflow.eternalengine.error.WindflowNotFoundException;
 import io.windflow.eternalengine.persistence.ComponentRepository;
 import io.windflow.eternalengine.beans.dto.HttpError;
-import io.windflow.eternalengine.utils.TextFileReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.Optional;
 
 @RestController
@@ -42,7 +40,7 @@ public class ComponentController {
             return optComponent.get().getJavaScript();
         } else {
             logger.warn("007 Component not found in database. Namespace: " + namespace + " and component name: " + componentName);
-            throw new WindflowNotFoundException(WindflowError.ERROR_007);
+            throw new WindflowNotFoundException(WindflowError.ERROR_008);
         }
 
     }

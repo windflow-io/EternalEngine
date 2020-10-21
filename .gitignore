@@ -38,6 +38,12 @@ out/
 
 ### Custom
 .DS_Store
-secret.properties
-openid.properties
 
+openid.development.properties
+openid.production.properties
+
+secret.development.properties
+secret.production.properties
+
+eternalengine.development.properties
+eternalengine.production.properties
