@@ -1,6 +1,6 @@
 package io.windflow.eternalengine.beans.dto;
 
-import io.windflow.eternalengine.error.WindflowError;
+import io.windflow.eternalengine.error.EternalEngineError;
 
 public class HttpError {
 
@@ -11,19 +11,19 @@ public class HttpError {
     String errorDetail;
     String siteId;
 
-    public HttpError(Integer httpStatus, WindflowError windflowError, String errorDetail) {
+    public HttpError(Integer httpStatus, EternalEngineError eternalEngineError, String errorDetail) {
         this.httpStatus = httpStatus;
-        this.errorCode = windflowError.name();
-        this.errorTitle = windflowError.getTitle();
-        this.errorDescription = windflowError.getDescription();
+        this.errorCode = eternalEngineError.name();
+        this.errorTitle = eternalEngineError.getTitle();
+        this.errorDescription = eternalEngineError.getDescription();
         this.errorDetail = errorDetail;
     }
 
-    public HttpError(Integer httpStatus, WindflowError windflowError, String errorDetail, String siteId) {
+    public HttpError(Integer httpStatus, EternalEngineError eternalEngineError, String errorDetail, String siteId) {
         this.httpStatus = httpStatus;
-        this.errorCode = windflowError.name();
-        this.errorTitle = windflowError.getTitle();
-        this.errorDescription = windflowError.getDescription();
+        this.errorCode = eternalEngineError.name();
+        this.errorTitle = eternalEngineError.getTitle();
+        this.errorDescription = eternalEngineError.getDescription();
         this.errorDetail = errorDetail;
         this.siteId = siteId;
     }

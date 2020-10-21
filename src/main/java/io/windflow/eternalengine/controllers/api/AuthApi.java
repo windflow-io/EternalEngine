@@ -5,8 +5,8 @@ import io.windflow.eternalengine.beans.GithubUser;
 import io.windflow.eternalengine.beans.dto.Token;
 import io.windflow.eternalengine.entities.EternalEngineUser;
 import io.windflow.eternalengine.entities.Session;
-import io.windflow.eternalengine.error.WindflowError;
-import io.windflow.eternalengine.error.WindflowWebException;
+import io.windflow.eternalengine.error.EternalEngineError;
+import io.windflow.eternalengine.error.EternalEngineWebException;
 
 import io.windflow.eternalengine.persistence.SessionRepository;
 import io.windflow.eternalengine.persistence.UserRepository;
@@ -61,13 +61,13 @@ public class AuthApi {
     }
 
     @GetMapping("/api/auth/github")
-    public void redirectUserToGitHub(HttpServletRequest request, HttpServletResponse response) throws WindflowWebException {
+    public void redirectUserToGitHub(HttpServletRequest request, HttpServletResponse response) throws EternalEngineWebException {
 
         final String GITHUB_CALLBACK_URL = GITHUB_CALLBACK_DOMAIN + "/api/auth/github/callback";
 
         String referer = request.getHeader("referer");
 
-        if (referer == null) throw new WindflowWebException(WindflowError.ERROR_009, "Auth refused to redirect use to github without referer header");
+        if (referer == null) throw new EternalEngineWebException(EternalEngineError.ERROR_009, "Auth refused to redirect use to github without referer header");
 
         String state = URLEncoder.encode(referer, StandardCharsets.UTF_8);
 
@@ -76,17 +76,17 @@ public class AuthApi {
         try {
             response.sendRedirect(authRedirectUrl);
         } catch (IOException ex) {
-            throw new WindflowWebException(WindflowError.ERROR_001, "Could not send redirect", ex);
+            throw new EternalEngineWebException(EternalEngineError.ERROR_001, "Could not send redirect", ex);
         }
     }
 
     /**
      * Callback URL should be: [protocol://domain:port]/api/auth/github/callback
      * @param request
-     * @throws WindflowWebException
+     * @throws EternalEngineWebException
      */
     @GetMapping("/api/auth/github/callback")
-    public void receiveUserFromGitHub(HttpServletRequest request, HttpServletResponse response) throws WindflowWebException {
+    public void receiveUserFromGitHub(HttpServletRequest request, HttpServletResponse response) throws EternalEngineWebException {
 
         final String GITHUB_CALLBACK_URL = GITHUB_CALLBACK_DOMAIN + "/api/auth/github/callback";
         final String code = request.getParameter("code");
@@ -102,7 +102,7 @@ public class AuthApi {
             response.addCookie(createCookie(session.getId()));
             response.sendRedirect(request.getParameter("state"));
         } catch (IOException ex) {
-            throw new WindflowWebException(WindflowError.ERROR_001, "Could not send redirect", ex);
+            throw new EternalEngineWebException(EternalEngineError.ERROR_001, "Could not send redirect", ex);
         }
 
     }
@@ -124,9 +124,9 @@ public class AuthApi {
 
         RestTemplate template = new RestTemplate();
         GithubTokenResponse token = template.getForObject(tokenUrl, GithubTokenResponse.class);
-        if (token == null) throw new WindflowWebException(WindflowError.ERROR_011, "No response to token request");
+        if (token == null) throw new EternalEngineWebException(EternalEngineError.ERROR_011, "No response to token request");
         if (token.getError() != null) {
-            throw new WindflowWebException(WindflowError.ERROR_011, token.getError() + ": " + token.getErrorDescription());
+            throw new EternalEngineWebException(EternalEngineError.ERROR_011, token.getError() + ": " + token.getErrorDescription());
         }
         return token;
 
@@ -137,7 +137,7 @@ public class AuthApi {
     private void checkForErrors(HttpServletRequest request) {
         if (request.getParameter("error") != null) {
             String errorString = request.getParameter("error") + ": " + request.getParameter("error_description");
-            throw new WindflowWebException(WindflowError.ERROR_011, errorString);
+            throw new EternalEngineWebException(EternalEngineError.ERROR_011, errorString);
         }
     }
 
@@ -160,10 +160,10 @@ public class AuthApi {
 
     /* Error handling */
 
-    @ExceptionHandler(WindflowWebException.class)
+    @ExceptionHandler(EternalEngineWebException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public HttpError handleWindflowWebException(WindflowWebException windEx) {
+    public HttpError handleWindflowWebException(EternalEngineWebException windEx) {
         windEx.printStackTrace();
         return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly());
     }
@@ -173,7 +173,7 @@ public class AuthApi {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public HttpError handleGeneralException(Exception ex) {
         ex.printStackTrace();
-        return new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), WindflowError.ERROR_010, ex.getMessage());
+        return new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), EternalEngineError.ERROR_010, ex.getMessage());
     }
 
 }

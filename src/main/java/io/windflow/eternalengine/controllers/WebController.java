@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.windflow.eternalengine.beans.PageData;
 import io.windflow.eternalengine.entities.Page;
-import io.windflow.eternalengine.error.WindflowError;
+import io.windflow.eternalengine.error.EternalEngineError;
 import io.windflow.eternalengine.persistence.DomainLookupRepository;
 import io.windflow.eternalengine.persistence.PageRepository;
 import org.slf4j.Logger;
@@ -75,7 +75,7 @@ public class WebController {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleRuntimeException(JsonProcessingException ex, HttpServletRequest request, HttpServletResponse response) {
         String domainAndPath = "domain:" + request.getServerName() + " and path:" + request.getServletPath();
-        logger.error(WindflowError.ERROR_007 + ": " + domainAndPath + " " + ex.getMessage());
+        logger.error(EternalEngineError.ERROR_007 + ": " + domainAndPath + " " + ex.getMessage());
         response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         ex.printStackTrace();
         return "spaError";

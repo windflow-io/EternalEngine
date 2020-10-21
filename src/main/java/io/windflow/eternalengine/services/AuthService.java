@@ -6,8 +6,8 @@ import io.windflow.eternalengine.beans.dto.Token;
 import io.windflow.eternalengine.entities.DomainLookup;
 import io.windflow.eternalengine.entities.EternalEngineUser;
 import io.windflow.eternalengine.entities.Session;
-import io.windflow.eternalengine.error.WindflowError;
-import io.windflow.eternalengine.error.WindflowWebException;
+import io.windflow.eternalengine.error.EternalEngineError;
+import io.windflow.eternalengine.error.EternalEngineWebException;
 import io.windflow.eternalengine.persistence.DomainLookupRepository;
 import io.windflow.eternalengine.persistence.SessionRepository;
 import io.windflow.eternalengine.persistence.UserRepository;
@@ -70,13 +70,13 @@ public class AuthService {
                     sessionRepository.deleteByUserId(user.getId());
                     return user;
                 } else {
-                    throw new WindflowWebException(WindflowError.ERROR_010, "No such user");
+                    throw new EternalEngineWebException(EternalEngineError.ERROR_010, "No such user");
                 }
             } else {
-                throw new WindflowWebException(WindflowError.ERROR_010, "Authorization Failed");
+                throw new EternalEngineWebException(EternalEngineError.ERROR_010, "Authorization Failed");
             }
         } else {
-            throw new WindflowWebException(WindflowError.ERROR_010, "Session not found");
+            throw new EternalEngineWebException(EternalEngineError.ERROR_010, "Session not found");
         }
     }
 }

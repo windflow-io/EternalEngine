@@ -3,7 +3,7 @@ package io.windflow.eternalengine.error;
 /**
  * @TODO: Refactor to "EternalEngine" as opposed to "Windflow"
  */
-public enum WindflowError {
+public enum EternalEngineError {
     ERROR_001("500 Internal Server Error", "An unexpected server error occurred"),
     ERROR_002("404 Not Found","Page was not found"),
     ERROR_003("404 Domain Not Configured", "This domain has not been configured"),
@@ -19,7 +19,7 @@ public enum WindflowError {
     String title;
     String description;
 
-    WindflowError(String title, String description) {
+    EternalEngineError(String title, String description) {
         this.title = title;
         this.description = description;
     }

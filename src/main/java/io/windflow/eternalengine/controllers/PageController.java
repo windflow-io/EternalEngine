@@ -2,9 +2,9 @@ package io.windflow.eternalengine.controllers;
 
 import io.windflow.eternalengine.entities.DomainLookup;
 import io.windflow.eternalengine.entities.Page;
-import io.windflow.eternalengine.error.WindflowEditableNotFoundException;
-import io.windflow.eternalengine.error.WindflowError;
-import io.windflow.eternalengine.error.WindflowNotFoundException;
+import io.windflow.eternalengine.error.EternalEngineEditableNotFoundException;
+import io.windflow.eternalengine.error.EternalEngineError;
+import io.windflow.eternalengine.error.EternalEngineNotFoundException;
 import io.windflow.eternalengine.persistence.DomainLookupRepository;
 import io.windflow.eternalengine.persistence.PageRepository;
 import io.windflow.eternalengine.beans.dto.HttpError;
@@ -45,7 +45,7 @@ public class PageController {
         if (siteId == null) {
             logger.warn("003 Domain does not exist");
             response.setStatus(HttpStatus.NOT_FOUND.value());
-            throw new WindflowNotFoundException(WindflowError.ERROR_003, "domain: " + request.getServerName());
+            throw new EternalEngineNotFoundException(EternalEngineError.ERROR_003, "domain: " + request.getServerName());
         }
 
         UrlHelper url = new UrlHelper(request);
@@ -59,19 +59,16 @@ public class PageController {
             if (optNotFound.isPresent()) {
                 return optNotFound.get().getJson();
             }
-            logger.warn("002 Page does not exist");
-            throw new WindflowNotFoundException(WindflowError.ERROR_002, "domain: " + url.getDomain() + " and path: " + url.getPath());
+            throw new EternalEngineNotFoundException(EternalEngineError.ERROR_002, "Page not found at " + url.getDomain() + url.getPath());
         } else if (pageRepository.existsByType(Page.PageType.PageNormal)) {
-            logger.debug("ERROR THROWN HERE");
-            logger.warn("004 Unused Domain");
-            response.setStatus(HttpStatus.NOT_FOUND.value());
-            throw new WindflowEditableNotFoundException(WindflowError.ERROR_004, "unused domain: " + url.getDomain(), siteId);
+
+
+            throw new EternalEngineEditableNotFoundException(EternalEngineError.ERROR_004, "Domain available for use: " + url.getDomain(), siteId);
         } else if (pageRepository.existsBy()) {
-            logger.warn("004 No sites configured");
-            throw new WindflowNotFoundException(WindflowError.ERROR_005);
+
+            throw new EternalEngineNotFoundException(EternalEngineError.ERROR_005, "No sites configured");
         } else {
-            logger.warn("005 Database is empty");
-            throw new WindflowNotFoundException(WindflowError.ERROR_006);
+            throw new EternalEngineNotFoundException(EternalEngineError.ERROR_006, "Database empty");
         }
     }
 
@@ -120,13 +117,12 @@ public class PageController {
     /**@TODO Common Errors must be moved to a common error handling class **/
 
 
-    @ExceptionHandler(WindflowNotFoundException.class)
+    @ExceptionHandler(EternalEngineNotFoundException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public HttpError handleWindflowNotFoundException(WindflowNotFoundException windEx) {
-        if (windEx instanceof WindflowEditableNotFoundException) {
-            logger.debug("AND HERE");
-            return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly(), ((WindflowEditableNotFoundException)windEx).getSiteId());
+    public HttpError handleWindflowNotFoundException(EternalEngineNotFoundException windEx) {
+        if (windEx instanceof EternalEngineEditableNotFoundException) {
+            return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly(), ((EternalEngineEditableNotFoundException)windEx).getSiteId());
         }
         return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly());
     }

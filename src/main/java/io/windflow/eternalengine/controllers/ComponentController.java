@@ -1,8 +1,8 @@
 package io.windflow.eternalengine.controllers;
 
 import io.windflow.eternalengine.entities.Component;
-import io.windflow.eternalengine.error.WindflowError;
-import io.windflow.eternalengine.error.WindflowNotFoundException;
+import io.windflow.eternalengine.error.EternalEngineError;
+import io.windflow.eternalengine.error.EternalEngineNotFoundException;
 import io.windflow.eternalengine.persistence.ComponentRepository;
 import io.windflow.eternalengine.beans.dto.HttpError;
 import org.slf4j.Logger;
@@ -40,7 +40,7 @@ public class ComponentController {
             return optComponent.get().getJavaScript();
         } else {
             logger.warn("007 Component not found in database. Namespace: " + namespace + " and component name: " + componentName);
-            throw new WindflowNotFoundException(WindflowError.ERROR_008);
+            throw new EternalEngineNotFoundException(EternalEngineError.ERROR_008);
         }
 
     }
@@ -74,10 +74,10 @@ public class ComponentController {
 
     }
 
-    @ExceptionHandler(WindflowNotFoundException.class)
+    @ExceptionHandler(EternalEngineNotFoundException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public HttpError handleWindflowNotFoundException(WindflowNotFoundException windEx) {
+    public HttpError handleWindflowNotFoundException(EternalEngineNotFoundException windEx) {
         windEx.printStackTrace();
         return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly());
     }

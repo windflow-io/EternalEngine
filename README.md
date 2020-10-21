@@ -14,7 +14,7 @@ Windflow Eternal Engine is for you if:
 
 <blockquote>If you would like to try Windflow Eternal Engine without installing it, go create a free developer account on our hosted service at <a href="https://windflow.io">windflow.io</a> and give it a test run.</blockquote>
 
-Client code is written in highly-readable plain-old ES6 modular JavaScript with no client-side build tools. By default index.html and app.js are un-opinionated. All the data, layouts, graphics, fonts, etc are/will be requested from the server. The application is then "built" on the client side.
+Client code is written in highly-readable plain-old ES6 modular JavaScript with no client-side build tools. By default index.html and app.js are un-opinionated. All the data, layouts, graphics, fonts, etc are requested from the server. The application is then "built" on the client side.
 
 The process is as follows:
 
@@ -41,15 +41,17 @@ To run the application:
         eternalengine.auth.github_auth_domain=your_domain_name
     ```
     </blockquote>
-  6. Create an environment variable: --spring.profiles.active=development
-  7. Start the application using the Gradle Wrapper `./gradlew bootRun` 
+  6. Create a `src/main/resources/eternalengine.development.properties` and pop the github info in it. See more info link above.
+    <blockquote>
+    ```
+        eternalengine.auth.github_client_id=from_github
+        eternalengine.auth.github_client_secret=from_github
+        eternalengine.auth.github_auth_domain=your_domain_name
+    ```
+    </blockquote>    
+  7. Create an environment variable: --spring.profiles.active=development
+  8. Start the application using the Gradle Wrapper `./gradlew bootRun` 
 
 * **Note 1**: As above, there is a gradlew.bat for windows users.
 * **Note 2**: The application checks `window.location.host` to decide which site to serve. This doesn't help much when running locally as http://localhost so we added a feature that allows you to fudge hosts. To fudge a host, just add a querystring parameter `?host=www.example.com` (for example) to any url.
 * **Note 3**: Default database credentials are `postgres:postgres@windflow`   
-
-### Undocumented.
-1. One needs to create /src/main/java/resources/secret.properties (ignored by .gitignore)
-2. In this file, add: io.windflow.encryption.password=your-secret-password-here
-3. Go and encrypt the client_id, callback_url and client_secret and put it in InitialData.java
-4. Add auth.windflow.io.local to the /etc/hosts file
