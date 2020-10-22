@@ -45,8 +45,6 @@ public class PageController {
     @ResponseBody
     public String servePage(HttpServletRequest request, HttpServletResponse response) {
 
-        /** See if we can find the domain in DomainLookUp - if not, 404 **/
-
         String siteId = getSiteId(request);
         if (siteId == null) {
             logger.warn("003 Domain does not exist");
