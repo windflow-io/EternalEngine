@@ -33,6 +33,11 @@ public class PageController {
 
     @Value(value = "${eternalengine.appDomain}")
     String appDomain;
+
+    @Value(value = "${eternalengine.systemNamespace}")
+    String systemNamespace;
+
+
     final DomainLookupRepository domainLookupRepository;
 
 
@@ -133,17 +138,23 @@ public class PageController {
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String handleEternalEngineNotFoundException(EternalEngineNotFoundException windEx) {
-        System.out.println("HERE1");
-        if (windEx instanceof EternalEngineEditableNotFoundException) {
-            return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly(), ((EternalEngineEditableNotFoundException)windEx).getSiteId()).toString();
+
+        Optional<Page> optNotFound = pageRepository.findByDomainAndType(systemNamespace, Page.PageType.Page404);
+        if (optNotFound.isPresent()) { // General 404 for domain
+            return optNotFound.get().getJson();
         }
-        return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly()).toString();
+
+        if (windEx instanceof EternalEngineEditableNotFoundException) {
+            EternalEngineNotFoundException windEx2 = new EternalEngineNotFoundException(EternalEngineError.ERROR_013, "Looking in the " + systemNamespace + " namespace. The original cause of the 404 is " + windEx.getMessage());
+            return new HttpError(HttpStatus.NOT_FOUND.value(), windEx2.getWindflowError(), windEx2.getDetailOnly(), ((EternalEngineEditableNotFoundException)windEx).getSiteId()).toString();
+        }
+        EternalEngineNotFoundException windEx2 = new EternalEngineNotFoundException(EternalEngineError.ERROR_013, "Looking in the " + systemNamespace + " namespace. The original cause of the 404 is " + windEx.getMessage());
+        return new HttpError(HttpStatus.NOT_FOUND.value(), windEx2.getWindflowError(), windEx2.getDetailOnly()).toString();
     }
 
     @ExceptionHandler(EternalEngineWebException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
-
     public HttpError handleEternalEngineWebException(EternalEngineWebException windEx) {
         System.out.println("HERE2");
         return new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), windEx.getWindflowError(), windEx.getDetailOnly());

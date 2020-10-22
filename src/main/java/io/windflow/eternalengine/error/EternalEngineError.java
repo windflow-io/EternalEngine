@@ -15,7 +15,8 @@ public enum EternalEngineError {
     ERROR_009("Authentication Error", "Redirects to an authentication provider must have a referer"),
     ERROR_010("Authorization Error", "Token verification failed"),
     ERROR_011("GitHub Authentication Failed", "GitHub returned an error"),
-    ERROR_012("JSON Page Data Corrupt", "Could not parse JSON in database");
+    ERROR_012("JSON Page Data Corrupt", "Could not parse JSON in database"),
+    ERROR_013("No Generic 404 Page", "There is no generic 404 page in the database");
 
     String title;
     String description;
