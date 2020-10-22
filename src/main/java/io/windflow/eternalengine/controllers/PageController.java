@@ -126,10 +126,11 @@ public class PageController {
         }
     }
 
-    @ExceptionHandler(EternalEngineNotFoundException.class)
+    @ExceptionHandler({EternalEngineNotFoundException.class, EternalEngineEditableNotFoundException.class})
+
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public HttpError handleWindflowNotFoundException(EternalEngineNotFoundException windEx) {
+    public HttpError handleEternalEngineNotFoundException(EternalEngineNotFoundException windEx) {
         System.out.println("HERE1");
         if (windEx instanceof EternalEngineEditableNotFoundException) {
             return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly(), ((EternalEngineEditableNotFoundException)windEx).getSiteId());
@@ -141,7 +142,7 @@ public class PageController {
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
 
-    public HttpError handleWindflowNotFoundException(EternalEngineWebException windEx) {
+    public HttpError handleEternalEngineWebException(EternalEngineWebException windEx) {
         System.out.println("HERE2");
         return new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), windEx.getWindflowError(), windEx.getDetailOnly());
     }
