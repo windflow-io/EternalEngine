@@ -10,7 +10,7 @@
         "link": [
             {"rel":"icon" ,"type": "img/png", "href": "https://cdn.windflow.io/app/img/favicon-32x32.png", "sizes": "32x32"},
             {"rel":"icon" ,"type": "img/png", "href": "https://cdn.windflow.io/app/img/favicon-16x16.png", "sizes": "16x16"},
-            {"rel":"stylesheet" ,"type": "text/css", "href": "https://cdn.windflow.io/app/vendor/tailwindcss/tailwind.min.css"}
+            {"rel":"stylesheet", "href": "https://cdn.windflow.io/app/vendor/tailwindcss/tailwind.min.css"}
         ]
     },
     "layout": "auth-windflow-io.windflow.app.local.CenteredLayout",

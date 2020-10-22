@@ -726,7 +726,6 @@ export const FlowArea = {
             />
             <div
                 v-if="isInEditMode"
-                
                 class="flex p-8 justify-center items-end"
             >
                 <flow-form-field-text
