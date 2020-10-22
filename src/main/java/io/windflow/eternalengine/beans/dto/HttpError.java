@@ -1,8 +1,9 @@
 package io.windflow.eternalengine.beans.dto;
 
 import io.windflow.eternalengine.error.EternalEngineError;
+import io.windflow.eternalengine.utils.JsonStringifiable;
 
-public class HttpError {
+public class HttpError extends JsonStringifiable {
 
     Integer httpStatus;
     String errorCode;

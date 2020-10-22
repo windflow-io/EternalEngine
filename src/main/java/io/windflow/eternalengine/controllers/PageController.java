@@ -31,7 +31,7 @@ public class PageController {
     private final PageRepository pageRepository;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Value(value = "${eternalengine.appdomain}")
+    @Value(value = "${eternalengine.appDomain}")
     String appDomain;
     final DomainLookupRepository domainLookupRepository;
 
@@ -70,16 +70,18 @@ public class PageController {
 
         } else if (pageRepository.existsByDomain(url.getDomain())) { // Domain but no page
             Optional<Page> optNotFound = pageRepository.findByDomainAndType(url.getDomain(), Page.PageType.Page404);
-            if (optNotFound.isPresent()) { // Custom 404
+            if (optNotFound.isPresent()) { // Custom 404 for domain
                 return optNotFound.get().getJson();
             }
             throw new EternalEngineEditableNotFoundException(EternalEngineError.ERROR_002, "Page not found at " + url.getDomain() + url.getPath(), siteId);
-        } else if (pageRepository.existsByType(Page.PageType.PageNormal)) {
-            throw new EternalEngineEditableNotFoundException(EternalEngineError.ERROR_004, "Domain available for use: " + url.getDomain(), siteId);
-        } else if (pageRepository.existsBy()) {
 
+        } else if (pageRepository.existsByType(Page.PageType.PageNormal)) { // domain not found
+            throw new EternalEngineEditableNotFoundException(EternalEngineError.ERROR_004, "Domain available for use: " + url.getDomain(), siteId);
+
+        } else if (pageRepository.existsBy()) { // no pages whatsoever
             throw new EternalEngineNotFoundException(EternalEngineError.ERROR_005, "No sites configured");
-        } else {
+
+        } else { // no records found
             throw new EternalEngineNotFoundException(EternalEngineError.ERROR_006, "Database empty");
         }
     }
@@ -130,12 +132,12 @@ public class PageController {
 
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public HttpError handleEternalEngineNotFoundException(EternalEngineNotFoundException windEx) {
+    public String handleEternalEngineNotFoundException(EternalEngineNotFoundException windEx) {
         System.out.println("HERE1");
         if (windEx instanceof EternalEngineEditableNotFoundException) {
-            return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly(), ((EternalEngineEditableNotFoundException)windEx).getSiteId());
+            return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly(), ((EternalEngineEditableNotFoundException)windEx).getSiteId()).toString();
         }
-        return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly());
+        return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly()).toString();
     }
 
     @ExceptionHandler(EternalEngineWebException.class)
@@ -146,7 +148,6 @@ public class PageController {
         System.out.println("HERE2");
         return new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), windEx.getWindflowError(), windEx.getDetailOnly());
     }
-
 
     /*** Helper Class ***/
 
