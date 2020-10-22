@@ -56,7 +56,7 @@ public class PageController {
         url.setDomain(siteId);
 
         Optional<Page> optPage = pageRepository.findByDomainAndPath(url.getDomain(), url.getPath());
-        if (optPage.isPresent()) {
+        if (optPage.isPresent()) { // Page found
             Page page = optPage.get();
             ObjectMapper mapper = new ObjectMapper();
 
@@ -68,15 +68,13 @@ public class PageController {
                 throw new EternalEngineWebException(EternalEngineError.ERROR_012, ex.getMessage());
             }
 
-        } else if (pageRepository.existsByDomain(url.getDomain())) {
+        } else if (pageRepository.existsByDomain(url.getDomain())) { // Domain but no page
             Optional<Page> optNotFound = pageRepository.findByDomainAndType(url.getDomain(), Page.PageType.Page404);
-            if (optNotFound.isPresent()) {
+            if (optNotFound.isPresent()) { // Custom 404
                 return optNotFound.get().getJson();
             }
-            throw new EternalEngineNotFoundException(EternalEngineError.ERROR_002, "Page not found at " + url.getDomain() + url.getPath());
+            throw new EternalEngineEditableNotFoundException(EternalEngineError.ERROR_002, "Page not found at " + url.getDomain() + url.getPath(), siteId);
         } else if (pageRepository.existsByType(Page.PageType.PageNormal)) {
-
-
             throw new EternalEngineEditableNotFoundException(EternalEngineError.ERROR_004, "Domain available for use: " + url.getDomain(), siteId);
         } else if (pageRepository.existsBy()) {
 
@@ -132,6 +130,7 @@ public class PageController {
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public HttpError handleWindflowNotFoundException(EternalEngineNotFoundException windEx) {
+        System.out.println("HERE1");
         if (windEx instanceof EternalEngineEditableNotFoundException) {
             return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly(), ((EternalEngineEditableNotFoundException)windEx).getSiteId());
         }
@@ -141,7 +140,9 @@ public class PageController {
     @ExceptionHandler(EternalEngineWebException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
+
     public HttpError handleWindflowNotFoundException(EternalEngineWebException windEx) {
+        System.out.println("HERE2");
         return new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), windEx.getWindflowError(), windEx.getDetailOnly());
     }
 

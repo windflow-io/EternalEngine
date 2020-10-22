@@ -719,13 +719,13 @@ export function makeContextRouter({
     const updateMetaData = (metaInfo) => {
         document.title = metaInfo.title;
 
-        for (const [attribute, value] of Object.entries(metaInfo.htmlAttrs)) {
-            document.documentElement.setAttribute(attribute, value);
-        }
-
-        for (const [attribute, value] of Object.entries(metaInfo.bodyAttrs)) {
-            document.body.setAttribute(attribute, value);
-        }
+        // for (const [attribute, value] of Object.entries(metaInfo.htmlAttrs)) {
+        //     document.documentElement.setAttribute(attribute, value);
+        // }
+        //
+        // for (const [attribute, value] of Object.entries(metaInfo.bodyAttrs)) {
+        //     document.body.setAttribute(attribute, value);
+        // }
 
         const $head = document.getElementsByTagName('head')[0];
         const renderId = `${Date.now()}`;
