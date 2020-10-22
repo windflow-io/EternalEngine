@@ -48,7 +48,7 @@ public class InitialData {
             pageRepository.truncate();
 
             /* Auth.windflow.io.local */
-            savePage("auth.windflow.io.local", "/", Page.PageType.PageNormal, "/data/auth.windflow.io.local/pages/index.json");
+            savePage("auth-windflow-io.windflow.app.local", "/", Page.PageType.PageNormal, "/data/auth-windflow-io.windflow.app.local/pages/index.json");
 
         }
     }
@@ -62,13 +62,13 @@ public class InitialData {
             // LAYOUTS
 
             /* auth.windflow.io.local */
-            saveComponent("auth.windflow.io.local", "CenteredLayout", io.windflow.eternalengine.entities.Component.ComponentType.LAYOUT, "/data/auth.windflow.io.local/layouts/CenteredLayout.js");
-            saveComponent("auth.windflow.io.local", "SingleColumnLayout", io.windflow.eternalengine.entities.Component.ComponentType.LAYOUT, "/data/auth.windflow.io.local/layouts/SingleColumnLayout.js");
+            saveComponent("auth-windflow-io.windflow.app.local", "CenteredLayout", io.windflow.eternalengine.entities.Component.ComponentType.LAYOUT, "/data/auth-windflow-io.windflow.app.local/layouts/CenteredLayout.js");
+            saveComponent("auth-windflow-io.windflow.app.local", "SingleColumnLayout", io.windflow.eternalengine.entities.Component.ComponentType.LAYOUT, "/data/auth-windflow-io.windflow.app.local/layouts/SingleColumnLayout.js");
 
             // COMPONENTS
 
             /* auth.windflow.io.local */
-            saveComponent("auth.windflow.io.local", "GithubAuth", io.windflow.eternalengine.entities.Component.ComponentType.COMPONENT, "/data/auth.windflow.io.local/components/GithubAuth.js");
+            saveComponent("auth-windflow-io.windflow.app.local", "GithubAuth", io.windflow.eternalengine.entities.Component.ComponentType.COMPONENT, "/data/auth-windflow-io.windflow.app.local/components/GithubAuth.js");
 
 
         }
@@ -83,14 +83,18 @@ public class InitialData {
         }
 
         domainLookupRepository.save(
-            new DomainLookup("windflow-io.windflow.app.local", "windflow-io.windflow.app.local", UUID.fromString("742e256a-b3cd-45ba-adfd-ac24d7b4698c"))
+                new DomainLookup("windflow-io.windflow.app.local", "windflow-io.windflow.app.local", UUID.fromString("742e256a-b3cd-45ba-adfd-ac24d7b4698c"))
         );
         domainLookupRepository.save(
-            new DomainLookup("windflow.io.local", "windflow-io.windflow.app.local", UUID.fromString("742e256a-b3cd-45ba-adfd-ac24d7b4698c"))
+                new DomainLookup("windflow.io.local", "windflow-io.windflow.app.local", UUID.fromString("742e256a-b3cd-45ba-adfd-ac24d7b4698c"))
         );
         domainLookupRepository.save(
-            new DomainLookup("www.windflow.io.local", "windflow-io.windflow.app.local", UUID.fromString("742e256a-b3cd-45ba-adfd-ac24d7b4698c"))
+                new DomainLookup("www.windflow.io.local", "windflow-io.windflow.app.local", UUID.fromString("742e256a-b3cd-45ba-adfd-ac24d7b4698c"))
         );
+        domainLookupRepository.save(
+                new DomainLookup("auth.windflow.io.local", "auth-windflow-io.windflow.app.local", UUID.fromString("742e256a-b3cd-45ba-adfd-ac24d7b4698c"))
+        );
+
 
     }
 

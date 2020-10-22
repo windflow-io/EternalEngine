@@ -34,22 +34,24 @@ To run the application:
     </blockquote>
   6. Create an OpenID app on Github. <a href="docs/Github.md">More info</a>
   5. Create a `src/main/resources/openid.development.properties` and pop the github info in it. See more info link above.
-    <blockquote>
-    ```
+    
+  
         eternalengine.auth.github_client_id=from_github
         eternalengine.auth.github_client_secret=from_github
         eternalengine.auth.github_auth_domain=your_domain_name
-    ```
-    </blockquote>
+    
+    
   6. Create a `src/main/resources/eternalengine.development.properties` and pop the github info in it. See more info link above.
-    <blockquote>
-    ```
-        eternalengine.auth.github_client_id=from_github
-        eternalengine.auth.github_client_secret=from_github
-        eternalengine.auth.github_auth_domain=your_domain_name
-    ```
-    </blockquote>    
-  7. Create an environment variable: --spring.profiles.active=development
+    ```properties
+    eternalengine.auth.github_client_id=from_github
+    eternalengine.auth.github_client_secret=from_github
+    eternalengine.auth.github_auth_domain=your_domain_name
+      ```
+  7. Create an environment variable:
+```bash
+./gradlew bootRun --args='--spring.profiles.active=development'
+```
+    (in IntelliJ idea, you can pop `--spring.profiles.active=development` into the `environment variables` )
   8. Start the application using the Gradle Wrapper `./gradlew bootRun` 
 
 * **Note 1**: As above, there is a gradlew.bat for windows users.

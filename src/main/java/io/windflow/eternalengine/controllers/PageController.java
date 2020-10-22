@@ -1,10 +1,16 @@
 package io.windflow.eternalengine.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.windflow.eternalengine.entities.DomainLookup;
 import io.windflow.eternalengine.entities.Page;
 import io.windflow.eternalengine.error.EternalEngineEditableNotFoundException;
 import io.windflow.eternalengine.error.EternalEngineError;
 import io.windflow.eternalengine.error.EternalEngineNotFoundException;
+import io.windflow.eternalengine.error.EternalEngineWebException;
 import io.windflow.eternalengine.persistence.DomainLookupRepository;
 import io.windflow.eternalengine.persistence.PageRepository;
 import io.windflow.eternalengine.beans.dto.HttpError;
@@ -53,7 +59,17 @@ public class PageController {
 
         Optional<Page> optPage = pageRepository.findByDomainAndPath(url.getDomain(), url.getPath());
         if (optPage.isPresent()) {
-            return optPage.get().getJson();
+            Page page = optPage.get();
+            ObjectMapper mapper = new ObjectMapper();
+
+            try {
+                JsonNode node = mapper.readTree(page.getJson());
+                ((ObjectNode)node).put("siteId", siteId);
+                return node.toString();
+            } catch (JsonProcessingException ex) {
+                throw new EternalEngineWebException(EternalEngineError.ERROR_012, ex.getMessage());
+            }
+
         } else if (pageRepository.existsByDomain(url.getDomain())) {
             Optional<Page> optNotFound = pageRepository.findByDomainAndType(url.getDomain(), Page.PageType.Page404);
             if (optNotFound.isPresent()) {
@@ -69,24 +85,6 @@ public class PageController {
             throw new EternalEngineNotFoundException(EternalEngineError.ERROR_005, "No sites configured");
         } else {
             throw new EternalEngineNotFoundException(EternalEngineError.ERROR_006, "Database empty");
-        }
-    }
-
-    private String getSiteId(HttpServletRequest request) {
-        String requestDomain = request.getServerName();
-        if (!requestDomain.endsWith(appDomain)) {
-            logger.debug("Domain " + requestDomain + " is not on the app domain " + appDomain);
-            Optional<DomainLookup> domainLookup = domainLookupRepository.findFirstByDomainAlias(requestDomain);
-            if (domainLookup.isPresent()) {
-                logger.debug("Domain " + requestDomain + " maps to " + domainLookup.get().getSiteId());
-                return domainLookup.get().getSiteId();
-            } else {
-                logger.debug("Domain " + requestDomain + " is not configured");
-                return null;
-            }
-        } else {
-            logger.debug("Domain " + requestDomain + " is on wildcard app domain " + appDomain);
-            return requestDomain;
         }
     }
 
@@ -114,8 +112,23 @@ public class PageController {
         return pageRepository.save(page).getJson();
     }
 
-    /**@TODO Common Errors must be moved to a common error handling class **/
-
+    private String getSiteId(HttpServletRequest request) {
+        String requestDomain = request.getServerName();
+        if (!requestDomain.endsWith(appDomain)) {
+            logger.debug("Domain " + requestDomain + " is not on the app domain " + appDomain);
+            Optional<DomainLookup> domainLookup = domainLookupRepository.findFirstByDomainAlias(requestDomain);
+            if (domainLookup.isPresent()) {
+                logger.debug("Domain " + requestDomain + " maps to " + domainLookup.get().getSiteId());
+                return domainLookup.get().getSiteId();
+            } else {
+                logger.debug("Domain " + requestDomain + " is not configured");
+                return null;
+            }
+        } else {
+            logger.debug("Domain " + requestDomain + " is on wildcard app domain " + appDomain);
+            return requestDomain;
+        }
+    }
 
     @ExceptionHandler(EternalEngineNotFoundException.class)
     @ResponseBody
@@ -125,6 +138,13 @@ public class PageController {
             return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly(), ((EternalEngineEditableNotFoundException)windEx).getSiteId());
         }
         return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly());
+    }
+
+    @ExceptionHandler(EternalEngineWebException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public HttpError handleWindflowNotFoundException(EternalEngineWebException windEx) {
+        return new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), windEx.getWindflowError(), windEx.getDetailOnly());
     }
 
 

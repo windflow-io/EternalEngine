@@ -13,11 +13,11 @@
             {"rel":"stylesheet" ,"type": "text/css", "href": "https://cdn.windflow.io/app/vendor/tailwindcss/tailwind.min.css"}
         ]
     },
-    "layout": "auth.windflow.io.local.CenteredLayout",
+    "layout": "auth-windflow-io.windflow.app.local.CenteredLayout",
     "areas": [
         {
             "area": "center",
-            "components": [{"name":"auth.windflow.io.local.GithubAuth", "id": "1"}]
+            "components": [{"name":"auth-windflow-io.windflow.app.local.GithubAuth", "id": "1"}]
         }
     ],
     "data": {}

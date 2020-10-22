@@ -1,8 +1,5 @@
 package io.windflow.eternalengine.error;
 
-/**
- * @TODO: Refactor to "EternalEngine" as opposed to "Windflow"
- */
 public class EternalEngineWebException extends EternalEngineBaseException {
 
     public EternalEngineWebException(EternalEngineError eternalEngineError) {
