@@ -34,6 +34,9 @@ public class InitialData {
     @Value(value = "${eternalengine.resetDataOnStartup:undefined}")
     String resetDataOnStartup;
 
+    @Value(value = "${eternalengine.systemNamespace}")
+    private String systemNamespace;
+
     InitialData(@Autowired PageRepository pageRepository, @Autowired ComponentRepository componentRepository, @Autowired ExtensionDataRepository extensionDataRepository, @Autowired CryptoService cryptoService, @Autowired DomainLookupRepository domainLookupRepository) {
         this.pageRepository = pageRepository;
         this.componentRepository = componentRepository;
@@ -49,6 +52,9 @@ public class InitialData {
 
             /* Auth.windflow.io.local */
             savePage("auth-windflow-io.windflow.app.local", "/", Page.PageType.PageNormal, "/data/auth-windflow-io.windflow.app.local/pages/index.json");
+
+            /* System 404 */
+            savePage(systemNamespace, "/", Page.PageType.Page404, "/data/" + systemNamespace + "/pages/index.json");
 
         }
     }
@@ -70,6 +76,9 @@ public class InitialData {
             /* auth.windflow.io.local */
             saveComponent("auth-windflow-io.windflow.app.local", "GithubAuth", io.windflow.eternalengine.entities.Component.ComponentType.COMPONENT, "/data/auth-windflow-io.windflow.app.local/components/GithubAuth.js");
 
+            /* System 404 */
+            saveComponent(systemNamespace, "CenteredLayout", io.windflow.eternalengine.entities.Component.ComponentType.LAYOUT, "/data/" + systemNamespace + "/layouts/CenteredLayout.js");
+            saveComponent(systemNamespace, "Error404Message", io.windflow.eternalengine.entities.Component.ComponentType.COMPONENT, "/data/" + systemNamespace + "/components/Error404Message.js");
 
         }
     }

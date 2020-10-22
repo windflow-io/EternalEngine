@@ -1,11 +1,15 @@
 {
     "metaInfo": {
-        "title": "Login Page",
+        "title": "Error",
         "htmlAttrs" : {
             "lang" : "en"
         },
+        "bodyAttrs" : {
+            "class" : "dark mode"
+        },
         "meta": [
-            {"charset" :  "utf-8"}
+            {"charset" :  "utf-8"},
+            {"name": "robots", "content":  "noindex, follow"}
         ],
         "link": [
             {"rel":"icon" ,"type": "img/png", "href": "https://cdn.windflow.io/app/img/favicon-32x32.png", "sizes": "32x32"},
@@ -13,12 +17,22 @@
             {"rel":"stylesheet" ,"type": "text/css", "href": "https://cdn.windflow.io/app/vendor/tailwindcss/tailwind.min.css"}
         ]
     },
-    "layout": "auth-windflow-io.windflow.app.local.CenteredLayout",
+    "layout": "system.windflow.io.CenteredLayout",
     "areas": [
         {
             "area": "center",
-            "components": [{"name":"auth-windflow-io.windflow.app.local.GithubAuth", "id": "1"}]
+            "components":[
+                {"name":"system.windflow.io.Error404Message", "id":"displayMessage"}
+            ]
         }
     ],
-    "data": {}
+    "data": {
+        "components": {
+            "displayMessage": {
+                "errorTitle": "...",
+                "errorDescription": "...",
+                "errorDetail": "..."
+            }
+        }
+    }
 }

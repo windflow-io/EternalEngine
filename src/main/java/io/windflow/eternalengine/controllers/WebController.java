@@ -3,6 +3,7 @@ package io.windflow.eternalengine.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.windflow.eternalengine.beans.PageData;
+import io.windflow.eternalengine.entities.DomainLookup;
 import io.windflow.eternalengine.entities.Page;
 import io.windflow.eternalengine.error.EternalEngineError;
 import io.windflow.eternalengine.persistence.DomainLookupRepository;
@@ -28,22 +29,28 @@ import java.util.Optional;
 public class WebController {
 
     final PageRepository pageRepository;
+    final DomainLookupRepository domainLookupRepository;
+
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Value(value = "${eternalengine.cdn:undefined}")
     String cdn;
 
-    public WebController(@Autowired PageRepository pageRepository, @Autowired DomainLookupRepository domainLookupRepository) {
+    public WebController(@Autowired PageRepository pageRepository, @Autowired DomainLookupRepository domainLookupRepository, @Autowired DomainLookupRepository domainLookupRepository1) {
         this.pageRepository = pageRepository;
+        this.domainLookupRepository = domainLookupRepository1;
     }
 
     @GetMapping(value = {"/**/{regex:[-a-zA-Z0-9]*}", "/"})
     public String spa(HttpServletRequest request, HttpServletResponse response, Model model) throws JsonProcessingException {
 
-        /** @TODO: Send content down with Index **/
+        String requestDomain = request.getServerName();
+
+        Optional<DomainLookup> domainLookup = domainLookupRepository.findFirstByDomainAlias(requestDomain);
+        if (domainLookup.isPresent()) requestDomain = domainLookup.get().getSiteId();
 
         /** Look for the page **/
-        Optional<Page> optPage = pageRepository.findByDomainAndPath(request.getServerName(), request.getServletPath());
+        Optional<Page> optPage = pageRepository.findByDomainAndPath(requestDomain, request.getServletPath());
         if (optPage.isPresent()) {
             PageData pageData = prepareModel(optPage.get());
             model.addAttribute("pageData", pageData);
@@ -52,7 +59,7 @@ public class WebController {
         }
 
         /** Look for the error 404 **/
-        Optional<Page> optCustom404 = pageRepository.findByDomainAndType(request.getServerName(), Page.PageType.Page404);
+        Optional<Page> optCustom404 = pageRepository.findByDomainAndType(requestDomain, Page.PageType.Page404);
         if (optCustom404.isPresent()) {
             PageData pageData = prepareModel(optCustom404.get());
             model.addAttribute("pageData", pageData);

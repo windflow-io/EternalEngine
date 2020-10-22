@@ -1,7 +1,6 @@
 package io.windflow.eternalengine.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -18,21 +17,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Optional;
 
-@RestController
+@PropertySource("eternalengine.${spring.profiles.active}.properties")
 public class PageController {
 
     private final PageRepository pageRepository;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Value(value = "${eternalengine.appdomain}")
-    String appDomain;
+    @Value(value = "${eternalengine.appDomain}")
+    private String appDomain;
+
+    @Value(value = "${eternalengine.systemNamespace}")
+    private String systemNamespace;
+
     final DomainLookupRepository domainLookupRepository;
 
 
@@ -44,6 +47,8 @@ public class PageController {
     @RequestMapping(method = RequestMethod.GET, value = {"/api/pages/**"}, produces = "application/json")
     @ResponseBody
     public String servePage(HttpServletRequest request, HttpServletResponse response) {
+
+        System.out.println("SERVING");
 
         /** See if we can find the domain in DomainLookUp - if not, 404 **/
 
@@ -75,9 +80,9 @@ public class PageController {
             if (optNotFound.isPresent()) {
                 return optNotFound.get().getJson();
             }
-            throw new EternalEngineNotFoundException(EternalEngineError.ERROR_002, "Page not found at " + url.getDomain() + url.getPath());
-        } else if (pageRepository.existsByType(Page.PageType.PageNormal)) {
+            throw new EternalEngineEditableNotFoundException(EternalEngineError.ERROR_002, "Page not found at " + url.getDomain() + url.getPath(), siteId);
 
+        } else if (pageRepository.existsByType(Page.PageType.PageNormal)) {
 
             throw new EternalEngineEditableNotFoundException(EternalEngineError.ERROR_004, "Domain available for use: " + url.getDomain(), siteId);
         } else if (pageRepository.existsBy()) {
@@ -108,7 +113,6 @@ public class PageController {
         }
 
         page.setJson(json);
-
         return pageRepository.save(page).getJson();
     }
 
@@ -133,17 +137,24 @@ public class PageController {
     @ExceptionHandler(EternalEngineNotFoundException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public HttpError handleWindflowNotFoundException(EternalEngineNotFoundException windEx) {
-        if (windEx instanceof EternalEngineEditableNotFoundException) {
-            return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly(), ((EternalEngineEditableNotFoundException)windEx).getSiteId());
+    public String handleWindflowNotFoundException(EternalEngineNotFoundException windEx) {
+
+        System.out.println("ERROR HERE");
+
+        Optional<Page> optNotFound = pageRepository.findByDomainAndType(systemNamespace, Page.PageType.Page404);
+        if (optNotFound.isPresent()) {
+            return optNotFound.get().getJson();
         }
-        return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly());
+        if (windEx instanceof EternalEngineEditableNotFoundException) {
+            return new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), windEx.getWindflowError(), windEx.getDetailOnly(), ((EternalEngineEditableNotFoundException) windEx).getSiteId()).toString();
+        }
+        return new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), windEx.getWindflowError(), windEx.getDetailOnly()).toString();
     }
 
     @ExceptionHandler(EternalEngineWebException.class)
     @ResponseBody
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public HttpError handleWindflowNotFoundException(EternalEngineWebException windEx) {
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public HttpError handleWindflowWebException(EternalEngineWebException windEx) {
         return new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), windEx.getWindflowError(), windEx.getDetailOnly());
     }
 
