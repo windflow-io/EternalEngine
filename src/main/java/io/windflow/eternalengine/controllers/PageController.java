@@ -145,6 +145,17 @@ public class PageController {
         if (optNotFound.isPresent()) { // General 404 for domain
             System.out.println("HERE2");
             String json = optNotFound.get().getJson();
+            if (windEx instanceof EternalEngineEditableNotFoundException) {
+                try {
+                    ObjectMapper mapper = new ObjectMapper();
+                    JsonNode node = mapper.readTree(json);
+
+                    ((ObjectNode) node).put("siteId", ((EternalEngineEditableNotFoundException)windEx).getSiteId());
+                    return node.toString();
+                } catch (JsonProcessingException ex) {
+                    throw new EternalEngineWebException(EternalEngineError.ERROR_012, ex.getMessage());
+                }
+            }
             System.out.println(json);
             return json;
         }
