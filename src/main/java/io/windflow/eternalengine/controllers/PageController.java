@@ -16,6 +16,7 @@ import io.windflow.eternalengine.persistence.PageRepository;
 import io.windflow.eternalengine.beans.dto.HttpError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -134,20 +135,28 @@ public class PageController {
     }
 
     @ExceptionHandler({EternalEngineNotFoundException.class, EternalEngineEditableNotFoundException.class})
-
     @ResponseBody
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.OK)
     public String handleEternalEngineNotFoundException(EternalEngineNotFoundException windEx) {
+
+        System.out.println("HERE1");
 
         Optional<Page> optNotFound = pageRepository.findByDomainAndType(systemNamespace, Page.PageType.Page404);
         if (optNotFound.isPresent()) { // General 404 for domain
-            return optNotFound.get().getJson();
+            System.out.println("HERE2");
+            String json = optNotFound.get().getJson();
+            System.out.println(json);
+            return json;
         }
 
+        System.out.println("HERE3");
+
         if (windEx instanceof EternalEngineEditableNotFoundException) {
+            System.out.println("HERE4");
             EternalEngineNotFoundException windEx2 = new EternalEngineNotFoundException(EternalEngineError.ERROR_013, "Looking in the " + systemNamespace + " namespace. The original cause of the 404 is " + windEx.getMessage());
             return new HttpError(HttpStatus.NOT_FOUND.value(), windEx2.getWindflowError(), windEx2.getDetailOnly(), ((EternalEngineEditableNotFoundException)windEx).getSiteId()).toString();
         }
+        System.out.println("HERE5");
         EternalEngineNotFoundException windEx2 = new EternalEngineNotFoundException(EternalEngineError.ERROR_013, "Looking in the " + systemNamespace + " namespace. The original cause of the 404 is " + windEx.getMessage());
         return new HttpError(HttpStatus.NOT_FOUND.value(), windEx2.getWindflowError(), windEx2.getDetailOnly()).toString();
     }
@@ -156,7 +165,7 @@ public class PageController {
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public HttpError handleEternalEngineWebException(EternalEngineWebException windEx) {
-        System.out.println("HERE2");
+        System.out.println("HERE5");
         return new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), windEx.getWindflowError(), windEx.getDetailOnly());
     }
 

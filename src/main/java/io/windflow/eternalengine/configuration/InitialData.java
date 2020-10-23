@@ -34,6 +34,9 @@ public class InitialData {
     @Value(value = "${eternalengine.resetDataOnStartup:undefined}")
     String resetDataOnStartup;
 
+    @Value(value = "${eternalengine.systemNamespace}")
+    String systemNamespace;
+
     InitialData(@Autowired PageRepository pageRepository, @Autowired ComponentRepository componentRepository, @Autowired ExtensionDataRepository extensionDataRepository, @Autowired CryptoService cryptoService, @Autowired DomainLookupRepository domainLookupRepository) {
         this.pageRepository = pageRepository;
         this.componentRepository = componentRepository;
@@ -50,6 +53,10 @@ public class InitialData {
             /* Auth.windflow.io.local */
             savePage("auth-windflow-io.windflow.app.local", "/", Page.PageType.PageNormal, "/data/auth-windflow-io.windflow.app.local/pages/index.json");
 
+            // SYSTEM
+
+            savePage(systemNamespace, "/", Page.PageType.Page404, "/data/" + systemNamespace + "/pages/404.json");
+
         }
     }
 
@@ -64,12 +71,16 @@ public class InitialData {
             /* auth.windflow.io.local */
             saveComponent("auth-windflow-io.windflow.app.local", "CenteredLayout", io.windflow.eternalengine.entities.Component.ComponentType.LAYOUT, "/data/auth-windflow-io.windflow.app.local/layouts/CenteredLayout.js");
             saveComponent("auth-windflow-io.windflow.app.local", "SingleColumnLayout", io.windflow.eternalengine.entities.Component.ComponentType.LAYOUT, "/data/auth-windflow-io.windflow.app.local/layouts/SingleColumnLayout.js");
+            saveComponent(systemNamespace, "CenteredLayout", io.windflow.eternalengine.entities.Component.ComponentType.LAYOUT, "/data/" + systemNamespace + "/layouts/CenteredLayout.js");
 
             // COMPONENTS
 
             /* auth.windflow.io.local */
             saveComponent("auth-windflow-io.windflow.app.local", "GithubAuth", io.windflow.eternalengine.entities.Component.ComponentType.COMPONENT, "/data/auth-windflow-io.windflow.app.local/components/GithubAuth.js");
 
+            // SYSTEM
+
+            saveComponent(systemNamespace, "NotFoundDisplay", io.windflow.eternalengine.entities.Component.ComponentType.COMPONENT, "/data" + systemNamespace + "/components/NotFoundDisplay.js");
 
         }
     }
