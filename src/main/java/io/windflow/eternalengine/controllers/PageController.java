@@ -19,7 +19,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -137,13 +140,13 @@ public class PageController {
     @ExceptionHandler({EternalEngineNotFoundException.class, EternalEngineEditableNotFoundException.class})
     @ResponseBody
     @ResponseStatus(HttpStatus.OK)
-    public String handleEternalEngineNotFoundException(EternalEngineNotFoundException windEx) {
+    public ResponseEntity<String> handleEternalEngineNotFoundException(EternalEngineNotFoundException windEx) {
 
-        System.out.println("HERE1");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
 
         Optional<Page> optNotFound = pageRepository.findByDomainAndType(systemNamespace, Page.PageType.Page404);
         if (optNotFound.isPresent()) { // General 404 for domain
-            System.out.println("HERE2");
             String json = optNotFound.get().getJson();
             if (windEx instanceof EternalEngineEditableNotFoundException) {
                 try {
@@ -151,25 +154,23 @@ public class PageController {
                     JsonNode node = mapper.readTree(json);
 
                     ((ObjectNode) node).put("siteId", ((EternalEngineEditableNotFoundException)windEx).getSiteId());
-                    return node.toString();
+                    return new ResponseEntity<String>(node.toString(), headers, HttpStatus.OK);
                 } catch (JsonProcessingException ex) {
                     throw new EternalEngineWebException(EternalEngineError.ERROR_012, ex.getMessage());
                 }
             }
-            System.out.println(json);
-            return json;
+            return new ResponseEntity<String>(json, headers, HttpStatus.OK);
         }
-
-        System.out.println("HERE3");
 
         if (windEx instanceof EternalEngineEditableNotFoundException) {
-            System.out.println("HERE4");
             EternalEngineNotFoundException windEx2 = new EternalEngineNotFoundException(EternalEngineError.ERROR_013, "Looking in the " + systemNamespace + " namespace. The original cause of the 404 is " + windEx.getMessage());
-            return new HttpError(HttpStatus.NOT_FOUND.value(), windEx2.getWindflowError(), windEx2.getDetailOnly(), ((EternalEngineEditableNotFoundException)windEx).getSiteId()).toString();
+            String err = new HttpError(HttpStatus.NOT_FOUND.value(), windEx2.getWindflowError(), windEx2.getDetailOnly(), ((EternalEngineEditableNotFoundException)windEx).getSiteId()).toString();
+            return new ResponseEntity<String>(err, headers, HttpStatus.OK);
+
         }
-        System.out.println("HERE5");
         EternalEngineNotFoundException windEx2 = new EternalEngineNotFoundException(EternalEngineError.ERROR_013, "Looking in the " + systemNamespace + " namespace. The original cause of the 404 is " + windEx.getMessage());
-        return new HttpError(HttpStatus.NOT_FOUND.value(), windEx2.getWindflowError(), windEx2.getDetailOnly()).toString();
+        String err = new HttpError(HttpStatus.NOT_FOUND.value(), windEx2.getWindflowError(), windEx2.getDetailOnly()).toString();
+        return new ResponseEntity<String>(err, headers, HttpStatus.OK);
     }
 
     @ExceptionHandler(EternalEngineWebException.class)
