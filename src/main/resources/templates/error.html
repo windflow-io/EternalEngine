@@ -1,7 +1,24 @@
-<!doctype html>
-<html xmlns:th="http://www.thymeleaf.org" th:lang="${pageData?.getMetaInfo()?.getHtmlAttrs()?.getLang()}">
-<head><title>Error</title></head>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <title>404</title>
+    <meta  name="robots" content="noindex, follow">
+    <link rel="icon" href="https://cdn.windflow.io/app/img/favicon-32x32.png" type="img/png" sizes="32x32">
+    <link rel="icon" href="https://cdn.windflow.io/app/img/favicon-16x16.png" type="img/png" sizes="16x16">
+    <link rel="stylesheet" href="https://cdn.windflow.io/app/vendor/tailwindcss/tailwind.min.css">
+</head>
 <body>
-    An error happened.
+    <div>
+        <div>
+            <div class="flex flex-row h-screen items-center justify-center p-10 bg-gray-900">
+                <div class="relative z-10 max-w-4xl opacity-100">
+                    <section class="text-center">
+                        <h1 class="text-6xl text-white" th:text="${param.title ?: 'Oops!'}"></h1>
+                        <h2 class="text-3xl text-gray-400 -mt-2" th:text="${param.description ?: 'That was not supposed to happen!'}"></h2>
+                        <h3 class="text-base text-gray-600 mt-2" th:text="${param.detail ?: 'Please contact us and let us know..'}"></h3>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
