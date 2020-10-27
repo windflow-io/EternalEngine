@@ -14,6 +14,7 @@ import io.windflow.eternalengine.error.EternalEngineWebException;
 import io.windflow.eternalengine.persistence.DomainLookupRepository;
 import io.windflow.eternalengine.persistence.PageRepository;
 import io.windflow.eternalengine.beans.dto.HttpError;
+import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.aop.support.AopUtils;
@@ -27,7 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 public class PageController {
@@ -41,9 +42,7 @@ public class PageController {
     @Value(value = "${eternalengine.systemNamespace}")
     String systemNamespace;
 
-
     final DomainLookupRepository domainLookupRepository;
-
 
     public PageController(@Autowired PageRepository pageRepository, @Autowired DomainLookupRepository domainLookupRepository) {
         this.pageRepository = pageRepository;
@@ -148,6 +147,15 @@ public class PageController {
         Optional<Page> optNotFound = pageRepository.findByDomainAndType(systemNamespace, Page.PageType.Page404);
         if (optNotFound.isPresent()) { // General 404 for domain
             String json = optNotFound.get().getJson();
+
+            Map<String, String> dynamicPageVariables = new HashMap<>();
+            dynamicPageVariables.put("errorTitle", "404");
+            dynamicPageVariables.put("errorDescription", windEx.getErrorDetail());
+            dynamicPageVariables.put("errorDetail", windEx.getWindflowError().getDescription());
+
+            StringSubstitutor replacer = new StringSubstitutor(dynamicPageVariables);
+            json = replacer.replace(json);
+
             if (windEx instanceof EternalEngineEditableNotFoundException) {
                 try {
                     ObjectMapper mapper = new ObjectMapper();
@@ -177,7 +185,6 @@ public class PageController {
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public HttpError handleEternalEngineWebException(EternalEngineWebException windEx) {
-        System.out.println("HERE5");
         return new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), windEx.getWindflowError(), windEx.getDetailOnly());
     }
 

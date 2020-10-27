@@ -68,7 +68,7 @@ public class WebController {
             return "spa200";
         }
 
-        //response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         return "spa200";
 
     }

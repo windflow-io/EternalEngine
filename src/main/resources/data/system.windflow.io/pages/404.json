@@ -1,6 +1,6 @@
 {
     "metaInfo": {
-        "title": "404 - Custom 404 Page",
+        "title": "${errorTitle}",
         "htmlAttrs" : {
             "lang" : "en"
         },
@@ -27,9 +27,9 @@
     "data": {
         "components": {
             "notFoundDisplay": {
-                "errorDescription": "...",
-                "errorDetail": "...",
-                "errorTitle": "..."
+                "errorTitle": "${errorTitle}",
+                "errorDescription": "${errorDescription}",
+                "errorDetail": "${errorDetail}"
             }
         }
     }

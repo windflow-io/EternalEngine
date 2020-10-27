@@ -17,8 +17,9 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'com.vladmihalcea:hibernate-types-52:2.9.13'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:2.3.2.RELEASE'
-    runtimeOnly 'org.postgresql:postgresql'
     implementation 'org.slf4j:log4j-over-slf4j:1.7.30'
     implementation 'org.jasypt:jasypt:1.9.3'
     implementation 'com.auth0:java-jwt:3.11.0'
+    implementation 'org.apache.commons:commons-text:1.9'
+    runtimeOnly 'org.postgresql:postgresql'
 }
