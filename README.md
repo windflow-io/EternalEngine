@@ -1,5 +1,8 @@
 ![Windflow logo](https://i.imgur.com/Yt2FfIY.png)
 # Windflow.io's Eternal Engine
+
+> This project is in early development phase and not ready for use. Please 'Watch' us for updates. Send questions or queries to [support@windflow.io](mailto:support@windflow.io)
+
 Windflow Eternal Engine is an open-source, web-component-based platform for building apps and web sites in Vue.js and TailwindCSS. It serves web sites and apps as an assortment of web components dynamically constructed from a database.
 The components, order, layout, styles and content are all dynamic.
 Eternal Engine provides out-of-the-box component and content management functionality, bringing Wordpress-like features to Vue.js developers.
