@@ -1,7 +1,6 @@
 package io.windflow.eternalengine.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -17,7 +16,6 @@ import io.windflow.eternalengine.beans.dto.HttpError;
 import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -96,7 +94,7 @@ public class PageController {
 
     @RequestMapping(method = RequestMethod.PUT, value = {"/api/pages/**"}, produces = "application/json")
     @ResponseBody
-    public String savePage(HttpServletRequest request, HttpServletResponse response, @RequestBody String json) {
+    public String savePage(HttpServletRequest request, @RequestBody String json) {
 
         UrlHelper url = new UrlHelper(request);
 
@@ -162,23 +160,23 @@ public class PageController {
                     JsonNode node = mapper.readTree(json);
 
                     ((ObjectNode) node).put("siteId", ((EternalEngineEditableNotFoundException)windEx).getSiteId());
-                    return new ResponseEntity<String>(node.toString(), headers, HttpStatus.OK);
+                    return new ResponseEntity<>(node.toString(), headers, HttpStatus.OK);
                 } catch (JsonProcessingException ex) {
                     throw new EternalEngineWebException(EternalEngineError.ERROR_012, ex.getMessage());
                 }
             }
-            return new ResponseEntity<String>(json, headers, HttpStatus.OK);
+            return new ResponseEntity<>(json, headers, HttpStatus.OK);
         }
 
         if (windEx instanceof EternalEngineEditableNotFoundException) {
             EternalEngineNotFoundException windEx2 = new EternalEngineNotFoundException(EternalEngineError.ERROR_013, "Looking in the " + systemNamespace + " namespace. The original cause of the 404 is " + windEx.getMessage());
             String err = new HttpError(HttpStatus.NOT_FOUND.value(), windEx2.getWindflowError(), windEx2.getDetailOnly(), ((EternalEngineEditableNotFoundException)windEx).getSiteId()).toString();
-            return new ResponseEntity<String>(err, headers, HttpStatus.OK);
+            return new ResponseEntity<>(err, headers, HttpStatus.OK);
 
         }
         EternalEngineNotFoundException windEx2 = new EternalEngineNotFoundException(EternalEngineError.ERROR_013, "Looking in the " + systemNamespace + " namespace. The original cause of the 404 is " + windEx.getMessage());
         String err = new HttpError(HttpStatus.NOT_FOUND.value(), windEx2.getWindflowError(), windEx2.getDetailOnly()).toString();
-        return new ResponseEntity<String>(err, headers, HttpStatus.OK);
+        return new ResponseEntity<>(err, headers, HttpStatus.OK);
     }
 
     @ExceptionHandler(EternalEngineWebException.class)
@@ -190,11 +188,10 @@ public class PageController {
 
     /*** Helper Class ***/
 
-    public class UrlHelper {
+    public static class UrlHelper {
 
-        private HttpServletRequest request;
         private String domain;
-        private String path;
+        private final String path;
 
         public UrlHelper(HttpServletRequest request) {
             String requestedPath = request.getRequestURI().replace("/api/pages", "").toLowerCase();
