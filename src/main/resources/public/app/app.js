@@ -31,7 +31,7 @@ export const FlowApplication = {
     },
     setup() {
         const urlParams = new URLSearchParams(window.location.search);
-        const host = urlParams.get('host') || location.host;
+        const host = location.host;
 
         const api = makeApi({ http });
         const serviceComponent = makeServiceComponent({ api, host });

@@ -57,5 +57,5 @@ To run the application:
         ``` 
 
 * **Note 1**: As above, there is a gradlew.bat for windows users.
-* **Note 2**: The application checks `window.location.host` to decide which site to serve. This doesn't help much when running locally as http://localhost so we added a feature that allows you to fudge hosts. To fudge a host, just add a querystring parameter `?host=www.example.com` (for example) to any url.
+* **Note 2**: The application checks `window.location.host` to decide which site to serve. Use your `/etc/hosts` file to create local aliases for your site. 
 * **Note 3**: Default database credentials are `postgres:postgres@windflow`   
