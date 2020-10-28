@@ -1,6 +1,6 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <title>404</title>
+    <title th:text="${param.title ?: 'Oops!'}"></title>
     <meta  name="robots" content="noindex, follow">
     <link rel="icon" href="https://cdn.windflow.io/app/img/favicon-32x32.png" type="img/png" sizes="32x32">
     <link rel="icon" href="https://cdn.windflow.io/app/img/favicon-16x16.png" type="img/png" sizes="16x16">

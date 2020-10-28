@@ -1,12 +1,13 @@
 package io.windflow.eternalengine.controllers.api;
 
+import io.windflow.eternalengine.EternalEngine;
 import io.windflow.eternalengine.beans.GithubTokenResponse;
 import io.windflow.eternalengine.beans.GithubUser;
 import io.windflow.eternalengine.beans.dto.Token;
 import io.windflow.eternalengine.entities.EternalEngineUser;
 import io.windflow.eternalengine.entities.Session;
+import io.windflow.eternalengine.error.EternalEngineAuthException;
 import io.windflow.eternalengine.error.EternalEngineError;
-import io.windflow.eternalengine.error.EternalEngineWebException;
 
 import io.windflow.eternalengine.persistence.SessionRepository;
 import io.windflow.eternalengine.persistence.UserRepository;
@@ -41,9 +42,6 @@ public class AuthApi {
     @Value("${eternalengine.auth.github_auth_domain}")
     String GITHUB_CALLBACK_DOMAIN;
 
-    //@Value("${io.windflow.auth.cookiedomain}")
-    //String GITHUB_COOKIE_DOMAIN;
-
     final String GITHUB_ALLOW_SIGNUP = "true";
     final String SCOPE = "read:user+user:email";
 
@@ -61,13 +59,13 @@ public class AuthApi {
     }
 
     @GetMapping("/api/auth/github")
-    public void redirectUserToGitHub(HttpServletRequest request, HttpServletResponse response) throws EternalEngineWebException {
+    public void redirectUserToGitHub(HttpServletRequest request, HttpServletResponse response) throws EternalEngineAuthException {
 
         final String GITHUB_CALLBACK_URL = GITHUB_CALLBACK_DOMAIN + "/api/auth/github/callback";
 
         String referer = request.getHeader("referer");
 
-        if (referer == null) throw new EternalEngineWebException(EternalEngineError.ERROR_009, "Auth refused to redirect use to github without referer header");
+        if (referer == null) throw new EternalEngineAuthException(EternalEngineError.ERROR_009, "Auth refused to redirect use to github without referer header", null);
 
         String state = URLEncoder.encode(referer, StandardCharsets.UTF_8);
 
@@ -76,23 +74,24 @@ public class AuthApi {
         try {
             response.sendRedirect(authRedirectUrl);
         } catch (IOException ex) {
-            throw new EternalEngineWebException(EternalEngineError.ERROR_001, "Could not send redirect", ex);
+            throw new EternalEngineAuthException(EternalEngineError.ERROR_001, "Could not send redirect", ex, state);
         }
     }
 
     /**
      * Callback URL should be: [protocol://domain:port]/api/auth/github/callback
      * @param request
-     * @throws EternalEngineWebException
+     * @throws EternalEngineAuthException
      */
     @GetMapping("/api/auth/github/callback")
-    public void receiveUserFromGitHub(HttpServletRequest request, HttpServletResponse response) throws EternalEngineWebException {
+    public void receiveUserFromGitHub(HttpServletRequest request, HttpServletResponse response) throws EternalEngineAuthException {
 
         final String GITHUB_CALLBACK_URL = GITHUB_CALLBACK_DOMAIN + "/api/auth/github/callback";
         final String code = request.getParameter("code");
         final String tokenUrl = GITHUB_TOKEN_URL + "?client_id=" + GITHUB_CLIENT_ID + "&client_secret=" + GITHUB_CLIENT_SECRET + "&code=" + code + "&redirect_uri=" + GITHUB_CALLBACK_URL;
+        final String referer = request.getParameter("state");
 
-        checkForErrors(request);
+        checkForErrors(request, referer);
         GithubTokenResponse token = fetchToken(tokenUrl);
         GithubUser githubUser = fetchUserData(token.getAccessToken());
         EternalEngineUser user = createOrFetchUser(githubUser);
@@ -100,9 +99,9 @@ public class AuthApi {
 
         try {
             response.addCookie(createCookie(session.getId()));
-            response.sendRedirect(request.getParameter("state"));
+            response.sendRedirect(referer);
         } catch (IOException ex) {
-            throw new EternalEngineWebException(EternalEngineError.ERROR_001, "Could not send redirect", ex);
+            throw new EternalEngineAuthException(EternalEngineError.ERROR_001, "Could not send redirect", ex, referer);
         }
 
     }
@@ -124,9 +123,9 @@ public class AuthApi {
 
         RestTemplate template = new RestTemplate();
         GithubTokenResponse token = template.getForObject(tokenUrl, GithubTokenResponse.class);
-        if (token == null) throw new EternalEngineWebException(EternalEngineError.ERROR_011, "No response to token request");
+        if (token == null) throw new EternalEngineAuthException(EternalEngineError.ERROR_011, "No response to token request", null);
         if (token.getError() != null) {
-            throw new EternalEngineWebException(EternalEngineError.ERROR_011, token.getError() + ": " + token.getErrorDescription());
+            throw new EternalEngineAuthException(EternalEngineError.ERROR_011, token.getError() + ": " + token.getErrorDescription(), null);
         }
         return token;
 
@@ -134,10 +133,10 @@ public class AuthApi {
 
     /* private methods */
 
-    private void checkForErrors(HttpServletRequest request) {
+    private void checkForErrors(HttpServletRequest request, String referer) {
         if (request.getParameter("error") != null) {
             String errorString = request.getParameter("error") + ": " + request.getParameter("error_description");
-            throw new EternalEngineWebException(EternalEngineError.ERROR_011, errorString);
+            throw new EternalEngineAuthException(EternalEngineError.ERROR_011, errorString, referer);
         }
     }
 
@@ -160,20 +159,37 @@ public class AuthApi {
 
     /* Error handling */
 
-    @ExceptionHandler(EternalEngineWebException.class)
-    @ResponseBody
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public HttpError handleWindflowWebException(EternalEngineWebException windEx) {
+    @ExceptionHandler(EternalEngineAuthException.class)
+    public ResponseEntity<String> handleWindflowAuthException(EternalEngineAuthException windEx, HttpServletResponse response) {
         windEx.printStackTrace();
-        return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly());
+        try {
+            String referer = windEx.getReferer();
+            if (referer == null) throw new IOException(windEx);
+            response.sendRedirect(referer + "?status=failed&error=" + URLEncoder.encode(windEx.getMessage(), StandardCharsets.UTF_8));
+            return null;
+        } catch (IOException ioe) {
+            try {
+                response.sendRedirect("/error?title=Internal+Server+Error&description=" + URLEncoder.encode(EternalEngineError.ERROR_014.name()  + ": " + EternalEngineError.ERROR_011.getTitle(), StandardCharsets.UTF_8) + "&detail=" + ioe.getCause().getMessage());
+                return null;
+            } catch (IOException ioe2) {
+                String error = new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), EternalEngineError.ERROR_014, ioe.getMessage() + " and " + windEx.getMessage()).toString();
+                return new ResponseEntity<String>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
     }
 
     @ExceptionHandler(Exception.class)
-    @ResponseBody
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public HttpError handleGeneralException(Exception ex) {
+    public ResponseEntity<String> handleGeneralException(Exception ex, HttpServletResponse response) {
         ex.printStackTrace();
-        return new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), EternalEngineError.ERROR_010, ex.getMessage());
+        final String description = URLEncoder.encode(EternalEngineError.ERROR_011.name() + ": " + EternalEngineError.ERROR_011.getTitle(), StandardCharsets.UTF_8);
+        final String detail = URLEncoder.encode(ex.getMessage(), StandardCharsets.UTF_8);
+        try {
+            response.sendRedirect("/error?title=Internal+Server+Error&description=" + description + "&detail=" + detail);
+            return null;
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+            String error = new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), EternalEngineError.ERROR_014, ioe.getMessage() + " and " + ex.getMessage()).toString();
+            return new ResponseEntity<String>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-
 }
