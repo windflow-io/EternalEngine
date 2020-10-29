@@ -766,7 +766,7 @@ export function makeContextRouter({
             $head.appendChild(element);
         }
 
-        const $obsoleteElements = $head.querySelectorAll(`meta:not([data-render-id="${renderId}"]),link:not([data-render-id="${renderId}"])`)
+        const $obsoleteElements = $head.querySelectorAll(`[data-render-id]:not([data-render-id="${renderId}"])`)
         $obsoleteElements.forEach($el => $head.removeChild($el));
     };
 
