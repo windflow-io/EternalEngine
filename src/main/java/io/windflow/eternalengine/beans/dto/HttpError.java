@@ -10,7 +10,6 @@ public class HttpError extends JsonStringifiable {
     String errorTitle;
     String errorDescription;
     String errorDetail;
-    String siteId;
 
     public HttpError(Integer httpStatus, EternalEngineError eternalEngineError, String errorDetail) {
         this.httpStatus = httpStatus;
@@ -26,7 +25,6 @@ public class HttpError extends JsonStringifiable {
         this.errorTitle = eternalEngineError.getTitle();
         this.errorDescription = eternalEngineError.getDescription();
         this.errorDetail = errorDetail;
-        this.siteId = siteId;
     }
 
     /*** Getters and Setters ***/
@@ -75,11 +73,4 @@ public class HttpError extends JsonStringifiable {
         this.httpStatus = httpStatus;
     }
 
-    public String getSiteId() {
-        return siteId;
-    }
-
-    public void setSiteId(String siteId) {
-        this.siteId = siteId;
-    }
 }

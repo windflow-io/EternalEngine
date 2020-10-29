@@ -4,6 +4,7 @@ import io.windflow.eternalengine.entities.Component;
 import io.windflow.eternalengine.entities.DomainLookup;
 import io.windflow.eternalengine.error.EternalEngineError;
 import io.windflow.eternalengine.error.EternalEngineNotFoundException;
+import io.windflow.eternalengine.error.EternalEngineWebException;
 import io.windflow.eternalengine.persistence.ComponentRepository;
 import io.windflow.eternalengine.beans.dto.HttpError;
 import io.windflow.eternalengine.services.DomainFinder;
@@ -37,8 +38,6 @@ public class ComponentController {
     @ResponseBody
     public String getComponent(@PathVariable(value = "namespace", required = false) String namespace, @PathVariable("filename") String componentFilename, HttpServletRequest request) {
 
-        System.out.println("HERE HERE HERE");
-
         if (namespace == null) {
             DomainLookup site = domainFinder.getSite(request);
             namespace = site.getSiteId();
@@ -48,7 +47,7 @@ public class ComponentController {
 
         Optional<Component> optComponent = componentRepository.findByNamespaceAndComponentName(namespace, componentName);
         if (optComponent.isPresent()) {
-            return optComponent.get().getJavaScript();
+            return optComponent.get().getJavascript();
         } else {
             String errorDetail = "007 Component not found in database. Namespace: " + namespace + " and component name: " + componentName;
             logger.warn(errorDetail);
@@ -99,10 +98,8 @@ public class ComponentController {
             componentToSave = componentArrived;
         }
 
-        componentToSave.setJavaScript(vueConversionService.convertVueToJs(componentToSave.getSingleFileComponent()));
-
+        componentToSave.setJavascript(vueConversionService.convertVueToJs(componentToSave.getComponentName(), componentToSave.getSingleFileComponent()));
         componentRepository.save(componentToSave);
-
         return "{}";
     }
 
@@ -112,6 +109,13 @@ public class ComponentController {
     public HttpError handleWindflowNotFoundException(EternalEngineNotFoundException windEx) {
         windEx.printStackTrace();
         return new HttpError(HttpStatus.NOT_FOUND.value(), windEx.getWindflowError(), windEx.getDetailOnly());
+    }
+
+    @ExceptionHandler(EternalEngineWebException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public HttpError handleEternalEngineWebException(EternalEngineWebException windEx) {
+        return new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), windEx.getWindflowError(), windEx.getDetailOnly());
     }
 
 }

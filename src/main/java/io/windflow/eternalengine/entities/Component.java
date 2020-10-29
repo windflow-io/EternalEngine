@@ -23,7 +23,7 @@ public class Component {
     Float version = 0f;
 
     @Type(type="org.hibernate.type.TextType")
-    String javaScript;
+    String javascript;
 
     @Type(type="org.hibernate.type.TextType")
     String singleFileComponent;
@@ -34,10 +34,10 @@ public class Component {
 
     public Component() {}
 
-    public Component(String namespace, String componentName, ComponentType componentType, String javaScript, String singleFileComponent) {
+    public Component(String namespace, String componentName, ComponentType componentType, String javascript, String singleFileComponent) {
         this.namespace = namespace;
         this.componentName = componentName;
-        this.javaScript = javaScript;
+        this.javascript = javascript;
         this.singleFileComponent = singleFileComponent;
         this.componentType = componentType;
     }
@@ -102,12 +102,12 @@ public class Component {
     }
 
     @JsonIgnore
-    public String getJavaScript() {
-        return javaScript;
+    public String getJavascript() {
+        return javascript;
     }
 
-    public void setJavaScript(String javaScript) {
-        this.javaScript = javaScript;
+    public void setJavascript(String javaScript) {
+        this.javascript = javaScript;
     }
 
     @JsonProperty("sfc")

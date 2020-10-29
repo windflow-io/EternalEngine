@@ -129,7 +129,7 @@ public class PageController {
 
     @ExceptionHandler(EternalEngineWebException.class)
     @ResponseBody
-    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public HttpError handleEternalEngineWebException(EternalEngineWebException windEx) {
         return new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), windEx.getWindflowError(), windEx.getDetailOnly());
     }
