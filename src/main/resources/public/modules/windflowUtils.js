@@ -528,7 +528,7 @@ export function makeContextEditMode({
     const loadEditModeAssets = async () => {
         await Promise.all([
             loadEditor(),
-            loadStylesheet('/vendor/tailwindcss/tailwind.min.css'),
+            loadStylesheet('/vendor/tailwindcss/tailwind.editor.min.css'),
         ]);
     }
 
