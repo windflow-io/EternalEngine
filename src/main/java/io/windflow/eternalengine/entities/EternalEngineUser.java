@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(indexes = {@Index(name="index_columns", columnList="email", unique = true)})
+@Table(indexes = {@Index(name="index_eternal_engine_user", columnList="email", unique = true)})
 public class EternalEngineUser extends JsonStringifiable {
 
     @Id
@@ -15,6 +15,8 @@ public class EternalEngineUser extends JsonStringifiable {
     UUID id;
 
     String name;
+
+    @Column(name="email")
     String email;
     String avatarUrl;
     String location;

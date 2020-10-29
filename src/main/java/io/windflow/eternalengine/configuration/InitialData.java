@@ -76,11 +76,11 @@ public class InitialData {
             // COMPONENTS
 
             /* auth.windflow.io.local */
-            saveComponent("auth-windflow-io.windflow.app.local", "GithubAuth", io.windflow.eternalengine.entities.Component.ComponentType.COMPONENT, "/data/auth-windflow-io.windflow.app.local/components/GithubAuth.js");
+            saveComponent("auth-windflow-io.windflow.app.local", "GithubAuth", io.windflow.eternalengine.entities.Component.ComponentType.COMPONENT, "/data/auth-windflow-io.windflow.app.local/components/GithubAuth.js", "/data/auth-windflow-io.windflow.app.local/components/GithubAuth.vue");
 
             // SYSTEM
 
-            saveComponent(systemNamespace, "NotFoundDisplay", io.windflow.eternalengine.entities.Component.ComponentType.COMPONENT, "/data/" + systemNamespace + "/components/NotFoundDisplay.js");
+            saveComponent(systemNamespace, "NotFoundDisplay", io.windflow.eternalengine.entities.Component.ComponentType.COMPONENT, "/data/ƒGiyhubA" + systemNamespace + "/components/NotFoundDisplay.js");
 
         }
     }
@@ -120,12 +120,17 @@ public class InitialData {
         }
     }
 
-    private void saveComponent(String namespace, String name, io.windflow.eternalengine.entities.Component.ComponentType componentType, String filePath) {
+    private void saveComponent(String namespace, String name, io.windflow.eternalengine.entities.Component.ComponentType componentType, String jsPath) {
+        saveComponent(namespace, name, componentType, jsPath, null);
+    }
+
+    private void saveComponent(String namespace, String name, io.windflow.eternalengine.entities.Component.ComponentType componentType, String jsPath, String vuePath) {
         try {
-            componentRepository.save(new io.windflow.eternalengine.entities.Component(namespace, name, componentType, TextFileReader.getText(filePath)));
+            componentRepository.save(new io.windflow.eternalengine.entities.Component(namespace, name, componentType, TextFileReader.getText(jsPath), TextFileReader.getText(vuePath)));
         } catch (IOException ex) {
             logger.warn("Could not load file: " + ex.getMessage() + ". Ignoring, but be prepared for an error page on first visit!");
         }
+
     }
 
     private void saveExtensionData(String className, String key, String value, Boolean encrypted) {

@@ -4,21 +4,33 @@ import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(indexes = {@Index(name="index_columns", columnList="siteId,domainAlias,ownerId", unique = true)})
+@Table(indexes = {@Index(name="index_domain_lookup", columnList="site_id,domain_alias,owner_id")})
 public class DomainLookup {
 
     @Id
     @GeneratedValue
     UUID id;
 
+    @Column(name="domain_alias")
     String domainAlias;
+
+    @Column(name="site_id")
     String siteId;
+
+    @Column(name="owner_id")
     UUID ownerId;
+
     String herokuCanonicalName;
 
     public DomainLookup() {}
 
     public DomainLookup(String domainAlias, String siteId, UUID ownerId) {
+        this.siteId = siteId;
+        this.domainAlias = domainAlias;
+        this.ownerId = ownerId;
+    }
+
+    public DomainLookup(String siteId) {
         this.siteId = siteId;
         this.domainAlias = domainAlias;
         this.ownerId = ownerId;

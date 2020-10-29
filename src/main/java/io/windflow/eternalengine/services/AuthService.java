@@ -41,7 +41,6 @@ public class AuthService {
 
         Set<DomainLookup> ownedDomains = domainLookupRepository.findByOwnerId(user.getId());
 
-
         Algorithm algorithm = Algorithm.HMAC256(ENCRYPTION_PASSWORD);
         Map<String, String> claims = new HashMap<>();
         claims.put("name", user.getName());
@@ -51,7 +50,6 @@ public class AuthService {
         for (DomainLookup domain : ownedDomains) {
             claims.put(domain.getDomainAlias(), domain.getSiteId());
         }
-
 
         String jwt = JWT.create().withClaim("user", claims).sign(algorithm);
         return new Token(jwt);

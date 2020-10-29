@@ -1,77 +1,109 @@
 package io.windflow.eternalengine.controllers;
 
 import io.windflow.eternalengine.entities.Component;
+import io.windflow.eternalengine.entities.DomainLookup;
 import io.windflow.eternalengine.error.EternalEngineError;
 import io.windflow.eternalengine.error.EternalEngineNotFoundException;
 import io.windflow.eternalengine.persistence.ComponentRepository;
 import io.windflow.eternalengine.beans.dto.HttpError;
+import io.windflow.eternalengine.services.DomainFinder;
+import io.windflow.eternalengine.services.VueConversionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
 @RestController
 public class ComponentController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private ComponentRepository componentRepository;
+    private final ComponentRepository componentRepository;
+    private final DomainFinder domainFinder;
+    private final VueConversionService vueConversionService;
 
-    public ComponentController(@Autowired ComponentRepository componentRepository) {
+    public ComponentController(@Autowired ComponentRepository componentRepository, @Autowired DomainFinder domainFinder, @Autowired VueConversionService vueConversionService) {
         this.componentRepository = componentRepository;
+        this.domainFinder = domainFinder;
+        this.vueConversionService = vueConversionService;
     }
 
-    /***
-     * Get component from server
-     * @param namespace component namespace (domain) eg: com.mysite.components
-     * @param componentFilename the filename of the component ending in .js
-     * @return
-     */
-    @RequestMapping(method = RequestMethod.GET, value = {"/api/components/{namespace}/{filename:^.+\\.js$}","/api/layouts/{namespace}/{filename:^.+\\.js$}"}, produces = "text/javascript")
-    @ResponseBody
-    public String getComponent(@PathVariable("namespace") String namespace, @PathVariable("filename") String componentFilename) {
+    /** RENDERER GET **/
 
-        String componentName = componentFilename.replace(".js", "");
+    @RequestMapping(method = RequestMethod.GET, value = {"/components/{namespace}/{filename:^.+\\.js$}", "/components/{filename:^.+\\.js$}"}, produces = "text/javascript")
+    @ResponseBody
+    public String getComponent(@PathVariable(value = "namespace", required = false) String namespace, @PathVariable("filename") String componentFilename, HttpServletRequest request) {
+
+        System.out.println("HERE HERE HERE");
+
+        if (namespace == null) {
+            DomainLookup site = domainFinder.getSite(request);
+            namespace = site.getSiteId();
+        }
+
+        String componentName = componentFilename.replaceFirst(".js", "");
 
         Optional<Component> optComponent = componentRepository.findByNamespaceAndComponentName(namespace, componentName);
         if (optComponent.isPresent()) {
             return optComponent.get().getJavaScript();
         } else {
-            logger.warn("007 Component not found in database. Namespace: " + namespace + " and component name: " + componentName);
-            throw new EternalEngineNotFoundException(EternalEngineError.ERROR_008);
+            String errorDetail = "007 Component not found in database. Namespace: " + namespace + " and component name: " + componentName;
+            logger.warn(errorDetail);
+            throw new EternalEngineNotFoundException(EternalEngineError.ERROR_008, errorDetail);
         }
 
     }
 
-    /***
-     * Put a component on the server
-     * @param namespace component namespace (domain) eg: com.mysite.components
-     * @param componentFilename the filename of the component ending in .js
-     * @return
-     */
-    @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST}, value = "/api/{componentType}/{namespace}/{filename:^.+\\.js$}", produces = "text/javascript")
-    @ResponseBody
-    public String saveComponent(@PathVariable("namespace") String componentType, @PathVariable("namespace") String namespace, @PathVariable("filename") String componentFilename, @RequestBody String javaScript) {
+    /*** EDITOR GET ***/
 
-        String componentName = componentFilename.replace(".js", "");
-        Component component;
+    @RequestMapping(method = RequestMethod.GET, value = {"/api/components/{namespace}/{filename}", "/api/components/{filename}"}, produces = "application/json")
+    @ResponseBody
+    public Component getComponentForEditing(@PathVariable(value = "namespace", required = false) String namespace, @PathVariable("filename") String componentFilename, HttpServletRequest request) {
+
+        if (namespace == null) {
+            DomainLookup site = domainFinder.getSite(request);
+            namespace = site.getSiteId();
+        }
+
+        String componentName = componentFilename.replaceFirst(".js", "");
 
         Optional<Component> optComponent = componentRepository.findByNamespaceAndComponentName(namespace, componentName);
         if (optComponent.isPresent()) {
-            component = optComponent.get();
+            return optComponent.get();
         } else {
-            component = new Component();
-            component.setNamespace(namespace);
-            component.setComponentName(componentName);
-            component.setComponentType(componentType.equals("layouts") ? Component.ComponentType.LAYOUT : Component.ComponentType.COMPONENT);
+            String errorDetail = "007 Component not found in database. Namespace: " + namespace + " and component name: " + componentName;
+            logger.warn(errorDetail);
+            throw new EternalEngineNotFoundException(EternalEngineError.ERROR_008, errorDetail);
+        }
+    }
+
+    /** RENDERER PUT **/     /** CRAPPY ERROR **/
+
+    @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST}, value = {"/api/components"}, produces = "text/javascript")
+    @ResponseBody
+    public String saveComponent(HttpServletRequest request, @RequestBody Component componentArrived) {
+
+        Optional<Component> optComponentOnDisk = componentRepository.findByNamespaceAndComponentName(componentArrived.getNamespace(), componentArrived.getComponentName());
+        Component componentToSave;
+
+        if (optComponentOnDisk.isPresent()) {
+            componentToSave = optComponentOnDisk.get();
+            componentToSave.setComponentName(componentArrived.getComponentName());
+            componentToSave.setNamespace(componentArrived.getNamespace());
+            componentToSave.setComponentType(componentArrived.getComponentType());
+            componentToSave.setSingleFileComponent(componentArrived.getSingleFileComponent());
+        } else {
+            componentToSave = componentArrived;
         }
 
-        component.setJavaScript(javaScript);
+        componentToSave.setJavaScript(vueConversionService.convertVueToJs(componentToSave.getSingleFileComponent()));
 
-        return componentRepository.save(component).getJavaScript();
+        componentRepository.save(componentToSave);
 
+        return "{}";
     }
 
     @ExceptionHandler(EternalEngineNotFoundException.class)

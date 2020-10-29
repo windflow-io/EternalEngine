@@ -1,18 +1,14 @@
 package io.windflow.eternalengine.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.windflow.eternalengine.entities.DomainLookup;
 import io.windflow.eternalengine.entities.Page;
-import io.windflow.eternalengine.error.EternalEngineEditableNotFoundException;
 import io.windflow.eternalengine.error.EternalEngineError;
 import io.windflow.eternalengine.error.EternalEngineNotFoundException;
 import io.windflow.eternalengine.error.EternalEngineWebException;
 import io.windflow.eternalengine.persistence.DomainLookupRepository;
 import io.windflow.eternalengine.persistence.PageRepository;
 import io.windflow.eternalengine.beans.dto.HttpError;
+import io.windflow.eternalengine.services.DomainFinder;
 import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,58 +27,43 @@ import java.util.*;
 @RestController
 public class PageController {
 
-    private final PageRepository pageRepository;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Value(value = "${eternalengine.appDomain}")
-    String appDomain;
+    private final PageRepository pageRepository;
+    private final DomainFinder domainFinder;
 
     @Value(value = "${eternalengine.systemNamespace}")
     String systemNamespace;
 
-    final DomainLookupRepository domainLookupRepository;
-
-    public PageController(@Autowired PageRepository pageRepository, @Autowired DomainLookupRepository domainLookupRepository) {
+    public PageController(@Autowired PageRepository pageRepository, @Autowired DomainLookupRepository domainLookupRepository, @Autowired DomainFinder domainFinder) {
         this.pageRepository = pageRepository;
-        this.domainLookupRepository = domainLookupRepository;
+        this.domainFinder = domainFinder;
     }
 
-    @RequestMapping(method = RequestMethod.GET, value = {"/api/pages/**"}, produces = "application/json")
+
+    @RequestMapping(method = RequestMethod.GET, value = {"/api/pages/**", "/api/pages"}, produces = "application/json")
     @ResponseBody
     public String servePage(HttpServletRequest request, HttpServletResponse response) {
 
-        String siteId = getSiteId(request);
-        if (siteId == null) {
-            logger.warn("003 Domain does not exist");
-            response.setStatus(HttpStatus.NOT_FOUND.value());
-            throw new EternalEngineNotFoundException(EternalEngineError.ERROR_003, "domain: " + request.getServerName());
-        }
+        DomainLookup site = domainFinder.getSite(request);
+        String path = domainFinder.getPath(request);
+        String siteId = site.getSiteId();
 
-        UrlHelper url = new UrlHelper(request);
-        url.setDomain(siteId);
+        // @TODO: PERMISSIONS IN HERE
 
-        Optional<Page> optPage = pageRepository.findByDomainAndPath(url.getDomain(), url.getPath());
+        Optional<Page> optPage = pageRepository.findByDomainAndPath(siteId, path);
         if (optPage.isPresent()) { // Page found
-            Page page = optPage.get();
-            ObjectMapper mapper = new ObjectMapper();
+            return optPage.get().getJson();
 
-            try {
-                JsonNode node = mapper.readTree(page.getJson());
-                ((ObjectNode)node).put("siteId", siteId);
-                return node.toString();
-            } catch (JsonProcessingException ex) {
-                throw new EternalEngineWebException(EternalEngineError.ERROR_012, ex.getMessage());
-            }
-
-        } else if (pageRepository.existsByDomain(url.getDomain())) { // Domain but no page
-            Optional<Page> optNotFound = pageRepository.findByDomainAndType(url.getDomain(), Page.PageType.Page404);
+        } else if (pageRepository.existsByDomain(siteId)) { // Domain but no page
+            Optional<Page> optNotFound = pageRepository.findByDomainAndType(siteId, Page.PageType.Page404);
             if (optNotFound.isPresent()) { // Custom 404 for domain
                 return optNotFound.get().getJson();
             }
-            throw new EternalEngineEditableNotFoundException(EternalEngineError.ERROR_002, "Page not found at " + url.getDomain() + url.getPath(), siteId);
+            throw new EternalEngineNotFoundException(EternalEngineError.ERROR_002, "Page not found at " + request.getServerName() + path);
 
         } else if (pageRepository.existsByType(Page.PageType.PageNormal)) { // domain not found
-            throw new EternalEngineEditableNotFoundException(EternalEngineError.ERROR_004, "Domain available for use: " + url.getDomain(), siteId);
+            throw new EternalEngineNotFoundException(EternalEngineError.ERROR_004, "Domain available for use: " + request.getServerName());
 
         } else if (pageRepository.existsBy()) { // no pages whatsoever
             throw new EternalEngineNotFoundException(EternalEngineError.ERROR_005, "No sites configured");
@@ -96,17 +77,19 @@ public class PageController {
     @ResponseBody
     public String savePage(HttpServletRequest request, @RequestBody String json) {
 
-        UrlHelper url = new UrlHelper(request);
+        DomainLookup site = domainFinder.getSite(request);
+        String path = domainFinder.getPath(request);
+        String siteId = site.getSiteId();
 
         Page page;
-        Optional<Page> optPage = pageRepository.findByDomainAndPathAndType(url.getDomain(), url.getPath(), Page.PageType.PageNormal);
+        Optional<Page> optPage = pageRepository.findByDomainAndPathAndType(siteId, path, Page.PageType.PageNormal);
 
         if (optPage.isPresent()) {
             page = optPage.get();
         } else {
             page = new Page();
-            page.setDomain(url.getDomain());
-            page.setPath(url.getPath());
+            page.setDomain(siteId);
+            page.setPath(path);
             page.setType(Page.PageType.PageNormal);
             page.setJson(json);
         }
@@ -116,27 +99,9 @@ public class PageController {
         return pageRepository.save(page).getJson();
     }
 
-    private String getSiteId(HttpServletRequest request) {
-        String requestDomain = request.getServerName();
-        if (!requestDomain.endsWith(appDomain)) {
-            logger.debug("Domain " + requestDomain + " is not on the app domain " + appDomain);
-            Optional<DomainLookup> domainLookup = domainLookupRepository.findFirstByDomainAlias(requestDomain);
-            if (domainLookup.isPresent()) {
-                logger.debug("Domain " + requestDomain + " maps to " + domainLookup.get().getSiteId());
-                return domainLookup.get().getSiteId();
-            } else {
-                logger.debug("Domain " + requestDomain + " is not configured");
-                return null;
-            }
-        } else {
-            logger.debug("Domain " + requestDomain + " is on wildcard app domain " + appDomain);
-            return requestDomain;
-        }
-    }
 
-    @ExceptionHandler({EternalEngineNotFoundException.class, EternalEngineEditableNotFoundException.class})
-    @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
+
+    @ExceptionHandler({EternalEngineNotFoundException.class})
     public ResponseEntity<String> handleEternalEngineNotFoundException(EternalEngineNotFoundException windEx) {
 
         HttpHeaders headers = new HttpHeaders();
@@ -154,26 +119,9 @@ public class PageController {
             StringSubstitutor replacer = new StringSubstitutor(dynamicPageVariables);
             json = replacer.replace(json);
 
-            if (windEx instanceof EternalEngineEditableNotFoundException) {
-                try {
-                    ObjectMapper mapper = new ObjectMapper();
-                    JsonNode node = mapper.readTree(json);
-
-                    ((ObjectNode) node).put("siteId", ((EternalEngineEditableNotFoundException)windEx).getSiteId());
-                    return new ResponseEntity<>(node.toString(), headers, HttpStatus.OK);
-                } catch (JsonProcessingException ex) {
-                    throw new EternalEngineWebException(EternalEngineError.ERROR_012, ex.getMessage());
-                }
-            }
             return new ResponseEntity<>(json, headers, HttpStatus.OK);
         }
 
-        if (windEx instanceof EternalEngineEditableNotFoundException) {
-            EternalEngineNotFoundException windEx2 = new EternalEngineNotFoundException(EternalEngineError.ERROR_013, "Looking in the " + systemNamespace + " namespace. The original cause of the 404 is " + windEx.getMessage());
-            String err = new HttpError(HttpStatus.NOT_FOUND.value(), windEx2.getWindflowError(), windEx2.getDetailOnly(), ((EternalEngineEditableNotFoundException)windEx).getSiteId()).toString();
-            return new ResponseEntity<>(err, headers, HttpStatus.OK);
-
-        }
         EternalEngineNotFoundException windEx2 = new EternalEngineNotFoundException(EternalEngineError.ERROR_013, "Looking in the " + systemNamespace + " namespace. The original cause of the 404 is " + windEx.getMessage());
         String err = new HttpError(HttpStatus.NOT_FOUND.value(), windEx2.getWindflowError(), windEx2.getDetailOnly()).toString();
         return new ResponseEntity<>(err, headers, HttpStatus.OK);
@@ -185,37 +133,5 @@ public class PageController {
     public HttpError handleEternalEngineWebException(EternalEngineWebException windEx) {
         return new HttpError(HttpStatus.INTERNAL_SERVER_ERROR.value(), windEx.getWindflowError(), windEx.getDetailOnly());
     }
-
-    /*** Helper Class ***/
-
-    public static class UrlHelper {
-
-        private String domain;
-        private final String path;
-
-        public UrlHelper(HttpServletRequest request) {
-            String requestedPath = request.getRequestURI().replace("/api/pages", "").toLowerCase();
-            String hostAndPort = requestedPath.split("/")[1];
-            String urlPath = requestedPath.replace("/" + hostAndPort + "/", "");
-            urlPath = urlPath.endsWith("/") ? urlPath.substring(0, urlPath.length() -1) : urlPath;
-            String host = !hostAndPort.contains(":") ? hostAndPort : hostAndPort.substring(0, hostAndPort.indexOf(":"));
-            this.domain = host.startsWith("www.") ? host.replace("www.", "") : host;
-            this.path = (urlPath.length() == 0 ? "/" : "/" + urlPath);
-        }
-
-        public String getDomain() {
-            return this.domain;
-        }
-
-        public void setDomain(String domain) {
-            this.domain = domain;
-        }
-
-        public String getPath() {
-            return this.path;
-        }
-
-    }
-
 
 }

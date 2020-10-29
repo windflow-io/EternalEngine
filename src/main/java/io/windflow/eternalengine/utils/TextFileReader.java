@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 public class TextFileReader {
 
     public static String getText(String path) throws IOException {
+        if (path == null) return null;
         Resource resource = new ClassPathResource(path);
         try (Reader reader = new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8)) {
             return FileCopyUtils.copyToString(reader);

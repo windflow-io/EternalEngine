@@ -1,5 +1,8 @@
 package io.windflow.eternalengine.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -7,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Component {
 
     @Id
@@ -14,11 +18,15 @@ public class Component {
     UUID id;
 
     String namespace;
+
     String componentName;
     Float version = 0f;
 
     @Type(type="org.hibernate.type.TextType")
     String javaScript;
+
+    @Type(type="org.hibernate.type.TextType")
+    String singleFileComponent;
 
     LocalDateTime lastUpdated;
 
@@ -26,10 +34,11 @@ public class Component {
 
     public Component() {}
 
-    public Component(String namespace, String componentName, ComponentType componentType, String javaScript) {
+    public Component(String namespace, String componentName, ComponentType componentType, String javaScript, String singleFileComponent) {
         this.namespace = namespace;
         this.componentName = componentName;
         this.javaScript = javaScript;
+        this.singleFileComponent = singleFileComponent;
         this.componentType = componentType;
     }
 
@@ -50,6 +59,7 @@ public class Component {
 
     /*** Getters and Setters ***/
 
+    @JsonIgnore
     public UUID getId() {
         return id;
     }
@@ -58,6 +68,7 @@ public class Component {
         this.id = id;
     }
 
+    @JsonIgnore
     public String getNamespace() {
         return namespace;
     }
@@ -66,14 +77,17 @@ public class Component {
         this.namespace = namespace;
     }
 
+    @JsonProperty("name")
     public String getComponentName() {
         return componentName;
     }
 
+    @JsonProperty("name")
     public void setComponentName(String componentName) {
         this.componentName = componentName;
     }
 
+    @JsonIgnore
     public Float getVersion() {
         return version;
     }
@@ -82,10 +96,12 @@ public class Component {
         this.version = version;
     }
 
+    @JsonIgnore
     public LocalDateTime getLastUpdated() {
         return lastUpdated;
     }
 
+    @JsonIgnore
     public String getJavaScript() {
         return javaScript;
     }
@@ -94,11 +110,37 @@ public class Component {
         this.javaScript = javaScript;
     }
 
+    @JsonProperty("sfc")
+    public String getSingleFileComponent() {
+        return singleFileComponent;
+    }
+
+    @JsonProperty("sfc")
+    public void setSingleFileComponent(String singleFileComponent) {
+        this.singleFileComponent = singleFileComponent;
+    }
+
+    @JsonProperty("type")
     public ComponentType getComponentType() {
         return componentType;
     }
 
+    @JsonProperty("type")
     public void setComponentType(ComponentType componentType) {
         this.componentType = componentType;
+    }
+
+    /** Additional Getters **/
+
+    @JsonProperty ("id")
+    public String getComponentId() {
+        return namespace + "." + componentName;
+    }
+
+    @JsonProperty ("id")
+    public void setComponentId(String componentId) {
+        int dot = componentId.lastIndexOf(".");
+        this.componentName = componentId.substring(dot + 1);
+        this.namespace = componentId.substring(0, dot);
     }
 }
