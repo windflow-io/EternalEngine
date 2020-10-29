@@ -80,7 +80,7 @@ public class InitialData {
 
             // SYSTEM
 
-            saveComponent(systemNamespace, "NotFoundDisplay", io.windflow.eternalengine.entities.Component.ComponentType.COMPONENT, "/data/ƒGiyhubA" + systemNamespace + "/components/NotFoundDisplay.js");
+            saveComponent(systemNamespace, "NotFoundDisplay", io.windflow.eternalengine.entities.Component.ComponentType.COMPONENT, "/data/" + systemNamespace + "/components/NotFoundDisplay.js");
 
         }
     }
