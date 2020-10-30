@@ -357,6 +357,8 @@ export function makeServicePage({ api, serviceComponent }) {
             }
 
             included.components = {};
+            // REFACTOR
+            // Load in parallel.
             for (const component of await serviceComponent.find(componentIds)) {
                 included.components[component.id] = component;
             }
