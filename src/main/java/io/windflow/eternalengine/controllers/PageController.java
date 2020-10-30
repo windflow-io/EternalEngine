@@ -73,7 +73,7 @@ public class PageController {
         }
     }
 
-    @RequestMapping(method = RequestMethod.PUT, value = {"/api/pages/**"}, produces = "application/json")
+    @RequestMapping(method = RequestMethod.PUT, value = {"/api/pages/**", "/api/pages"}, produces = "application/json")
     @ResponseBody
     public String savePage(HttpServletRequest request, @RequestBody String json) {
 
@@ -98,8 +98,6 @@ public class PageController {
 
         return pageRepository.save(page).getJson();
     }
-
-
 
     @ExceptionHandler({EternalEngineNotFoundException.class})
     public ResponseEntity<String> handleEternalEngineNotFoundException(EternalEngineNotFoundException windEx) {

@@ -1,6 +1,5 @@
 package io.windflow.eternalengine.controllers.api;
 
-import io.windflow.eternalengine.EternalEngine;
 import io.windflow.eternalengine.beans.GithubTokenResponse;
 import io.windflow.eternalengine.beans.GithubUser;
 import io.windflow.eternalengine.beans.dto.Token;
@@ -13,6 +12,8 @@ import io.windflow.eternalengine.persistence.SessionRepository;
 import io.windflow.eternalengine.persistence.UserRepository;
 import io.windflow.eternalengine.beans.dto.HttpError;
 import io.windflow.eternalengine.services.AuthService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -32,6 +33,8 @@ import java.util.*;
 @RestController
 @PropertySource("classpath:openid.${spring.profiles.active}.properties")
 public class AuthApi {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     @Value("${eternalengine.auth.github_client_id}")
     String GITHUB_CLIENT_ID;
@@ -94,11 +97,24 @@ public class AuthApi {
         checkForErrors(request, referer);
         GithubTokenResponse token = fetchToken(tokenUrl);
         GithubUser githubUser = fetchUserData(token.getAccessToken());
+
+        log.debug("We have a github user:");
+        log.debug(githubUser.toString());
+
         EternalEngineUser user = createOrFetchUser(githubUser);
+
+        log.debug("We've created a Eternal Engine User from the github user:");
+        log.debug(user.toString());
+        log.debug("Creating a session for this login:");
+
         Session session = sessionRepository.save(new Session(user.getId(), request.getRemoteAddr()));
 
+        log.debug(session.toString());
+
         try {
+            log.debug("Creating a cookie with the session UUID base 64 encoded session UUID in it. UUID is: " + session.getId());
             response.addCookie(createCookie(session.getId()));
+            log.debug("Redirecting, cookie and all to: " + referer);
             response.sendRedirect(referer);
         } catch (IOException ex) {
             throw new EternalEngineAuthException(EternalEngineError.ERROR_001, "Could not send redirect", ex, referer);
@@ -113,6 +129,8 @@ public class AuthApi {
         EternalEngineUser user = authService.exchangeToken(sessionId, request.getRemoteAddr());
         return authService.createJWT(user);
     }
+
+    /* private methods */
 
     private EternalEngineUser createOrFetchUser(GithubUser githubUser) {
         Optional<EternalEngineUser> optUser = userRepository.findByEmail(githubUser.getEmail());
@@ -130,8 +148,6 @@ public class AuthApi {
         return token;
 
     }
-
-    /* private methods */
 
     private void checkForErrors(HttpServletRequest request, String referer) {
         if (request.getParameter("error") != null) {

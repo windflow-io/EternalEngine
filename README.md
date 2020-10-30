@@ -6,7 +6,7 @@
 Windflow Eternal Engine is an open-source, web-component-based platform for building apps and web sites in Vue.js and TailwindCSS. It serves web sites and apps as an assortment of web components dynamically constructed from a database.
 The components, order, layout, styles and content are all dynamic.
 Eternal Engine provides out-of-the-box component and content management functionality, bringing Wordpress-like features to Vue.js developers.
-Eternal Engine includes bare-necessity web components to get you going. They are 100% editable in-place, via the front-end editor. A vast array of more complex components are freely copy-and-pastable from Windflow.io's component library
+Eternal Engine includes bare-necessity web components to get you going. They are 100% editable in-place, via the front-end editor. A vast array of more complex components are freely copy-and-pastable from Windflow.io's component library.
 
 Windflow Eternal Engine is for you if:
  1. You're a Vue.js developer or TailwindCSS fan.
@@ -48,10 +48,12 @@ To run the application:
         eternalengine.cdn=https://cdn.windflow.io/app
         eternalengine.appDomain=windflow.app.local
         eternalengine.systemNamespace=system.windflow.io
+        eternalengine.templateCompilerUrl=http://localhost:5000/compile-vue-sfc 
         ```
-
+        (install our windflow-node-api project to install the vue template compiler node REST service. Start this application before Eternal Engine)
         (in IntelliJ idea, you can pop `--spring.profiles.active=development` into the 'environment variables' )
-  8. Start the application using the Gradle Wrapper 
+        
+  9. Start the application using the Gradle Wrapper 
         ```properties
          ./gradlew bootRun --args='--spring.profiles.active=development'
         ``` 

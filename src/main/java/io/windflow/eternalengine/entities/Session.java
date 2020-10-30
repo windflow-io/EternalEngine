@@ -1,5 +1,7 @@
 package io.windflow.eternalengine.entities;
 
+import io.windflow.eternalengine.utils.JsonStringifiable;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -7,7 +9,7 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 
 @Entity
-public class Session {
+public class Session extends JsonStringifiable {
 
     @Id
     @GeneratedValue
