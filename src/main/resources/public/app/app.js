@@ -30,12 +30,9 @@ export const FlowApplication = {
         FlowToolbar,
     },
     setup() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const host = location.host;
-
         const api = makeApi({ http });
-        const serviceComponent = makeServiceComponent({ api, host });
-        const servicePage = makeServicePage({ api, host, serviceComponent });
+        const serviceComponent = makeServiceComponent({ api });
+        const servicePage = makeServicePage({ api, serviceComponent });
 
         const contextComponentRegistry = makeContextComponentRegistry();
         app.provide(CONTEXT_COMPONENT_REGISTRY, contextComponentRegistry);
