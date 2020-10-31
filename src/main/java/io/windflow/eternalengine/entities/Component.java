@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.windflow.eternalengine.services.DomainFinder;
+import io.windflow.eternalengine.utils.JsonStringifiable;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -12,7 +13,7 @@ import java.util.UUID;
 
 @Entity
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Component {
+public class Component extends JsonStringifiable     {
 
     @Id
     @GeneratedValue
