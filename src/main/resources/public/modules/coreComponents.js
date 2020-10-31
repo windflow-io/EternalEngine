@@ -33,7 +33,7 @@ export const FlowButton = {
         <component
             :is="tag"
             type="button"
-            class="px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md transition duration-150 ease-in-out text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo"
+            class="wf-px-6 wf-py-3 wf-border wf-border-transparent wf-text-base wf-leading-6 wf-font-medium wf-rounded-md wf-transition wf-duration-150 wf-ease-in-out wf-text-white wf-bg-indigo-600 hover:wf-bg-indigo-500 focus:wf-outline-none focus:wf-border-indigo-700 focus:wf-shadow-outline-indigo"
         >
             <slot/>
         </component>
@@ -139,9 +139,9 @@ export const CodeEditor = {
                 ref="editor"
                 @input="$emit('update', this.editor.getValue())"
             />
-            <div class="px-4 py-2">
+            <div class="wf-px-4 wf-py-2">
                 <button
-                    class="px-4 py-1 border border-transparent text-base leading-6 font-medium rounded-md transition duration-150 ease-in-out text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo"
+                    class="wf-px-4 wf-py-1 wf-border wf-border-transparent wf-text-base wf-leading-6 wf-font-medium wf-rounded-md wf-transition wf-duration-150 wf-ease-in-out wf-text-white wf-bg-indigo-600 hover:wf-bg-indigo-500 focus:wf-outline-none focus:wf-border-indigo-700 focus:wf-shadow-outline-indigo"
                     @click="$emit('save', this.editor.getValue())"
                 >
                     Save
@@ -173,11 +173,11 @@ export const FlowFormGroup = {
         <div>
             <label
                 :for="id"
-                class="block text-sm leading-5 font-medium text-gray-700"
+                class="wf-block wf-text-sm wf-leading-5 wf-font-medium wf-text-gray-700"
             >
                 {{ label }}
             </label>
-            <div class="mt-1">
+            <div class="wf-mt-1">
                 <slot :id="id"/>
             </div>
         </div>
@@ -213,7 +213,7 @@ export const FlowFormFieldText = {
                 :id="id"
                 :value="modelValue"
                 :name="name"
-                class="border border-gray-400 block w-full p-3 leading-6 rounded-md shadow-sm"
+                class="wf-border wf-border-gray-400 wf-block wf-w-full wf-p-3 wf-leading-6 wf-rounded-md wf-shadow-sm"
                 @input.stop="$emit('update:modelValue', $event.target.value)"
             >
         </flow-form-group>
@@ -249,7 +249,7 @@ export const FlowFormFieldTextarea = {
                 :id="id"
                 :value="modelValue"
                 :name="name"
-                class="border border-gray-400 block w-full p-3 h-24 sm:text-sm sm:leading-5 rounded-md shadow-sm"
+                class="wf-border wf-border-gray-400 wf-block wf-w-full wf-p-3 wf-h-24 sm:wf-text-sm sm:wf-leading-5 wf-rounded-md wf-shadow-sm"
                 @input.stop="$emit('update:modelValue', $event.target.value)"
             />
         </flow-form-group>
@@ -289,7 +289,7 @@ export const FlowFormFieldSelect = {
                 :id="id"
                 :value="modelValue"
                 :name="name"
-                class="border border-gray-400 block w-full p-3 sm:text-sm sm:leading-5 rounded-md shadow-sm"
+                class="wf-border wf-border-gray-400 wf-block wf-w-full wf-p-3 sm:wf-text-sm sm:wf-leading-5 wf-rounded-md wf-shadow-sm"
                 @input.stop="$emit('update:modelValue', $event.target.value)"
             >
                 <option
@@ -376,7 +376,7 @@ export const FlowFormFieldFieldset = {
     template: `
         <div>
             <div>{{ label }}</div>
-            <div class="mt-1 p-4 border border-gray-300">
+            <div class="wf-mt-1 wf-p-4 wf-border wf-border-gray-300">
                 <flow-form-fields
                     :fields="fields"
                     :model-value="modelValue"
@@ -446,105 +446,105 @@ export const FlowToolbar = {
     },
     template: `
         <div
-            class="fixed z-50 bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all text-gray-700 max-w-xl"
+            class="wf-fixed wf-z-50 wf-bg-white wf-rounded-lg wf-text-left wf-overflow-hidden wf-shadow-xl wf-transform wf-transition-all wf-text-gray-700 wf-max-w-xl"
             style="left:calc(100% - 380px);top:50px;"
             ref="$root"
         >
-            <div class="flex h-16">
+            <div class="wf-flex wf-h-16">
                 <button
-                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-300 hover:text-gray-800 cursor-move"
+                    class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-r wf-border-gray-300 hover:wf-text-gray-800 wf-cursor-move"
                     title="drag"
                     aria-label="drag"
                     @mousedown="startDrag"
                 >
-                    <flow-icon icon="grip-vertical" class="text-md" />
+                    <flow-icon icon="grip-vertical" class="wf-text-md" />
                 </button>
                 <button
                     v-if="!chapter"
-                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-300 hover:text-gray-800"
+                    class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-r wf-border-gray-300 hover:wf-text-gray-800"
                     title="add component"
                     aria-label="add component"
                 >
-                    <flow-icon icon="plus" class="text-md" />
+                    <flow-icon icon="plus" class="wf-text-md" />
                 </button>
                 <button
                     v-if="chapter"
-                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-300 hover:text-gray-800"
+                    class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-r wf-border-gray-300 hover:wf-text-gray-800"
                     title="edit chapter data"
                     aria-label="edit chapter data"
                     @click="tab = 'edit-chapter-data'"
                 >
-                    <flow-icon icon="edit" class="text-md" />
+                    <flow-icon icon="edit" class="wf-text-md" />
                 </button>
                 <button
                     v-if="chapter"
-                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-300 hover:text-gray-800"
+                    class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-r wf-border-gray-300 hover:wf-text-gray-800"
                     title="edit chapter component"
                     aria-label="edit chapter component"
                     @click="tab = 'edit-chapter-component'"
                 >
-                    <flow-icon icon="code" class="text-md" />
+                    <flow-icon icon="code" class="wf-text-md" />
                 </button>
                 <button
-                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-300 hover:text-gray-800"
+                    class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-r wf-border-gray-300 hover:wf-text-gray-800"
                     title="rollback (coming soon)"
                     aria-label="rollback (coming soon)"
                 >
-                    <flow-icon icon="undo-alt" class="text-md" />
+                    <flow-icon icon="undo-alt" class="wf-text-md" />
                 </button>
                 <button
-                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-r border-gray-300 hover:text-gray-800"
+                    class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-r wf-border-gray-300 hover:wf-text-gray-800"
                     title="save"
                     aria-label="save"
                     @click="$emit('save-page')"
                 >
-                    <flow-icon icon="save" class="text-md"/>
+                    <flow-icon icon="save" class="wf-text-md"/>
                 </button>
                 <button
                     v-if="chapter"
-                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-gray-300 hover:text-gray-800"
+                    class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-gray-300 hover:wf-text-gray-800"
                     title="exit chapter edit mode"
                     aria-label="exit chapter edit mode"
                     @click="$emit('disable-chapter-edit-mode')"
                 >
-                    <flow-icon icon="times" class="text-md" />
+                    <flow-icon icon="times" class="wf-text-md" />
                 </button>
                 <button
                     v-else
-                    class="flex items-center pl-5 pr-5 mt-3 mb-3 border-gray-300 hover:text-gray-800"
+                    class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-gray-300 hover:wf-text-gray-800"
                     title="exit edit mode"
                     aria-label="exit edit mode"
                     @click="$emit('disable-edit-mode')"
                 >
-                    <flow-icon icon="times" class="text-md" />
+                    <flow-icon icon="times" class="wf-text-md" />
                 </button>
             </div>
             <div
                 v-if="chapter"
-                class="bg-gray-100 px-4 py-3 text-xs"
+                class="wf-bg-gray-100 wf-px-4 wf-py-3 wf-text-xs"
             >
                 {{ chapter.component.name }}
             </div>
             <div
                 v-if="tab"
-                class="w-full"
+                class="wf-w-full"
             >
                 <div
                     v-if="tab === 'edit-chapter-data' && component"
-                    class="p-6 bg-white"
+                    class="wf-p-6 wf-bg-white"
                     style="max-height: 42rem;overflow: auto;"
                 >
                     <flow-toolbar-form
                         :schema="component.schema"
                         :model-value="chapter.data"
-                        class="w-full h-full"
+                        class="wf-w-full wf-h-full"
                         @update:model-value="$emit('update-chapter', { ...chapter, data: $event })"
                     />
                 </div>
                 <code-editor
                     v-if="tab === 'edit-chapter-component' && chapter"
                     :value="chapter.component.sfc"
-                    class="w-full h-full"
+                    class="wf-w-full wf-h-full"
                     @save="$emit('save-component', { ...chapter.component, sfc: $event })"
                 />
             </div>
@@ -639,22 +639,22 @@ export const FlowAreaChapter = {
             <div
                 v-if="hasOverlay"
                 ref="$overlay"
-                class="opacity-0 hover:opacity-100 hover:bg-blue-700 hover:bg-opacity-50 transition duration-200 z-40"
+                class="wf-opacity-0 hover:wf-opacity-100 hover:wf-bg-blue-700 hover:wf-bg-opacity-50 wf-transition wf-duration-200 wf-z-40"
             >
-                <div class="inline-flex bg-blue-700 text-white leading-none text-xs">
-                    <div class="p-2 border-r border-white">
+                <div class="wf-inline-flex wf-bg-blue-700 wf-text-white wf-leading-none wf-text-xs">
+                    <div class="wf-p-2 wf-border-r wf-border-white">
                         {{ renderComponent && renderComponent.name }}
                     </div>
                     <button
                         v-if="!isFirst"
-                        class="p-2 border-r border-white"
+                        class="wf-p-2 wf-border-r wf-border-white"
                         @click="$emit('move-up')"
                     >
                         Up
                     </button>
                     <button
                         v-if="!isLast"
-                        class="p-2"
+                        class="wf-p-2"
                         @click="$emit('move-down')"
                     >
                         Down
@@ -726,7 +726,7 @@ export const FlowArea = {
             />
             <div
                 v-if="isInEditMode"
-                class="flex p-8 justify-center items-end"
+                class="wf-flex wf-p-8 wf-justify-center wf-items-end"
             >
                 <flow-form-field-text
                     v-model="newComponentName"
@@ -782,16 +782,16 @@ export const ErrorLayout = {
         };
     },
     template:
-        `<div class="flex flex-row h-screen items-center justify-center p-10 bg-gray-900">
-            <div class="relative z-10 max-w-4xl opacity-100">
-                <section class="flex flex-col">
-                    <h1 class="flex text-6xl justify-center font-semibold text-gray-300">
+        `<div class="wf-flex flex-row wf-h-screen wf-items-center justify-center wf-p-10 wf-bg-gray-900">
+            <div class="wf-relative wf-z-10 wf-max-w-4xl wf-opacity-100">
+                <section class="wf-flex flex-col">
+                    <h1 class="wf-flex wf-text-6xl wf-justify-center wf-font-semibold wf-text-gray-300">
                         {{ page.data.errorTitle }}
                     </h1>
-                    <h2 class="flex text-3xl justify-center text-gray-600">
+                    <h2 class="wf-flex wf-text-3xl wf-justify-center wf-text-gray-600">
                         {{ page.data.errorDescription }}
                     </h2>
-                    <h2 class="flex text-xl justify-center text-gray-700 mt-4">
+                    <h2 class="wf-flex wf-text-xl wf-justify-center wf-text-gray-700 wf-mt-4">
                         {{ page.data.errorDetail }}
                     </h2>
                 </section>
