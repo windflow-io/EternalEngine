@@ -627,6 +627,7 @@ export function makeContextRouter({
     const listeners = [];
     let previousPath = null;
     const currentPath = ref(window.location.pathname);
+    const currentPageId = computed(() => currentPath.value.replace('/', ''));
 
     const goTo = (path) => {
         previousPath = window.location.pathname;
@@ -745,7 +746,7 @@ export function makeContextRouter({
 
     // REFACTOR
     // - Make use of promises and wait until resolved and registered before returning data.
-    const { data, error } = contextCachePage.loadPage(() => currentPath.value);
+    const { data, error } = contextCachePage.loadPage(() => currentPageId.value);
     const registerError = ref(null);
 
     watch(data, () => {
