@@ -72,7 +72,7 @@ public class ComponentController {
 
     @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST}, value = {"/api/components"}, produces = "text/javascript")
     @ResponseBody
-    public String saveComponent(@RequestBody Component componentArrived) {
+    public Component saveComponent(@RequestBody Component componentArrived) {
 
         Optional<Component> optComponentOnDisk = componentRepository.findByNamespaceAndComponentName(componentArrived.getNamespace(), componentArrived.getComponentName());
         Component componentToSave;
@@ -88,8 +88,7 @@ public class ComponentController {
         }
 
         componentToSave.setJavascript(vueConversionService.convertVueToJs(componentToSave.getComponentName(), componentToSave.getSingleFileComponent()));
-        componentRepository.save(componentToSave);
-        return "{}";
+        return componentRepository.save(componentToSave);
     }
 
     @ExceptionHandler(EternalEngineNotFoundException.class)
