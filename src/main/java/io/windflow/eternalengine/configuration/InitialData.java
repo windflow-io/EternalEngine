@@ -1,7 +1,6 @@
 package io.windflow.eternalengine.configuration;
 
 import io.windflow.eternalengine.entities.DomainLookup;
-import io.windflow.eternalengine.entities.EternalEngineUser;
 import io.windflow.eternalengine.persistence.*;
 import io.windflow.eternalengine.services.CryptoService;
 import io.windflow.eternalengine.entities.ExtensionData;
@@ -16,12 +15,10 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.Optional;
-import java.util.UUID;
 
 
 @Component
-@PropertySource("eternalengine.${spring.profiles.active}.properties")
+@PropertySource({"eternalengine.${spring.profiles.active}.properties", "secret.${spring.profiles.active}.properties"})
 public class InitialData {
 
     private final PageRepository pageRepository;
