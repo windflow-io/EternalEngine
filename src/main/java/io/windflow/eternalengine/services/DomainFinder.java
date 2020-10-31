@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.Optional;
 
 @Service
@@ -48,6 +49,40 @@ public class DomainFinder {
         }
 
         return optHost.get();
+    }
+
+    public static NamespaceAndComponentName extractParts(String componentIdentifier) {
+        componentIdentifier = componentIdentifier.replace(".js", "");
+        int dot = componentIdentifier.lastIndexOf(".");
+        String componentName = componentIdentifier.substring(dot + 1);
+        String namespace = componentIdentifier.substring(0, dot);
+        return new NamespaceAndComponentName(namespace, componentName);
+    }
+
+    public static class NamespaceAndComponentName {
+        private String namespace;
+        private String componentName;
+
+        public NamespaceAndComponentName(String namespace, String componentName) {
+            this.namespace = namespace;
+            this.componentName = componentName;
+        }
+
+        public String getNamespace() {
+            return namespace;
+        }
+
+        public void setNamespace(String namespace) {
+            this.namespace = namespace;
+        }
+
+        public String getComponentName() {
+            return componentName;
+        }
+
+        public void setComponentName(String componentName) {
+            this.componentName = componentName;
+        }
     }
 
 }

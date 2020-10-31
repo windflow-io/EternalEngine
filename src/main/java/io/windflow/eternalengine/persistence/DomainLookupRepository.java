@@ -19,7 +19,7 @@ public interface DomainLookupRepository extends JpaRepository<DomainLookup, UUID
     @Query("delete from DomainLookup d")
     void truncate();
 
-    Set<DomainLookup> findByOwnerId(UUID ownerId);
+    Set<DomainLookup> findByOwnerEmail(String ownerEmail);
 
     Optional<DomainLookup> findFirstByDomainAlias(String domainAlias);
 }

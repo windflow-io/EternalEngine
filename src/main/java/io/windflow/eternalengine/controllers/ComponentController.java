@@ -34,22 +34,17 @@ public class ComponentController {
 
     /** RENDERER GET **/
 
-    @RequestMapping(method = RequestMethod.GET, value = {"/components/{namespace}/{filename:^.+\\.js$}", "/components/{filename:^.+\\.js$}"}, produces = "text/javascript")
+    @RequestMapping(method = RequestMethod.GET, value = "/components/{componentIdentifier:^.+\\.js$", produces = "text/javascript")
     @ResponseBody
-    public String getComponent(@PathVariable(value = "namespace", required = false) String namespace, @PathVariable("filename") String componentFilename, HttpServletRequest request) {
+    public String getComponent( @PathVariable("componentIdentifier") String componentIdentifier) {
 
-        if (namespace == null) {
-            DomainLookup site = domainFinder.getSite(request);
-            namespace = site.getSiteId();
-        }
+        DomainFinder.NamespaceAndComponentName spaceName = DomainFinder.extractParts(componentIdentifier);
 
-        String componentName = componentFilename.replaceFirst(".js", "");
-
-        Optional<Component> optComponent = componentRepository.findByNamespaceAndComponentName(namespace, componentName);
+        Optional<Component> optComponent = componentRepository.findByNamespaceAndComponentName(spaceName.getNamespace(), spaceName.getComponentName());
         if (optComponent.isPresent()) {
             return optComponent.get().getJavascript();
         } else {
-            String errorDetail = "007 Component not found in database. Namespace: " + namespace + " and component name: " + componentName;
+            String errorDetail = "007 Component not found in database. Namespace: " + spaceName.getNamespace() + " and component name: " + spaceName.getComponentName();
             logger.warn(errorDetail);
             throw new EternalEngineNotFoundException(EternalEngineError.ERROR_008, errorDetail);
         }
@@ -58,22 +53,17 @@ public class ComponentController {
 
     /*** EDITOR GET ***/
 
-    @RequestMapping(method = RequestMethod.GET, value = {"/api/components/{namespace}/{filename}", "/api/components/{filename}"}, produces = "application/json")
+    @RequestMapping(method = RequestMethod.GET, value = {"/api/components/{componentIdentifier}"}, produces = "application/json")
     @ResponseBody
-    public Component getComponentForEditing(@PathVariable(value = "namespace", required = false) String namespace, @PathVariable("filename") String componentFilename, HttpServletRequest request) {
+    public Component getComponentForEditing(@PathVariable(value = "componentIdentifier", required = false) String componentIdentifier, HttpServletRequest request) {
 
-        if (namespace == null) {
-            DomainLookup site = domainFinder.getSite(request);
-            namespace = site.getSiteId();
-        }
+        DomainFinder.NamespaceAndComponentName spaceName = DomainFinder.extractParts(componentIdentifier);
 
-        String componentName = componentFilename.replaceFirst(".js", "");
-
-        Optional<Component> optComponent = componentRepository.findByNamespaceAndComponentName(namespace, componentName);
+        Optional<Component> optComponent = componentRepository.findByNamespaceAndComponentName(spaceName.getNamespace(), spaceName.getComponentName());
         if (optComponent.isPresent()) {
             return optComponent.get();
         } else {
-            String errorDetail = "007 Component not found in database. Namespace: " + namespace + " and component name: " + componentName;
+            String errorDetail = "007 Component not found in database. Namespace: " + spaceName.getNamespace() + " and component name: " + spaceName.getComponentName();
             logger.warn(errorDetail);
             throw new EternalEngineNotFoundException(EternalEngineError.ERROR_008, errorDetail);
         }
@@ -83,7 +73,7 @@ public class ComponentController {
 
     @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST}, value = {"/api/components"}, produces = "text/javascript")
     @ResponseBody
-    public String saveComponent(HttpServletRequest request, @RequestBody Component componentArrived) {
+    public String saveComponent(@RequestBody Component componentArrived) {
 
         Optional<Component> optComponentOnDisk = componentRepository.findByNamespaceAndComponentName(componentArrived.getNamespace(), componentArrived.getComponentName());
         Component componentToSave;

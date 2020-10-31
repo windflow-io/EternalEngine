@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.util.UUID;
 
 @Entity
-@Table(indexes = {@Index(name="index_domain_lookup", columnList="site_id,domain_alias,owner_id")})
+@Table(indexes = {@Index(name="index_domain_lookup", columnList="site_id,domain_alias,owner_email")})
 public class DomainLookup {
 
     @Id
@@ -17,23 +17,17 @@ public class DomainLookup {
     @Column(name="site_id")
     String siteId;
 
-    @Column(name="owner_id")
-    UUID ownerId;
+    @Column(name="owner_email")
+    String ownerEmail;
 
     String herokuCanonicalName;
 
     public DomainLookup() {}
 
-    public DomainLookup(String domainAlias, String siteId, UUID ownerId) {
+    public DomainLookup(String domainAlias, String siteId, String ownerEmail) {
         this.siteId = siteId;
         this.domainAlias = domainAlias;
-        this.ownerId = ownerId;
-    }
-
-    public DomainLookup(String siteId) {
-        this.siteId = siteId;
-        this.domainAlias = domainAlias;
-        this.ownerId = ownerId;
+        this.ownerEmail = ownerEmail;
     }
 
     public UUID getId() {
@@ -60,12 +54,12 @@ public class DomainLookup {
         this.domainAlias = domainAlias;
     }
 
-    public UUID getOwnerId() {
-        return ownerId;
+    public String getOwnerEmail() {
+        return ownerEmail;
     }
 
-    public void setOwnerId(UUID ownerId) {
-        this.ownerId = ownerId;
+    public void setOwnerEmail(String ownerId) {
+        this.ownerEmail = ownerId;
     }
 
     public String getHerokuCanonicalName() {
@@ -75,4 +69,5 @@ public class DomainLookup {
     public void setHerokuCanonicalName(String herokuCanonicalName) {
         this.herokuCanonicalName = herokuCanonicalName;
     }
+
 }

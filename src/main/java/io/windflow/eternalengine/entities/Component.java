@@ -3,6 +3,7 @@ package io.windflow.eternalengine.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import io.windflow.eternalengine.services.DomainFinder;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -139,8 +140,8 @@ public class Component {
 
     @JsonProperty ("id")
     public void setComponentId(String componentId) {
-        int dot = componentId.lastIndexOf(".");
-        this.componentName = componentId.substring(dot + 1);
-        this.namespace = componentId.substring(0, dot);
+        DomainFinder.NamespaceAndComponentName parts = DomainFinder.extractParts(componentId);
+        this.componentName = parts.getComponentName();
+        this.namespace = parts.getNamespace();
     }
 }

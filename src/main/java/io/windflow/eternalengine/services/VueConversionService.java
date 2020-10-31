@@ -20,7 +20,7 @@ import java.net.ConnectException;
 import java.net.URI;
 
 @Service
-@PropertySource("classpath:eternalengine.${spring.profiles.active}.properties")
+@PropertySource("eternalengine.${spring.profiles.active}.properties")
 public class VueConversionService {
 
     @Value("${eternalengine.templateCompilerUrl}")

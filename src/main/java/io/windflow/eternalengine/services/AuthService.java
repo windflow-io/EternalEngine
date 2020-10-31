@@ -80,7 +80,7 @@ public class AuthService {
         log.debug("Creating JWT with user data");
         log.debug(user.toString());
 
-        Set<DomainLookup> ownedDomains = domainLookupRepository.findByOwnerId(user.getId());
+        Set<DomainLookup> ownedDomains = domainLookupRepository.findByOwnerEmail(user.getEmail());
 
         log.debug("Checking owner domains. This user has " + ownedDomains.size() + " domains.");
         log.debug(ENCRYPTION_PASSWORD.length() > 0 ? "The encryption password (secret) has a length greater than 0. Good." : "Encryption password has - length. Bad.");
