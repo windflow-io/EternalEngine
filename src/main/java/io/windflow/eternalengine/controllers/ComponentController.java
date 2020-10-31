@@ -1,7 +1,6 @@
 package io.windflow.eternalengine.controllers;
 
 import io.windflow.eternalengine.entities.Component;
-import io.windflow.eternalengine.entities.DomainLookup;
 import io.windflow.eternalengine.error.EternalEngineError;
 import io.windflow.eternalengine.error.EternalEngineNotFoundException;
 import io.windflow.eternalengine.error.EternalEngineWebException;
@@ -23,12 +22,11 @@ public class ComponentController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ComponentRepository componentRepository;
-    private final DomainFinder domainFinder;
+
     private final VueConversionService vueConversionService;
 
-    public ComponentController(@Autowired ComponentRepository componentRepository, @Autowired DomainFinder domainFinder, @Autowired VueConversionService vueConversionService) {
+    public ComponentController(@Autowired ComponentRepository componentRepository, @Autowired VueConversionService vueConversionService) {
         this.componentRepository = componentRepository;
-        this.domainFinder = domainFinder;
         this.vueConversionService = vueConversionService;
     }
 
@@ -37,9 +35,9 @@ public class ComponentController {
     @ResponseBody
     public String getComponent( @PathVariable("componentIdentifier") String componentIdentifier) {
 
-        logger.debug("");
-
         DomainFinder.NamespaceAndComponentName spaceName = DomainFinder.extractParts(componentIdentifier);
+
+        logger.debug("Component Request:" + spaceName.getNamespace() + "." + spaceName.getComponentName());
 
         Optional<Component> optComponent = componentRepository.findByNamespaceAndComponentName(spaceName.getNamespace(), spaceName.getComponentName());
         if (optComponent.isPresent()) {

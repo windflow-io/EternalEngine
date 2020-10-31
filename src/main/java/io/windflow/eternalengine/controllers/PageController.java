@@ -43,7 +43,7 @@ public class PageController {
 
     @RequestMapping(method = RequestMethod.GET, value = {"/api/pages/**", "/api/pages"}, produces = "application/json")
     @ResponseBody
-    public String servePage(HttpServletRequest request, HttpServletResponse response) {
+    public String servePage(HttpServletRequest request) {
 
         DomainLookup site = domainFinder.getSite(request);
         String path = domainFinder.getPath(request);
