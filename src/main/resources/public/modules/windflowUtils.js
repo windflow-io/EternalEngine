@@ -627,7 +627,7 @@ export function makeContextRouter({
     const listeners = [];
     let previousPath = null;
     const currentPath = ref(window.location.pathname);
-    const currentPageId = computed(() => currentPath.value.replace('/', ''));
+    const currentPageId = computed(() => currentPath.value.replace('/', '') || '/');
 
     const goTo = (path) => {
         previousPath = window.location.pathname;
