@@ -37,7 +37,7 @@ public class DomainFinder {
     }
 
     public String getPath(HttpServletRequest request) {
-        String path = request.getRequestURI().replaceFirst("/api/pages", "");
+        String path = request.getRequestURI().replaceFirst("/api/pages/", "");
         return path.length() == 0 ? "/" : path;
     }
 

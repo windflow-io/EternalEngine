@@ -1,5 +1,6 @@
 package io.windflow.eternalengine.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.windflow.eternalengine.utils.JsonStringifiable;
 
 import javax.persistence.Entity;

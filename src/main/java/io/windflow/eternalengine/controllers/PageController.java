@@ -49,6 +49,8 @@ public class PageController {
         String path = domainFinder.getPath(request);
         String siteId = site.getSiteId();
 
+        logger.debug("Page Request - Original domain:" + request.getServerName() + " SiteId:" + siteId + " Path:" + path);
+
         // @TODO: PERMISSIONS IN HERE
 
         Optional<Page> optPage = pageRepository.findByDomainAndPath(siteId, path);
@@ -116,6 +118,8 @@ public class PageController {
 
             StringSubstitutor replacer = new StringSubstitutor(dynamicPageVariables);
             json = replacer.replace(json);
+
+            logger.warn(windEx.getErrorDetail());
 
             return new ResponseEntity<>(json, headers, HttpStatus.OK);
         }

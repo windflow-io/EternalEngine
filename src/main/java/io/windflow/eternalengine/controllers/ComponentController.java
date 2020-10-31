@@ -33,10 +33,11 @@ public class ComponentController {
     }
 
     /** RENDERER GET **/
-
-    @RequestMapping(method = RequestMethod.GET, value = "/components/{componentIdentifier:^.+\\.js$", produces = "text/javascript")
+    @RequestMapping(method = RequestMethod.GET, value = "/components/{componentIdentifier:^.+\\.js$}", produces = "text/javascript")
     @ResponseBody
     public String getComponent( @PathVariable("componentIdentifier") String componentIdentifier) {
+
+        logger.debug("");
 
         DomainFinder.NamespaceAndComponentName spaceName = DomainFinder.extractParts(componentIdentifier);
 

@@ -9,6 +9,7 @@ public class EternalEngineNotFoundException extends EternalEngineBaseException {
     }
 
     public EternalEngineNotFoundException(EternalEngineError eternalEngineError, String errorDetail) {
+
         super(eternalEngineError, errorDetail);
     }
 }
