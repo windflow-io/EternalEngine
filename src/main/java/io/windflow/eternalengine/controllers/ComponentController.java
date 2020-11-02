@@ -73,7 +73,7 @@ public class ComponentController {
 
     /** RENDERER PUT **/     /** CRAPPY ERROR **/
 
-    @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST}, value = {"/api/components"}, produces = "text/javascript")
+    @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST}, value = {"/api/components"}, produces = "application/json")
     @ResponseBody
     public String saveComponent(@RequestBody Component componentArrived, HttpServletRequest request) {
 
