@@ -89,7 +89,7 @@ export const CodeEditor = {
   props: {
     options: {
         default: () => ({
-            language: 'javascript',
+            language: 'html',
             minimap: {
                 enabled: false
             }
