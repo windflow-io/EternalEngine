@@ -1,11 +1,13 @@
 package io.windflow.eternalengine.controllers;
 
 import io.windflow.eternalengine.entities.Component;
+import io.windflow.eternalengine.entities.DomainLookup;
 import io.windflow.eternalengine.error.EternalEngineError;
 import io.windflow.eternalengine.error.EternalEngineNotFoundException;
 import io.windflow.eternalengine.error.EternalEngineWebException;
 import io.windflow.eternalengine.persistence.ComponentRepository;
 import io.windflow.eternalengine.beans.dto.HttpError;
+import io.windflow.eternalengine.persistence.DomainLookupRepository;
 import io.windflow.eternalengine.services.DomainFinder;
 import io.windflow.eternalengine.services.VueConversionService;
 import org.slf4j.Logger;
@@ -22,12 +24,13 @@ public class ComponentController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ComponentRepository componentRepository;
-
+    private final DomainFinder domainFinder;
     private final VueConversionService vueConversionService;
 
-    public ComponentController(@Autowired ComponentRepository componentRepository, @Autowired VueConversionService vueConversionService) {
+    public ComponentController(@Autowired ComponentRepository componentRepository, @Autowired VueConversionService vueConversionService, @Autowired DomainFinder domainFinder) {
         this.componentRepository = componentRepository;
         this.vueConversionService = vueConversionService;
+        this.domainFinder = domainFinder;
     }
 
     /** RENDERER GET **/
@@ -72,7 +75,7 @@ public class ComponentController {
 
     @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST}, value = {"/api/components"}, produces = "text/javascript")
     @ResponseBody
-    public String saveComponent(@RequestBody Component componentArrived) {
+    public String saveComponent(@RequestBody Component componentArrived, HttpServletRequest request) {
 
         Optional<Component> optComponentOnDisk = componentRepository.findByNamespaceAndComponentName(componentArrived.getNamespace(), componentArrived.getComponentName());
         Component componentToSave;
@@ -85,6 +88,8 @@ public class ComponentController {
             componentToSave.setSingleFileComponent(componentArrived.getSingleFileComponent());
         } else {
             componentToSave = componentArrived;
+            componentToSave.setNamespace(domainFinder.getSite(request).getSiteId());
+
         }
 
         componentToSave.setJavascript(vueConversionService.convertVueToJs(componentToSave.getComponentName(), componentToSave.getSingleFileComponent()));
