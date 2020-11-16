@@ -1,13 +1,11 @@
 package io.windflow.eternalengine.controllers;
 
 import io.windflow.eternalengine.entities.Component;
-import io.windflow.eternalengine.entities.DomainLookup;
 import io.windflow.eternalengine.error.EternalEngineError;
 import io.windflow.eternalengine.error.EternalEngineNotFoundException;
 import io.windflow.eternalengine.error.EternalEngineWebException;
 import io.windflow.eternalengine.persistence.ComponentRepository;
 import io.windflow.eternalengine.beans.dto.HttpError;
-import io.windflow.eternalengine.persistence.DomainLookupRepository;
 import io.windflow.eternalengine.services.DomainFinder;
 import io.windflow.eternalengine.services.VueConversionService;
 import org.slf4j.Logger;
@@ -71,7 +69,7 @@ public class ComponentController {
         }
     }
 
-    /** RENDERER PUT **/     /** CRAPPY ERROR **/
+    /** EDITOR PUT **/
 
     @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST}, value = {"/api/components"}, produces = "application/json")
     @ResponseBody

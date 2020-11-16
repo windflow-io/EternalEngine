@@ -106,6 +106,13 @@ public class InitialData {
         domainLookupRepository.save(
                 new DomainLookup("auth.windflow.io.local", "auth-windflow-io.windflow.app", ownerEmail)
         );
+        domainLookupRepository.save(
+                new DomainLookup("app.mimo-connect.com", "mimo-connect.windflow.app", ownerEmail)
+        );
+        domainLookupRepository.save(
+                new DomainLookup("app.mimo-connect.com.local", "mimo-connect.windflow.app", ownerEmail)
+        );
+
     }
 
 

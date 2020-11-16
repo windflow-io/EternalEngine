@@ -21,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 @RestController
@@ -35,7 +34,7 @@ public class PageController {
     @Value(value = "${eternalengine.systemNamespace}")
     String systemNamespace;
 
-    public PageController(@Autowired PageRepository pageRepository, @Autowired DomainLookupRepository domainLookupRepository, @Autowired DomainFinder domainFinder) {
+    public PageController(@Autowired PageRepository pageRepository, @Autowired DomainFinder domainFinder) {
         this.pageRepository = pageRepository;
         this.domainFinder = domainFinder;
     }

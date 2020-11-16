@@ -1,16 +1,7 @@
-import {
-    computed,
-    isRef,
-    markRaw,
-    reactive,
-    readonly,
-    ref,
-    toRefs,
-    watch,
-} from '../vendor/vue3/vue.esm-browser.js';
-import useSwr, { mutate } from '../vendor/swrv/index.js';
+import {computed, isRef, markRaw, reactive, readonly, ref, toRefs, watch,} from '../vendor/vue3/vue.esm-browser.js';
+import useSwr, {mutate} from '../vendor/swrv/index.js';
 
-import { ErrorLayout } from './coreComponents.js'
+import {ErrorLayout} from './coreComponents.js'
 
 const COMPONENT_TYPES = {
     component: 'COMPONENT',
@@ -147,6 +138,7 @@ export const withRetryHandling = (callback, {
 // - Dedupe logic.
 export const http = {
     async get(url, options) {
+
         const response = await fetch(url, options);
         const contentType = response.headers.get('content-type');
         let data;
@@ -369,6 +361,7 @@ export function makeServicePage({ api, serviceComponent }) {
 
     return {
         findOne: withRetryHandling(async (id, { include = [] } = {}) => {
+
             const apiData = await api.get(`${PAGE_SERVICE_ENDPOINT}/${id}`);
 
             return pageServiceAdapter.adaptForApp({
@@ -379,7 +372,6 @@ export function makeServicePage({ api, serviceComponent }) {
         }),
         findCurrent(options) {
             const id = window.location.pathname;
-
             return this.findOne(id, options);
         },
         async update(id, data, { include = [] }) {
@@ -402,6 +394,7 @@ export function makeContextCachePage({ servicePage }) {
         // REFACTOR
         // - Make this generic and add an ID for each service.
         const params = isRef(options) ? options : computed(typeof options === 'function' ? options : () => options);
+
         return useSwr(() => params.value && JSON.stringify(params.value), paramString => servicePage.findOne(JSON.parse(paramString)));
     };
 
@@ -439,39 +432,42 @@ export function makeContextComponentRegistry() {
 /** Context: Edit Mode **/
 
 const makeNewSfc = (name) => {
-    return `export default {
-name: '${name}',
-props: {
-    heading: {
-        default: 'Hello World',
-        type: String,
+    return  `
+<script>
+export default {
+    name: '${name}',
+    props: {
+        heading: {
+            default: 'Hello World',
+            type: String,
+        },
+        paragraph: {
+            default: 'Lorem Ipsum',
+            type: String,
+        },
     },
-    paragraph: {
-        default: 'Lorem Ipsum',
-        type: String,
-    },
-},
-schema: {
-    heading: {
-        type: 'text',
-        label: 'Heading',
-    },
-    paragraph: {
-        type: 'textarea',
-        label: 'Paragraph',
-    },
-},
-template: \`
+    schema: {
+        heading: {
+            type: 'text',
+            label: 'Heading',
+        },
+        paragraph: {
+            type: 'textarea',
+            label: 'Paragraph',
+        }
+    }
+}
+</script>
+<template>
     <div class="max-w-screen-xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
-        <h2 class="leading-9 font-extrabold tracking-tight text-gray-900 sm:leading-10 text-3xl">
+        <h2 class="leading-9 font-extrabold tracking-tight text-gray-400 sm:leading-10 text-3xl">
             {{ heading }}
         </h2>
         <p class="mt-2 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
             {{ paragraph }}
         </p>
     </div>
-\`,
-}`;
+</template>`;
 }
 
 export function makeContextEditMode({
@@ -537,12 +533,11 @@ export function makeContextEditMode({
         };
 
         if (!chapterPartial.component.id) {
-            const component = await addComponent({
+            chapter.component = await addComponent({
                 sfc: makeNewSfc(chapterPartial.component.name),
                 type: COMPONENT_TYPES.component,
                 ...chapterPartial.component,
             });
-            chapter.component = component;
         }
 
         state.editedPage.areas[areaName].chapters.push(chapter);
