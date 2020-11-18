@@ -550,8 +550,7 @@ export function makeContextEditMode({
 
     const removeChapter = (areaName, chapterId) => {
         let area = state.editedPage.areas[areaName];
-        let arrayWithItemRemoved = area.chapters.filter(item => {return item.id != chapterId})
-        // What now
+        area.chapters = area.chapters.filter(chapter => chapter.id !== chapterId)
     }
 
     const saveComponent = async (data) => {
