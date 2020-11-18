@@ -484,8 +484,6 @@ export function makeContextEditMode({
         isInEditMode: null,
     });
     const editedChapter = computed(() => {
-        console.log("Edited chapter clicked");
-        console.log ("chapterId: " + state.editedChapterId);
         if (!state.editedChapterId) return null;
 
         // REFACTOR
@@ -495,7 +493,7 @@ export function makeContextEditMode({
                 if (chapter.id === state.editedChapterId) return chapter;
             }
         }
-
+        console.error(`Chapter with ID "${state.editedChapterId}" not found!`)
         //throw new Error(`Chapter with ID "${state.editedChapterId}" not found!`);
     });
 
@@ -551,11 +549,15 @@ export function makeContextEditMode({
     };
 
     const removeChapter = (areaName, chapterId) => {
-        console.log("Removing chapter id " + chapterId)
+        state.editedChapterId = null;
         let area = state.editedPage.areas[areaName];
         area.chapters = area.chapters.filter(chapter => chapter.id !== chapterId)
-        console.log("Setting state.editedChapterId to null")
-        state.editedChapterId = null;
+    }
+
+    const editLayout = (event) => {
+        if (event.target.classList.contains('windflow-container')) {
+            console.log ('yes');
+        }
     }
 
     const saveComponent = async (data) => {
@@ -617,6 +619,7 @@ export function makeContextEditMode({
         enableEditMode,
         reorderChapters,
         removeChapter,
+        editLayout,
         saveComponent,
         savePage,
         setEditedChapter,

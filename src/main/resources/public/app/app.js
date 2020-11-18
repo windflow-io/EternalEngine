@@ -66,6 +66,7 @@ export const FlowApplication = {
             isInEditMode,
             reorderChapters,
             removeChapter,
+            editLayout,
             saveComponent,
             savePage,
             setEditedChapter,
@@ -86,6 +87,7 @@ export const FlowApplication = {
             page,
             reorderChapters,
             removeChapter,
+            editLayout,
             saveComponent,
             savePage,
             setEditedChapter,
@@ -104,6 +106,7 @@ export const FlowApplication = {
                 @update-chapter="updateChapter"
             />
             <component
+                class="windflow-container"
                 v-if="page"
                 :is="layoutComponent"
                 :key="currentPath"
@@ -112,6 +115,7 @@ export const FlowApplication = {
                 @enable-chapter-edit-mode="setEditedChapter"
                 @reorder-chapters="reorderChapters"
                 @remove-chapter="removeChapter"
+                @click="editLayout($event)"
             />
         </div>
     `,
