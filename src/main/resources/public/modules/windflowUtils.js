@@ -551,11 +551,12 @@ export function makeContextEditMode({
     };
 
     const removeChapter = (areaName, chapterId) => {
+        state.editedChapterId = null;
         console.log("Removing chapter id " + chapterId)
         let area = state.editedPage.areas[areaName];
         area.chapters = area.chapters.filter(chapter => chapter.id !== chapterId)
         console.log("Setting state.editedChapterId to null")
-        state.editedChapterId = null;
+
     }
 
     const saveComponent = async (data) => {
