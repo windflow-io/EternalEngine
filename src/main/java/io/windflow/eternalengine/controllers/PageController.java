@@ -46,6 +46,7 @@ public class PageController {
 
         DomainLookup site = domainFinder.getSite(request);
         String path = domainFinder.getPath(request);
+        System.out.println(path);
         String siteId = site.getSiteId();
 
         logger.debug("Page Request - Original domain:" + request.getServerName() + " SiteId:" + siteId + " Path:" + path);
