@@ -65,6 +65,7 @@ export const FlowApplication = {
             editedPage,
             isInEditMode,
             reorderChapters,
+            removeChapter,
             saveComponent,
             savePage,
             setEditedChapter,
@@ -84,6 +85,7 @@ export const FlowApplication = {
             layoutComponent,
             page,
             reorderChapters,
+            removeChapter,
             saveComponent,
             savePage,
             setEditedChapter,
@@ -109,6 +111,7 @@ export const FlowApplication = {
                 @add-chapter="addChapter"
                 @enable-chapter-edit-mode="setEditedChapter"
                 @reorder-chapters="reorderChapters"
+                @remove-chapter="removeChapter"
             />
         </div>
     `,

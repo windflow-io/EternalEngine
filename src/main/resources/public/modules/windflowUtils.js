@@ -548,6 +548,12 @@ export function makeContextEditMode({
         area.chapters = chapterIds.map(chapterId => area.chapters.find(chapter => chapter.id === chapterId));
     };
 
+    const removeChapter = (areaName, chapterId) => {
+        let area = state.editedPage.areas[areaName];
+        let arrayWithItemRemoved = area.chapters.filter(item => {return item.id != chapterId})
+        // What now
+    }
+
     const saveComponent = async (data) => {
         const component = await serviceComponent.update(data.id, data);
 
@@ -606,6 +612,7 @@ export function makeContextEditMode({
         editedChapter,
         enableEditMode,
         reorderChapters,
+        removeChapter,
         saveComponent,
         savePage,
         setEditedChapter,

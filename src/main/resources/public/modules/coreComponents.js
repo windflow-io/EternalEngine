@@ -654,11 +654,17 @@ export const FlowAreaChapter = {
                     </button>
                     <button
                         v-if="!isLast"
-                        class="wf-p-2"
+                        class="wf-p-2 wf-border-r wf-border-white"
                         @click="$emit('move-down')"
                     >
                         Down
-                    </button>
+                    </button>                  
+                    <button                       
+                        class="wf-p-2"
+                        @click="$emit('remove')"
+                    >
+                        Remove
+                    </button>                    
                 </div>
             </div>
             <component
@@ -723,6 +729,7 @@ export const FlowArea = {
                 @click="isInEditMode && $parent.$emit('enable-chapter-edit-mode', chapter)"
                 @move-down="$parent.$emit('reorder-chapters', name, arrayMoveIndex(chapterIds, index, index + 1))"
                 @move-up="$parent.$emit('reorder-chapters', name, arrayMoveIndex(chapterIds, index, index - 1))"
+                @remove="$parent.$emit('remove-chapter', name, chapterIds[index])"
             />
             <div
                 v-if="isInEditMode"
