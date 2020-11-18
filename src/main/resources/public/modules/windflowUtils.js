@@ -495,8 +495,7 @@ export function makeContextEditMode({
                 if (chapter.id === state.editedChapterId) return chapter;
             }
         }
-
-        //throw new Error(`Chapter with ID "${state.editedChapterId}" not found!`);
+        console.error(`Chapter with ID "${state.editedChapterId}" not found!`)
     });
 
     const loadEditModeAssets = async () => {
