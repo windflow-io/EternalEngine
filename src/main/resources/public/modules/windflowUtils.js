@@ -267,7 +267,8 @@ export function makeServiceComponent({ api }) {
                 type: data.type || COMPONENT_TYPES.component,
             };
 
-            return api.update(`${COMPONENT_SERVICE_ENDPOINT}/${id}`, newData);
+            //return api.update(`${COMPONENT_SERVICE_ENDPOINT}/${id}`, newData);
+            return api.update(`${COMPONENT_SERVICE_ENDPOINT}`, newData);
         },
     };
 }

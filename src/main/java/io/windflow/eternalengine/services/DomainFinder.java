@@ -38,7 +38,7 @@ public class DomainFinder {
 
     public String getPath(HttpServletRequest request) {
         String path = request.getRequestURI().replaceFirst("/api/pages/", "");
-        return path.length() == 0 ? "/" : path;
+        return path.startsWith("/") ? path : "/" + path;
     }
 
     public DomainLookup getSite(HttpServletRequest request) throws EternalEngineNotFoundException {
