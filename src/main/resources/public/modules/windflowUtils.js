@@ -484,6 +484,8 @@ export function makeContextEditMode({
         isInEditMode: null,
     });
     const editedChapter = computed(() => {
+        console.log("Edited chapter clicked");
+        console.log ("chapterId: " + state.editedChapterId);
         if (!state.editedChapterId) return null;
 
         // REFACTOR
@@ -494,7 +496,7 @@ export function makeContextEditMode({
             }
         }
 
-        throw new Error(`Chapter with ID "${state.editedChapterId}" not found!`);
+        //throw new Error(`Chapter with ID "${state.editedChapterId}" not found!`);
     });
 
     const loadEditModeAssets = async () => {
@@ -549,8 +551,11 @@ export function makeContextEditMode({
     };
 
     const removeChapter = (areaName, chapterId) => {
+        console.log("Removing chapter id " + chapterId)
         let area = state.editedPage.areas[areaName];
         area.chapters = area.chapters.filter(chapter => chapter.id !== chapterId)
+        console.log("Setting state.editedChapterId to null")
+        state.editedChapterId = null;
     }
 
     const saveComponent = async (data) => {
