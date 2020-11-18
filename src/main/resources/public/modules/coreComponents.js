@@ -489,8 +489,8 @@ export const FlowToolbar = {
                     class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-r wf-border-gray-300 hover:wf-text-gray-800"
                     title="rollback (coming soon)"
                     aria-label="rollback (coming soon)"
-                >
-                    <flow-icon icon="undo-alt" class="wf-text-md" />
+                >                
+                    <flow-icon icon="columns" class="wf-text-md" />               
                 </button>
                 <button
                     class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-r wf-border-gray-300 hover:wf-text-gray-800"

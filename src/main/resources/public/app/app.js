@@ -70,6 +70,7 @@ export const FlowApplication = {
             savePage,
             setEditedChapter,
             updateChapter,
+            deselectChapter
         } = contextEditMode;
         const page = computed(() => isInEditMode.value ? editedPage.value : currentPage.value);
         const { components } = contextComponentRegistry;
@@ -90,20 +91,23 @@ export const FlowApplication = {
             savePage,
             setEditedChapter,
             updateChapter,
+            deselectChapter
         }
     },
     template: `
         <div>
             <flow-toolbar
+                
                 v-if="isInEditMode"
                 :chapter="editedChapter"
                 @disable-chapter-edit-mode="setEditedChapter(null)"
                 @disable-edit-mode="disableEditMode"
                 @save-component="saveComponent"
                 @save-page="savePage(page)"
-                @update-chapter="updateChapter"
+                @update-chapter="updateChapter"               
             />
             <component
+                class="windflow-layout"
                 v-if="page"
                 :is="layoutComponent"
                 :key="currentPath"
@@ -112,6 +116,7 @@ export const FlowApplication = {
                 @enable-chapter-edit-mode="setEditedChapter"
                 @reorder-chapters="reorderChapters"
                 @remove-chapter="removeChapter"
+                @click="deselectChapter"
             />
         </div>
     `,

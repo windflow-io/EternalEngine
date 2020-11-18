@@ -485,8 +485,6 @@ export function makeContextEditMode({
         isInEditMode: null,
     });
     const editedChapter = computed(() => {
-        console.log("Edited chapter clicked");
-        console.log ("chapterId: " + state.editedChapterId);
         if (!state.editedChapterId) return null;
 
         // REFACTOR
@@ -556,7 +554,15 @@ export function makeContextEditMode({
         let area = state.editedPage.areas[areaName];
         area.chapters = area.chapters.filter(chapter => chapter.id !== chapterId)
         console.log("Setting state.editedChapterId to null")
+    }
 
+    const deselectChapter = (event) => {
+        console.log (event.target.classList);
+        if (event.target.classList.contains("windflow-layout")) {
+            console.log("DESELECTING")
+            state.editedChapterId = null;
+            event.preventDefault();
+        }
     }
 
     const saveComponent = async (data) => {
@@ -618,6 +624,7 @@ export function makeContextEditMode({
         enableEditMode,
         reorderChapters,
         removeChapter,
+        deselectChapter,
         saveComponent,
         savePage,
         setEditedChapter,
