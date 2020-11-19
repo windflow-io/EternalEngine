@@ -469,7 +469,8 @@ export const FlowToolbar = {
                 </button>
                 <button
                     v-if="chapter"
-                    class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-r wf-border-gray-300 hover:wf-text-gray-800"
+                    class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-r wf-border-gray-300"
+                     :class="tab === 'edit-chapter-data' ? 'wf-text-blue-600' : 'hover:wf-text-black'"
                     title="edit chapter data"
                     aria-label="edit chapter data"
                     @click="tab = 'edit-chapter-data'"
@@ -478,7 +479,8 @@ export const FlowToolbar = {
                 </button>
                 <button
                     v-if="chapter"
-                    class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-r wf-border-gray-300 hover:wf-text-gray-800"
+                     :class="tab === 'edit-chapter-component' ? 'wf-text-blue-600' : 'hover:wf-text-gray-800'"
+                    class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-r wf-border-black"
                     title="edit chapter component"
                     aria-label="edit chapter component"
                     @click="tab = 'edit-chapter-component'"
@@ -486,14 +488,16 @@ export const FlowToolbar = {
                     <flow-icon icon="code" class="wf-text-md" />
                 </button>
                 <button
-                    class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-r wf-border-gray-300 hover:wf-text-gray-800"
+                    class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-r wf-border-gray-300"
+                    :class="tab === 'edit-layout' ? 'wf-text-blue-600' : 'hover:wf-text-black'"
                     title="rollback (coming soon)"
                     aria-label="rollback (coming soon)"
+                    @click="tab = 'edit-layout'"
                 >                
-                    <flow-icon icon="columns" class="wf-text-md" />               
+                    <flow-icon icon="columns" class="wf-text-md"/>               
                 </button>
                 <button
-                    class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-r wf-border-gray-300 hover:wf-text-gray-800"
+                    class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-r wf-border-gray-300 hover:wf-text-black"
                     title="save"
                     aria-label="save"
                     @click="$emit('save-page')"
@@ -502,7 +506,7 @@ export const FlowToolbar = {
                 </button>
                 <button
                     v-if="chapter"
-                    class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-gray-300 hover:wf-text-gray-800"
+                    class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-gray-300 hover:wf-text-black"
                     title="exit chapter edit mode"
                     aria-label="exit chapter edit mode"
                     @click="$emit('disable-chapter-edit-mode')"
@@ -511,7 +515,7 @@ export const FlowToolbar = {
                 </button>
                 <button
                     v-else
-                    class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-gray-300 hover:wf-text-gray-800"
+                    class="wf-flex wf-items-center wf-pl-5 wf-pr-5 wf-mt-3 wf-mb-3 wf-border-gray-300 hover:wf-text-black"
                     title="exit edit mode"
                     aria-label="exit edit mode"
                     @click="$emit('disable-edit-mode')"
@@ -523,7 +527,7 @@ export const FlowToolbar = {
                 v-if="chapter"
                 class="wf-bg-gray-100 wf-px-4 wf-py-3 wf-text-xs"
             >
-                {{ chapter.component.name }}
+                {{chapter.component.name}}
             </div>
             <div
                 v-if="tab"
@@ -547,6 +551,7 @@ export const FlowToolbar = {
                     class="wf-w-full wf-h-full"
                     @save="$emit('save-component', { ...chapter.component, sfc: $event })"
                 />
+                <code-editor/>             
             </div>
         </div>
     `,

@@ -557,7 +557,7 @@ export function makeContextEditMode({
     }
 
     const deselectChapter = (event) => {
-        console.log (event.target.classList);
+
         if (event.target.classList.contains("windflow-layout")) {
             console.log("DESELECTING")
             state.editedChapterId = null;
