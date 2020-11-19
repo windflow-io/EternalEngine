@@ -39,9 +39,15 @@ public class VueConversionService {
             ResponseEntity<String> response = template.postForEntity(templateCompilerUrl, request, String.class);
             return new ObjectMapper().readValue(response.getBody(), SingleFileComponent.class).getCode();
         } catch (ResourceAccessException ex) {
-            throw new EternalEngineWebException(EternalEngineError.ERROR_015, "Couldn't connect to external Vue SFC compiler at " + templateCompilerUrl, ex);
+            String err = "Couldn't connect to external Vue SFC compiler at " + templateCompilerUrl;
+            logger.error(err);
+            ex.printStackTrace();
+            throw new EternalEngineWebException(EternalEngineError.ERROR_015, err, ex);
         } catch (JsonProcessingException ex) {
-            throw new EternalEngineWebException(EternalEngineError.ERROR_015, "JSON Processing error", ex);
+            String err = "JSON Processing error";
+            logger.error(err);
+            ex.printStackTrace();
+            throw new EternalEngineWebException(EternalEngineError.ERROR_015, err, ex);
         } catch (HttpServerErrorException.InternalServerError ex) {
             String errorResponse = ex.getMessage();
             String json = errorResponse.substring(errorResponse.indexOf('{'), errorResponse.lastIndexOf('}') + 1);
@@ -49,8 +55,10 @@ public class VueConversionService {
                 NodeUtilsError objError = new ObjectMapper().readValue(json, NodeUtilsError.class);
                 throw new EternalEngineWebException(EternalEngineError.ERROR_015, objError.getMessage());
             } catch (JsonProcessingException jsonEx) {
+                String err = "Node Utils API failed but could not translate error";
+                logger.error(err);
                 jsonEx.printStackTrace();
-                throw new EternalEngineWebException(EternalEngineError.ERROR_015, "Node Utils API failed but could not translate error " + ex.getMessage());
+                throw new EternalEngineWebException(EternalEngineError.ERROR_015, err + " " + ex.getMessage());
             }
         }
     }

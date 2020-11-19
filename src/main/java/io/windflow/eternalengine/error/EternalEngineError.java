@@ -18,7 +18,8 @@ public enum EternalEngineError {
     ERROR_012("JSON Page Data Corrupt", "Could not parse JSON in database"),
     ERROR_013("No Generic 404 Page", "There is no generic 404 page in the database"),
     ERROR_014("Server Redirect Failed", "Server attempted to send a redirect to the user and failed"),
-    ERROR_015("Cannot compile vue template", "Vue Template Compiler Failed");
+    ERROR_015("Cannot compile vue template", "Vue Template Compiler Failed"),
+    ERROR_016("Invalid SiteId", "The domain requesting domain has not been configured.");
 
     String title;
     String description;

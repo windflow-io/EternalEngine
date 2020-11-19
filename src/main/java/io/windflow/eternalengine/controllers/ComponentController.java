@@ -1,6 +1,7 @@
 package io.windflow.eternalengine.controllers;
 
 import io.windflow.eternalengine.entities.Component;
+import io.windflow.eternalengine.entities.DomainLookup;
 import io.windflow.eternalengine.error.EternalEngineError;
 import io.windflow.eternalengine.error.EternalEngineNotFoundException;
 import io.windflow.eternalengine.error.EternalEngineWebException;
@@ -74,6 +75,18 @@ public class ComponentController {
     @RequestMapping(method = {RequestMethod.PUT, RequestMethod.POST}, value = {"/api/components"}, produces = "application/json")
     @ResponseBody
     public String saveComponent(@RequestBody Component componentArrived, HttpServletRequest request) {
+
+        String domain = request.getServerName();
+
+        Optional<DomainLookup> optDomain = domainFinder.lookup(domain);
+
+        if (optDomain.isEmpty()) throw new EternalEngineWebException(EternalEngineError.ERROR_016, domain + " has not been configured.");
+
+        String siteId = optDomain.get().getSiteId();
+        if (!siteId.equals(componentArrived.getNamespace())) {
+            componentArrived.setNamespace(siteId);
+            logger.debug("Copying component " + domain + "." + componentArrived.getComponentName() + " to " + siteId + "." + componentArrived.getComponentName());
+        }
 
         Optional<Component> optComponentOnDisk = componentRepository.findByNamespaceAndComponentName(componentArrived.getNamespace(), componentArrived.getComponentName());
         Component componentToSave;
